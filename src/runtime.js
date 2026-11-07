@@ -8,12 +8,13 @@ const B=globalThis.CourtyardPuzzle,puzzle=B.create(L.puzzle);
 const E=globalThis.CourtyardElevation,elevation=E.create();
 const J=globalThis.CourtyardJourney,journey=J.create();
 const W=globalThis.CourtyardWater,wetState=W.create();
+const G=globalThis.CourtyardGrappleInput;
 const animation=A.create();let firedThisFrame=false,lastTickClock=performance.now(),previousActive=false;
 const layer=runtimeScene.getLayer(''),renderer=layer.getRenderer();
 const group=renderer.getThreeGroup(),camera=renderer.getThreeCamera();
 const boxes=L.boxes.filter(b=>b.solid).map(b=>{const o=runtimeScene.getObjects(b.name)[0];return {...b,x:o.getX(),y:o.getY(),z:o.getZ(),w:o.getWidth(),h:o.getHeight(),d:o.getDepth()};});
 const p={...L.spawn,vx:0,vy:0,vz:0,grounded:false,impact:0};
-const state={time:0,acc:0,tether:null,arrow:null,draw:0,drawing:false,checkpoint:false,paused:true,started:false,keys:new Set(),jump:false,resetCount:0,frames:[],target:null,valid:false,aim:null,shotCount:0,hitCount:0,returnedCount:0,lastCatch:-10,cpuMs:0};
+const state={time:0,acc:0,tether:null,arrow:null,draw:0,drawing:false,checkpoint:false,paused:true,started:false,keys:new Set(),jump:false,resetCount:0,frames:[],target:null,valid:false,aim:null,shotCount:0,hitCount:0,returnedCount:0,transferCount:0,mouseReel:false,transferFrom:null,lastCatch:-10,cpuMs:0};
 // Explicit, visible test fixture for isolated browser checks, never the normal URL.
 const fixture=new URLSearchParams(location.search).has('debug')?new URLSearchParams(location.search).get('stage'):null;
 if(fixture==='tower'){puzzle.solved=true;puzzle.flow=1;puzzle.plate=1;puzzle.y=L.puzzle.endY;elevation.locked=true;elevation.drop=160;elevation.tower=true;state.checkpoint=true;Object.assign(p,{x:1300,y:-820,z:400});}
@@ -271,7 +272,7 @@ const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2(0,0),projected=new
 const root=document.createElement('div');root.id='courtyard-ui';
 root.innerHTML=`<style>
 #courtyard-ui{position:fixed;inset:0;pointer-events:none;color:#eff1dd;font:14px/1.45 system-ui,sans-serif;z-index:10}#courtyard-ui *{box-sizing:border-box}#courtyard-ui .top{position:absolute;top:24px;left:28px;right:28px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.brand{background:#203f3a;box-shadow:0 3px 0 #b4a572;padding:15px 20px;border-radius:3px}.eyebrow{letter-spacing:.2em;font-size:10px;text-transform:uppercase;color:#d4bc7a}.brand h1{font-family:Georgia,serif;font-weight:400;font-size:27px;margin:2px 0}.brand p{margin:0;font-size:12px;color:#ccd3c1}.pill{background:#203f3aed;padding:10px 16px;border:1px solid #68796c;border-radius:3px}.bottom{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);text-align:center;width:min(660px,92vw)}.hint{padding:12px 22px;background:#203f3af2;border-radius:3px;border-top:2px solid #b6a16c}.hint strong{display:block;font-weight:500;font-size:15px}.hint small{color:#c6cfbd}.controls{color:#304d46;background:#e7ebdded;font-size:11px;margin-top:8px;padding:7px 12px;border-radius:3px}.panel{pointer-events:auto;position:absolute;inset:0;background:#17362c70;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)}.card{width:min(460px,90vw);background:#f0eddd;color:#28463e;padding:34px;border:1px solid #9baf96;border-radius:5px;box-shadow:0 16px 80px #16362e40}.card h2{font:36px/1.12 Georgia,serif;margin:8px 0 18px}.card p{font-size:13px;color:#5e6d5e}.card button{cursor:pointer;background:#2a6554;border:0;color:#fff8dc;padding:12px 24px;font:inherit;border-radius:3px}.card label{display:flex;align-items:center;justify-content:space-between;font-size:12px;margin:10px 0}.card input[type=range]{width:52%;accent-color:#2a6554}.keys{font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:5px 16px;margin:15px 0 20px}.keys b{color:#28463e}.reticle{position:absolute;width:34px;height:34px;border:2px solid #c9a75b;border-radius:50%;transform:translate(-50%,-50%);display:none}.reticle.bad{border-color:#b84a39}.reticle:after{content:'';position:absolute;width:4px;height:4px;background:currentColor;top:13px;left:13px}.drawbar{height:3px;background:#a8915e;width:0;max-width:100%;margin-top:7px}.toast{position:absolute;top:138px;left:50%;transform:translateX(-50%);padding:10px 18px;background:#eff0de;color:#305649;opacity:0;transition:opacity .15s;border-radius:3px}.pausebtn{pointer-events:auto;background:#203f3a;color:#eee9cf;border:1px solid #688273;padding:10px 16px;cursor:pointer}.hidden{display:none!important}@media(max-width:700px){#courtyard-ui .top{top:10px;left:10px;right:10px}.brand{padding:9px 12px}.brand h1{font-size:20px}.pill{display:none}.bottom{bottom:8px}.controls{font-size:10px}}
-</style><div class="top"><div class="brand"><div class="eyebrow">KEEP IT ALIVE</div><h1>The Last Courtyard</h1><p>Restore the water. Bring the garden home.</p></div><button class="pausebtn">Pause · Esc</button></div><div class="toast"></div><div class="reticle"></div><div class="bottom"><div class="hint"><strong></strong><small></small><div class="drawbar"></div></div><div class="controls">WASD move · Space jump · Hold / release left mouse to shoot · E reel · Q pay out · Right mouse detach · R recover</div></div><div class="panel"><div class="card"><div class="eyebrow" style="color:#7d7448">A BOW & CHAIN ADVENTURE</div><h2>One small garden.<br>One more chance.</h2><p class="intro">Restore both water feeds to revive the courtyard tree.</p><div class="keys"><span><b>WASD</b> move</span><span><b>Space</b> jump</span><span><b>Left mouse</b> draw / fire</span><span><b>Right mouse</b> detach</span><span><b>E / Q</b> reel in / pay out</span><span><b>R</b> checkpoint reset</span><span><b>Esc</b> pause / resume</span><span><b>C</b> compare camera</span></div><label>Master<input data-volume="master" type="range" min="0" max="1" step="0.01"></label><label>Effects<input data-volume="effects" type="range" min="0" max="1" step="0.01"></label><label>Music<input data-volume="music" type="range" min="0" max="1" step="0.01"></label><label>Mute<input class="mute" type="checkbox"></label><button class="start">Enter the courtyard</button><p style="margin-bottom:0;font-size:11px">One courtyard. Three connected objectives.</p></div></div>`;
+</style><div class="top"><div class="brand"><div class="eyebrow">KEEP IT ALIVE</div><h1>The Last Courtyard</h1><p>Restore the water. Bring the garden home.</p></div><button class="pausebtn">Pause · Esc</button></div><div class="toast"></div><div class="reticle"></div><div class="bottom"><div class="hint"><strong></strong><small></small><div class="drawbar"></div></div><div class="controls">WASD move · Space jump · Hold / release left mouse to shoot · Left-click / E reel · Q pay out · Right mouse detach · R recover</div></div><div class="panel"><div class="card"><div class="eyebrow" style="color:#7d7448">A BOW & CHAIN ADVENTURE</div><h2>One small garden.<br>One more chance.</h2><p class="intro">Restore both water feeds to revive the courtyard tree.</p><div class="keys"><span><b>WASD</b> move</span><span><b>Space</b> jump</span><span><b>Left mouse</b> draw / fire; attached: toggle reel</span><span><b>Right mouse</b> detach</span><span><b>E / Q</b> reel in / pay out</span><span><b>R</b> checkpoint reset</span><span><b>Esc</b> pause / resume</span><span><b>New ring</b> hold / release left mouse to transfer</span><span><b>C</b> compare camera</span></div><label>Master<input data-volume="master" type="range" min="0" max="1" step="0.01"></label><label>Effects<input data-volume="effects" type="range" min="0" max="1" step="0.01"></label><label>Music<input data-volume="music" type="range" min="0" max="1" step="0.01"></label><label>Mute<input class="mute" type="checkbox"></label><button class="start">Enter the courtyard</button><p style="margin-bottom:0;font-size:11px">One courtyard. Three connected objectives.</p></div></div>`;
 root.querySelector('.intro').textContent='The courtyard tree needs both water feeds. Open the lower sluice, raise the bridge, then swing to the sky cistern. Stand on the brass seal above the tree to bring the garden back to life.';
 root.querySelector('.card p:last-child').textContent='R recovers safely. Restored water stays restored.';
 root.querySelector('.start').insertAdjacentHTML('afterend','<button class="restart" style="margin:10px 0 0 8px;background:#596b5d">Restart courtyard</button>');
@@ -279,6 +280,7 @@ root.querySelector('style').textContent += '.card{max-height:calc(100vh - 32px);
 root.querySelector('style').textContent += '@media(min-width:900px){#courtyard-ui .bottom{left:20px;bottom:18px;transform:none;width:325px;text-align:left}.hint{padding:10px 14px}.controls{line-height:1.7}}';
 // Preserve the player's feet and landing area on short/narrow desktop windows.
 root.querySelector('style').textContent += '@media(max-width:899px){.bottom{bottom:8px}.hint{padding:6px 12px}.hint strong{font-size:13px}.hint small{font-size:11px}.controls{font-size:10px;line-height:1.3;padding:5px 8px;margin-top:4px}.drawbar{margin-top:3px}.brand p{display:none}.brand{padding:9px 12px}.brand h1{font-size:21px}}';
+root.querySelector('.hint').insertAdjacentHTML('beforeend','<small class=\"reel-status\" style=\"display:block;color:#e7cd8e;margin-top:5px\"></small>');
 root.querySelector('.brand').insertAdjacentHTML('beforeend','<div class="journey-progress" aria-label="Level objectives"><div class="journey-count">0 / 3 restored</div><ol><li>Lower water feed</li><li>Counterweight bridge</li><li>Sky cistern & tree</li></ol></div>');
 root.insertAdjacentHTML('beforeend',`<div class="restoration hidden" aria-live="polite"><div><span class="eyebrow">BOTH WATER FEEDS RESTORED</span><h2>Life returns.</h2><p>From the sky to the roots.</p><button class="skip-ending">Continue</button></div></div><div class="ending hidden" role="dialog" aria-modal="true" aria-labelledby="ending-title"><div class="card"><div class="eyebrow">LEVEL 1 COMPLETE</div><h2 id="ending-title">You kept it alive.</h2><p>Water runs from the lower sluice and the sky cistern. The courtyard tree can grow again.</p><ul class="results-list"><li>Lower water feed restored</li><li>Counterweight bridge secured</li><li>Sky cistern opened · tree revived</li></ul><p class="run-summary"></p><button class="replay">Play again</button><button class="explore">Enjoy the restored garden</button><p class="finish-note">This is the end of the first level. Free exploration keeps everything restored.</p></div></div>`);
 root.querySelector('style').textContent += `
@@ -334,16 +336,17 @@ function sound(kind,strength=1){
 }
 function toast(text){$('.toast').textContent=text;toastUntil=state.time+2.5;}
 function detach(reason){
+  G.clear(state);
   if(state.tether){
     const t=state.tether;state.arrow={pos:{x:t.anchor.x,y:t.anchor.y,z:t.anchor.z},dir:t.shotDir||{x:0,y:0,z:1},phase:'return',hold:0};
     state.tether=null;sound('release');if(reason)toast(reason);
   }else if(state.arrow)S.retract(state.arrow);
   state.drawing=false;state.draw=0;
 }
-function recover(){if(J.locked(journey))return;stopVoices();chainView.clear();Object.assign(wetState,W.create());A.reset(animation);firedThisFrame=false;B.reset(puzzle,L.puzzle);syncPuzzle();journey.hold=0;const spawn=elevation.complete?{x:785,y:450,z:460}:E.checkpoint(elevation)||(puzzle.solved?L.puzzle.checkpoint:state.checkpoint?L.checkpoint:L.spawn);Object.assign(p,spawn,{vx:0,vy:0,vz:0,grounded:false,coyote:0,jumpBuffer:0});state.tether=null;state.arrow=null;state.drawing=false;state.draw=0;state.acc=0;state.jump=false;state.resetCount++;state.keys.clear();facingX=0;facingY=-1;toast(elevation.complete?'Garden restored. Back at the overlook.':puzzle.solved?'Checkpoint recovered. Puzzle progress kept.':'Back on solid ground');}
+function recover(){if(J.locked(journey))return;G.clear(state);stopVoices();chainView.clear();Object.assign(wetState,W.create());A.reset(animation);firedThisFrame=false;B.reset(puzzle,L.puzzle);syncPuzzle();journey.hold=0;const spawn=elevation.complete?{x:785,y:450,z:460}:E.checkpoint(elevation)||(puzzle.solved?L.puzzle.checkpoint:state.checkpoint?L.checkpoint:L.spawn);Object.assign(p,spawn,{vx:0,vy:0,vz:0,grounded:false,coyote:0,jumpBuffer:0});state.tether=null;state.arrow=null;state.drawing=false;state.draw=0;state.acc=0;state.jump=false;state.resetCount++;state.keys.clear();facingX=0;facingY=-1;toast(elevation.complete?'Garden restored. Back at the overlook.':puzzle.solved?'Checkpoint recovered. Puzzle progress kept.':'Back on solid ground');}
 let endingNote=-1;
 function beginRestoration(){
-  stopVoices();state.tether=null;state.arrow=null;state.drawing=false;state.draw=0;state.drawTarget=null;state.keys.clear();state.jump=false;state.acc=0;
+  G.clear(state);stopVoices();state.tether=null;state.arrow=null;state.drawing=false;state.draw=0;state.drawTarget=null;state.keys.clear();state.jump=false;state.acc=0;
   Object.assign(p,{vx:0,vy:0,vz:0});chainView.clear();A.reset(animation);firedThisFrame=false;
   perspective=true;toastUntil=0;musicVolume();root.classList.add('finishing');$('.restoration').classList.remove('hidden');$('.skip-ending').focus();
 }
@@ -359,7 +362,7 @@ function syncEndingVisibility(){
   $('.restoration').classList.toggle('hidden',state.paused||journey.phase!=='restoring');
 }
 function pause(on){
-  stopVoices();
+  G.clear(state);stopVoices();
   // Both the entry button and Escape are user gestures. Either can start play
   // and unlock audio; Escape must not silently bypass sound initialization.
   if(!on){if(!audio){const AC=window.AudioContext||window.webkitAudioContext;if(AC)audio=new AC();}state.started=true;}
@@ -394,6 +397,7 @@ window.addEventListener('keydown',e=>{
   if(e.code==='F3'&&!e.repeat){e.preventDefault();diagnosticVisible=!diagnosticVisible;return;}
   if(state.paused||J.locked(journey))return;
   if(['Space','KeyW','KeyA','KeyS','KeyD','KeyE','KeyQ','KeyR','KeyC'].includes(e.code))e.preventDefault();
+  if(e.code==='KeyQ')state.mouseReel=false;
   state.keys.add(e.code);if(e.code==='Space'&&!e.repeat)state.jump=true;
   if(e.code==='KeyR'&&!e.repeat)recover();
   if(e.code==='KeyC'&&!e.repeat){perspective=!perspective;toast(perspective?'Perspective comparison':'Orthographic view');}
@@ -406,15 +410,25 @@ window.addEventListener('pointermove',e=>{const c=document.querySelector('canvas
 window.addEventListener('pointerdown',e=>{
   if(state.paused||J.locked(journey)||e.target.tagName!=='CANVAS')return;
   if(e.button===2){detach();return;}
-  if(e.button===0){detach();state.arrow=null;state.drawing=true;state.draw=0;state.drawTarget=null;targetUnderMouse();state.drawTarget=state.valid?state.target:null;sound('draw');}
+  if(e.button===0){
+    targetUnderMouse();const action=G.press(state,state.target,state.valid);
+    if(action==='reel'){sound('reel',.3);return;}
+    state.arrow=null;sound('draw');
+  }
 },{signal});
 window.addEventListener('pointerup',e=>{
   if(e.button!==0||!state.drawing||state.paused||J.locked(journey))return;
-  targetUnderMouse();const charge=P.clamp(state.draw/0.6,0,1),from=muzzlePoint(),to=state.aim;
-  state.drawing=false;state.draw=0;firedThisFrame=true;sound('fire',0.7+charge*0.3);
-  const lead=state.valid&&state.target?.kind==='moving'?P.distance(from,to)/(1000+650*charge):0;
-  const aim=lead?{x:to.x+state.target.vx*lead,y:to.y+state.target.vy*lead,z:to.z}:to;
-  state.arrow=S.create(from,aim,state.valid?state.target:null,charge);state.shotCount++;state.drawTarget=null;
+  targetUnderMouse();const charge=P.clamp(state.draw/0.6,0,1),from=muzzlePoint(),to={...state.aim},target=state.valid?state.target:null;
+  const transition=G.fire(state,state.valid);
+  if(!transition.fired){if(transition.cancelled)toast(state.tether?'Transfer blocked. Your current anchor is kept.':'Transfer cancelled. Aim at a clear ring.');return;}
+  firedThisFrame=true;sound('fire',0.7+charge*0.3);
+  // Fast transfer flight limits the unanchored drop, while the old attachment
+  // was retained throughout aiming. No position/velocity changes at release.
+  const speed=transition.from?1800+250*charge:1000+650*charge;
+  const lead=target?.kind==='moving'?P.distance(from,to)/speed:0;
+  const aim=lead?{x:to.x+target.vx*lead,y:to.y+target.vy*lead,z:to.z}:to;
+  state.arrow=S.create(from,aim,target,charge);state.arrow.speed=speed;
+  state.arrow.ignoreAnchorId=transition.from;state.arrow.transfer=!!transition.from;state.shotCount++;
 
 },{signal});
 // Diagnostic perspective camera reuses the same engine-owned scene, renderer and layer.
@@ -526,9 +540,12 @@ courtyardGrass.update(state.time);
   setText($('.journey-count'),elevation.complete?'Level 1 complete · garden restored':`${count} / 3 restored`);
   const next=milestones.indexOf(false);
   root.querySelectorAll('.journey-progress li').forEach((el,i)=>{el.classList.toggle('done',milestones[i]);el.classList.toggle('current',i===next);el.setAttribute('aria-label',el.textContent+(milestones[i]?' — complete':i===next?' — current objective':' — still to come'));});
+  setText($('.reel-status'),state.tether?(state.mouseReel?'Mouse reel ON · click away from other rings to stop · Q pays out':'Left-click toggles reel · E also reels · aim at a new ring to transfer'):'');
   if(journey.hold>0){setText(title,'Opening the sky cistern…');setText(detail,'Stay on the brass seal for a moment.');}
-  else if(state.drawing){setText(title,state.draw>=0.6?'Ready. Release to fire.':'Draw the bow.');setText(detail,state.valid?'Clear anchor · longer draw gives a faster shot.':state.target?'The shot is obstructed or out of reach.':'Aim at a brass ring. Missed arrows wind back in.');}
+  else if(state.drawing){setText(title,state.transferFrom?'Transfer ready · release to switch anchors.':state.draw>=0.6?'Ready. Release to fire.':'Draw the bow.');setText(detail,state.transferFrom?(state.valid?'Current anchor holds while you aim. Release fires; momentum carries through.':'New target blocked. Release cancels the transfer and keeps your anchor.'):state.valid?'Clear anchor · longer draw gives a faster shot.':state.target?'The shot is obstructed or out of reach.':'Aim at a brass ring. Missed arrows wind back in.');}
   else if(state.arrow){setText(title,state.arrow.phase==='out'?'Chain paying out.':'Winding the arrow home.');setText(detail,'Right mouse cancels · You can draw another shot immediately.');}
+  else if(state.tether&&state.target&&state.target.id!==state.tether.anchor.id&&!state.valid){setText(title,'Next ring blocked or out of reach.');setText(detail,'Move into a clear line of sight. Left-click reels your current anchor; E also works.');}
+  else if(state.tether&&state.valid&&state.target&&state.target.id!==state.tether.anchor.id){setText(title,'Next anchor in reach.');setText(detail,'Hold left mouse to aim; release to transfer. Your current chain holds until you fire.');}
   else if(state.tether?.anchor.kind==='weight'){setText(title,puzzle.flow<1?'The waterwheel has no power.':elevation.locked?'Bridge locked in place.':'Lower the weight. Raise the bridge.');setText(detail,puzzle.flow<1?'Restore the water with the block below first.':(state.tether.length<=90.5&&!elevation.locked?'Fully reeled: step sideways away from the weight to keep tension, then E.':'Hold E from the upper garden. The ratchet keeps your progress; release when the bridge is level.'));}
   else if(state.tether?.anchor.kind==='moving'){setText(title,'Ride the waterwheel carriage.');setText(detail,'Reel up with E. Ride west toward the high landing, then release. R returns to your latest terrace.');}
   else if(state.tether?.anchor.kind==='block'){setText(title,puzzle.solved?'The sluice is secured.':'Pull the sluice block.');setText(detail,puzzle.solved?'Water is on its way to the tree. Right mouse releases the chain.':state.tether.length<=90.5?'Step backward toward the brass standing mark, then keep holding E. The chain needs room to pull.':'Stand on the brass mark beyond the plate and hold E. The guide keeps the heavy block on course.');}
@@ -586,6 +603,7 @@ function tick(){
             const a=event.anchor;
             if(P.distance(P.reelPoint(p),a)<=S.RANGE&&!P.blocked(P.reelPoint(p),a,boxes)){
               state.tether={anchor:a,length:Math.max(90,P.distance(P.reelPoint(p),a)),taut:false,motor:0,shotDir:{...shot.dir}};
+              if(shot.transfer)state.transferCount++;
               state.arrow=null;state.hitCount++;state.lastCatch=state.time;chainView.impact(a,state.time,true);sound('hit');
             }else{S.retract(shot);sound('miss',0.4);}
           }else if(event?.type==='wall'){chainView.impact(shot.pos,state.time,false);sound('miss',0.45);}
@@ -593,18 +611,19 @@ function tick(){
         }
         const oldX=p.x,oldY=p.y,wasGrounded=p.grounded;
         const pullingBlock=['block','weight'].includes(state.tether?.anchor.kind);
-        const mechanism=B.step(puzzle,L.puzzle,p,state.tether,{reel:k.has('KeyE')},P.STEP);
+        const mechanism=B.step(puzzle,L.puzzle,p,state.tether,{reel:G.reel(state)},P.STEP);
         syncPuzzle(false);
         const bridgeWas=E.bridgeTop(elevation),ridingBridge=p.grounded&&Math.abs(p.z-bridgeWas)<1&&p.x>bridgeBox.x-P.R&&p.x<bridgeBox.x+bridgeBox.w+P.R&&p.y>bridgeBox.y-P.R&&p.y<bridgeBox.y+bridgeBox.h+P.R;
-        const locked=E.step(elevation,p,state.tether,{reel:k.has('KeyE')},puzzle.flow>=1,P.STEP);
+        const locked=E.step(elevation,p,state.tether,{reel:G.reel(state)},puzzle.flow>=1,P.STEP);
         syncElevation(false);
         if(ridingBridge)p.z+=E.bridgeTop(elevation)-bridgeWas;
-        if(locked){sound('plate');toast('Bridge locked. Climb the waterwheel tower.');}
+        if(locked){state.mouseReel=false;sound('plate');toast('Bridge locked. Climb the waterwheel tower.');}
         const contactBefore=W.sample(p,L.water,state.time);
-        const result=P.step(p,{speedScale:contactBefore?(contactBefore.deep?0.4:0.72):1,x:fx*f-fy*r,y:fy*f+fx*r,jump:state.jump,reel:!pullingBlock&&k.has('KeyE'),payout:k.has('KeyQ')},boxes,state.tether);
-        if(mechanism.completed){state.checkpoint=true;sound('plate');toast('Sluice secured. Water is returning.');}
+        const result=P.step(p,{speedScale:contactBefore?(contactBefore.deep?0.4:0.72):1,x:fx*f-fy*r,y:fy*f+fx*r,jump:state.jump,reel:!pullingBlock&&G.reel(state),payout:k.has('KeyQ')},boxes,state.tether);
+        if(mechanism.completed){state.mouseReel=false;state.checkpoint=true;sound('plate');toast('Sluice secured. Water is returning.');}
         state.jump=false;state.acc-=P.STEP;
         if(wasGrounded&&p.grounded)walked+=Math.hypot(p.x-oldX,p.y-oldY);
+        if(state.tether?.length<=90.01)state.mouseReel=false;
         if(result.reason)detach('Chain released: the path is blocked');
         const contact=W.sample(p,L.water,state.time),waterEvent=W.step(wetState,p,contact,Math.hypot(p.x-oldX,p.y-oldY),P.STEP);
         if(waterEvent.ripple&&contact)waterView.splash(p.x,p.y,contact.z,waterEvent.splash?1:.35,contact.basin);
@@ -618,10 +637,10 @@ function tick(){
       if(p.grounded&&p.z>=398&&p.x>1100&&p.y<-730&&!elevation.tower){elevation.tower=true;toast('Tower checkpoint. Ride the moving ring west.');sound('checkpoint');}
       if(p.grounded&&p.z>=458&&p.x<1020&&p.y<-650&&!elevation.canopy){elevation.canopy=true;toast('Canopy checkpoint. Follow the high walk back to the tree.');sound('checkpoint');}
       if(elevation.canopy&&!elevation.wind&&p.grounded&&p.z===460&&p.y>-430&&p.y<-270){elevation.wind=true;toast('Wind walk checkpoint. Watch the paddle or take the high ring.');sound('checkpoint');}
-      const pose=A.update(animation,{grounded:p.grounded,vz:p.vz,distance:walked,drawing:state.drawing,draw:state.draw,fired:firedThisFrame,landed,attached:!!state.tether,reeling:(!!state.tether&&(k.has('KeyE')||k.has('KeyQ')))||state.arrow?.phase==='return'},elapsed);
+      const pose=A.update(animation,{grounded:p.grounded,vz:p.vz,distance:walked,drawing:state.drawing,draw:state.draw,fired:firedThisFrame,landed,attached:!!state.tether,reeling:(!!state.tether&&(G.reel(state)||k.has('KeyQ')))||state.arrow?.phase==='return'},elapsed);
       firedThisFrame=false;if(pose.step)sound(wetState.wet?'splash':'step',wetState.wet?0.13:0.35);
       const blockSlack=state.tether?.anchor.kind==='block'&&state.tether.length-P.distance(P.reelPoint(p),state.tether.anchor)>1;
-      const motor=state.tether?.anchor.kind==='block'?Math.max(puzzle.speed,blockSlack&&k.has('KeyE')&&!puzzle.solved?135:0):state.tether?Math.abs(state.tether.lengthRate||0):state.arrow?180:0;
+      const motor=state.tether?.anchor.kind==='block'?Math.max(puzzle.speed,blockSlack&&G.reel(state)&&!puzzle.solved?135:0):state.tether?Math.abs(state.tether.lengthRate||0):state.arrow?180:0;
       if(state.time-lastMechanism>0.16&&(elevation.moved>0||puzzle.speed>2||(puzzle.solved&&puzzle.flow<1))){sound(puzzle.speed>2?'block':'sluice',0.6);lastMechanism=state.time;}
       if(puzzle.flow>=1&&!restorationNotified){restorationNotified=true;sound('checkpoint');sound('music',0.6);toast('First feed restored. Raise the bridge to reach the sky cistern.');}
       if(motor>8&&state.time-lastReel>Math.max(0.055,10/motor)){sound('reel',state.arrow?0.15:0.22+0.12*(state.tether.load||0));lastReel=state.time;}
@@ -652,6 +671,7 @@ function tick(){
   diagnostics.textContent+=`\nDraw calls ${gpu?.calls??'—'} | triangles ${gpu?.triangles??'—'} | wind checkpoint ${elevation.wind}`;
   diagnostics.textContent+=`\nSluice block ${puzzle.y.toFixed(1)} | plate ${puzzle.solved?'latched':'waiting'} | water ${Math.round(puzzle.flow*100)}%`;
   diagnostics.textContent+=`\nJourney ${journey.phase} | seal ${journey.hold.toFixed(2)}s | reveal ${journey.reveal.toFixed(2)}s | route ${journey.seconds.toFixed(1)}s`;
+  diagnostics.textContent+=`\nMouse reel ${state.mouseReel?'ON':'off'} | transfer aim ${state.transferFrom||'none'} | transfers ${state.transferCount}`;
   diagnostics.textContent+=`\nWater ${wetState.wet?'wading':'dry'} | deep ${wetState.deepTime.toFixed(2)}s | ripples ${waterView.activeRipples}`;
 }
 function dispose(){flute.pause();flute.removeAttribute('src');flute.load();controls.abort();runtimeScene.getGame().setMaximumFps(60);root.remove();group.remove(world);for(const resource of own)resource.dispose?.();audio?.close();}

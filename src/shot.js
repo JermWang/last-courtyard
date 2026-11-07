@@ -28,7 +28,7 @@
     for(const k of ['x','y','z'])to[k]=s.pos[k]+s.dir[k]*travel;
     let t=1,hit=null;
     for(const b of boxes){const h=P.segmentHit(s.pos,to,b,1.5);if(h!==null&&h<=t){t=h;hit={type:'wall'};}}
-    for(const a of anchors){const h=sphere(s.pos,to,a,16);if(h!==null&&h<t){t=h;hit={type:'anchor',anchor:a};}}
+    for(const a of anchors){if(a.id===s.ignoreAnchorId)continue;const h=sphere(s.pos,to,a,16);if(h!==null&&h<t){t=h;hit={type:'anchor',anchor:a};}}
     for(const k of ['x','y','z'])s.pos[k]+=(to[k]-s.pos[k])*t;
     s.travel+=travel*t;
     if(hit){s.phase='impact';s.hold=0.065;return hit;}

@@ -17,8 +17,9 @@ Rebuild with `node tools/build-project.cjs`, then `powershell -File tools/export
 | Input | Action |
 | --- | --- |
 | WASD / Space | Camera-relative movement / jump |
-| Hold / release left mouse | Draw / fire |
-| E / Q | Reel in / pay out |
+| Hold / release left mouse | Draw / fire; aim at another valid ring while attached to transfer |
+| Left-click while attached | Toggle reeling when aiming at the current ring or away from other valid rings |
+| E / Q | Hold to reel / pay out (Q cancels mouse reeling) |
 | Right mouse | Release tether / cancel draw |
 | R | Recover at the current checkpoint |
 | Escape | Pause, audio settings, restart courtyard |
@@ -43,7 +44,7 @@ The playable floor elevations are 0, 20, 100, 220, 400 and 460 engine units, plu
 
 Generated originals and exact prompts are in `assets/source`; optimized runtime images are in `assets/runtime`. Source concepts do not load during gameplay. Existing generated stone, wood, brass, character and foliage art is reused across the expanded area. The chain, arrow and mechanisms use simple geometry. Sound effects are procedural Web Audio synthesis, including block drag, plate click and sluice movement. Music is the locally packaged CC0 flute/piano/strings track “Children’s Game Music 3 - Home” by heartade. Master, music and mute controls apply; pause stops playback and resume continues it. Generated foliage now bends on subdivided billboard planes, with rooted feet and gentle synchronized gusts. A blue sky and drifting low-poly clouds surround the real floating geometry. Full sources and provenance are recorded in `ASSET_PROVENANCE.md`.
 
-Run `node tests/physics.test.cjs`, `node tests/shot.test.cjs`, `node tests/animation.test.cjs`, `node tests/puzzle.test.cjs`, `node tests/elevation.test.cjs`, `node tests/journey.test.cjs`, and `node tests/water.test.cjs`. The seven suites pass, including the original routes and the new moving-anchor transfer. Tests cover the original crossing, collision/tether stability, shot ordering/recall, animation, block docking, player clearance, slack, reset persistence and connected upper/lower routes.
+Run `node tests/physics.test.cjs`, `node tests/shot.test.cjs`, `node tests/animation.test.cjs`, `node tests/puzzle.test.cjs`, `node tests/elevation.test.cjs`, `node tests/journey.test.cjs`, `node tests/water.test.cjs`, and `node tests/grapple-input.test.cjs`. The eight suites pass, including the original routes and the new moving-anchor transfer. Tests cover the original crossing, collision/tether stability, shot ordering/recall, animation, block docking, player clearance, slack, reset persistence and connected upper/lower routes.
 
 The normal in-app-browser run completed the entire route without seeded prerequisites: arrival crossing, block/plate, counterweight bridge, chain-only tower ascent, moving carriage, wind-paddle swing bypass and sky cistern. Two early falls recovered safely; three subsequent R resets and a deliberate canopy fall retained completion and left no arrows/chains/voices. Pause/resume during a tethered ride and a 1280 x 720 resize also preserved state. `tests/garden-browser.json` records the DOM diagnostics. The run took about 263 active seconds plus observation pauses. There were no console errors; GDevelop emitted a nonblocking empty-texture warning at startup.
 
@@ -92,3 +93,13 @@ The sky cistern has an open interior and real floor/walls. Basin edges, raised g
 Run `node tests/water.test.cjs` for finite-volume, swept arrow impact, shallow/deep response, stall safety and cistern/rail regressions. Existing route and tether tests cover the modified collision layout. Browser evidence is in `tests/water-browser.json`; seeded waterworks checks are labeled separately from normal arrival play.
 
 Water browser checks confirmed an arrow ripple and recall, deep-basin recovery, sustained shallow wading without resets, pause, and the updated sky-feed ending. Recent observed windows ranged from roughly 44 to 60 fps in this session; this is not a controlled hardware comparison. No console errors were captured. The first crossing was retried with an early release and recovered safely; full route reachability remains covered by the existing deterministic collision/tether tests and prior full-route browser evidence.
+
+## Mouse reel and chained transfers
+
+After attachment, left-click toggles the reel; E remains available. A persistent hint shows Mouse reel ON. Q cancels the mouse latch and pays out. Pause, focus loss, recovery, detach, firing, reaching minimum chain length and completing a mechanism cancel the latch, preventing surprise motion on resume.
+
+While attached, aim at a different valid ring and hold/release left mouse to transfer. The current tether stays active during the draw. Release fires a fast, visible arrow and releases the old chain without changing player velocity; the next hit creates the single new tether. Invalidated transfer targets cancel the shot and retain the old attachment where it still exists. The previous ring is excluded from that shot so it cannot immediately recatch the arrow. Moving targets retain the existing velocity-based shot lead. There is one active distance constraint at a time.
+
+`tests/grapple-input.test.cjs` verifies mouse/E/Q intent, safe cancellation, pause cleanup and old-ring exclusion. A shared-solver simulation completes four airborne transfers along a 1,600-unit relay with only start/end floors, checking height, speed and momentum. This demonstrates mechanical feasibility; it is not a new player-facing level or evidence of a browser-tested long-distance course.
+
+Focused browser check (normal arrival, no stage fixture): transferred from practice to crossing, reeled with the mouse toggle and landed at the first checkpoint. The final export also passed mouse toggle on/off, pause clearing the latch while retaining attachment, and recovery clearing tether/arrow/input state. No captured console errors. Evidence: `tests/grapple-browser.json`. Recent test windows were approximately 24-36 fps in the current desktop session; this change does not establish a 60 fps guarantee.

@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "name": "mouse reel activated without E",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 27.6 fps (last 300 active frames)\nPosition 271.2, 1194.5, 190.5\nVelocity 56.1, -2.3, -5.4\nUpdate 1.82 ms | grounded false | checkpoint false\nTether practice 90.0 taut\nArrows 0 | chains 1 | resets 0\nAudio running | enabled | voices 3\nLinks 10 | shot none\nShots 1 | catches 1 | returned 0\nSprite back-left | swing 14\nF3 diagnostics | C compare projection\nActive 27.2s | stalls 1 | p95 51.0 ms | max 191 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 27.3s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 469 | triangles 49315 | wind checkpoint false\nSluice block 300.0 | plate waiting | water 0%\nJourney playing | seal 0.00s | reveal 0.00s | route 27.1s\nMouse reel off | transfer aim none | transfers 0\nWater dry | deep 0.00s | ripples 0"
+    },
+    {
+      "name": "practice-to-crossing transfer and mouse reel",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 23.6 fps (last 300 active frames)\nPosition 513.5, 802.8, 299.6\nVelocity -8.9, 13.0, 4.2\nUpdate 2.33 ms | grounded false | checkpoint false\nTether crossing 90.0 taut\nArrows 0 | chains 1 | resets 0\nAudio running | enabled | voices 1\nLinks 12 | shot none\nShots 2 | catches 2 | returned 0\nSprite back | swing 14\nF3 diagnostics | C compare projection\nActive 212.4s | stalls 2 | p95 54.3 ms | max 2167 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 41.7s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 414 | triangles 48243 | wind checkpoint false\nSluice block 300.0 | plate waiting | water 0%\nJourney playing | seal 0.00s | reveal 0.00s | route 212.1s\nMouse reel off | transfer aim none | transfers 1\nWater dry | deep 0.00s | ripples 0"
+    },
+    {
+      "name": "landed at first checkpoint after transfer",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 28.0 fps (last 300 active frames)\nPosition 482.7, 569.3, 100.0\nVelocity -0.0, -0.0, 0.0\nUpdate 0.79 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 0\nAudio running | enabled | voices 1\nLinks 0 | shot none\nShots 2 | catches 2 | returned 1\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 384.3s | stalls 3 | p95 50.7 ms | max 2414 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 42.9s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 364 | triangles 45384 | wind checkpoint false\nSluice block 300.0 | plate waiting | water 0%\nJourney playing | seal 0.00s | reveal 0.00s | route 383.8s\nMouse reel off | transfer aim none | transfers 1\nWater dry | deep 0.00s | ripples 0"
+    },
+    {
+      "name": "final build mouse toggle on",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 24.4 fps (last 300 active frames)\nPosition 399.3, 1259.6, 0.7\nVelocity -26.4, -13.7, 21.8\nUpdate 3.41 ms | grounded false | checkpoint false\nTether practice 309.9 taut\nArrows 0 | chains 1 | resets 0\nAudio running | enabled | voices 8\nLinks 42 | shot none\nShots 1 | catches 1 | returned 0\nSprite back-left | swing 14\nF3 diagnostics | C compare projection\nActive 12.5s | stalls 2 | p95 57.4 ms | max 180 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 12.8s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 466 | triangles 51611 | wind checkpoint false\nSluice block 300.0 | plate waiting | water 0%\nJourney playing | seal 0.00s | reveal 0.00s | route 12.6s\nMouse reel ON | transfer aim none | transfers 0\nWater dry | deep 0.00s | ripples 0"
+    },
+    {
+      "name": "pause clears mouse reel latch",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nPAUSED | 24.3 fps (last 300 active frames)\nPosition 382.1, 1250.8, 13.1\nVelocity -132.1, -68.3, 82.9\nUpdate 2.16 ms | grounded false | checkpoint false\nTether practice 290.6 taut\nArrows 0 | chains 1 | resets 0\nAudio suspended | enabled | voices 0\nLinks 39 | shot none\nShots 1 | catches 1 | returned 0\nSprite back-left | swing 14\nF3 diagnostics | C compare projection\nActive 12.7s | stalls 2 | p95 57.4 ms | max 180 ms\nDocument visible | focus yes | frame cap 15\nFlute paused | 13.0s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 466 | triangles 51451 | wind checkpoint false\nSluice block 300.0 | plate waiting | water 0%\nJourney playing | seal 0.00s | reveal 0.00s | route 12.8s\nMouse reel off | transfer aim none | transfers 0\nWater dry | deep 0.00s | ripples 0"
+    },
+    {
+      "name": "resume then mouse reel re-enabled",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 24.1 fps (last 300 active frames)\nPosition 314.4, 1219.0, 61.3\nVelocity -76.9, -19.0, 123.3\nUpdate 3.31 ms | grounded false | checkpoint false\nTether practice 222.4 taut\nArrows 0 | chains 1 | resets 0\nAudio running | enabled | voices 3\nLinks 29 | shot none\nShots 1 | catches 1 | returned 0\nSprite back-left | swing 14\nF3 diagnostics | C compare projection\nActive 13.4s | stalls 2 | p95 57.4 ms | max 180 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 13.7s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 464 | triangles 50519 | wind checkpoint false\nSluice block 300.0 | plate waiting | water 0%\nJourney playing | seal 0.00s | reveal 0.00s | route 13.5s\nMouse reel ON | transfer aim none | transfers 0\nWater dry | deep 0.00s | ripples 0"
+    },
+    {
+      "name": "second click stops reel without dropping tether",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 23.7 fps (last 300 active frames)\nPosition 251.8, 1193.9, 114.0\nVelocity -86.4, -45.7, 15.8\nUpdate 2.39 ms | grounded false | checkpoint false\nTether practice 168.5 taut\nArrows 0 | chains 1 | resets 0\nAudio running | enabled | voices 2\nLinks 22 | shot none\nShots 1 | catches 1 | returned 0\nSprite back-left | swing 14\nF3 diagnostics | C compare projection\nActive 14.0s | stalls 2 | p95 57.7 ms | max 180 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 14.3s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 465 | triangles 50115 | wind checkpoint false\nSluice block 300.0 | plate waiting | water 0%\nJourney playing | seal 0.00s | reveal 0.00s | route 14.1s\nMouse reel off | transfer aim none | transfers 0\nWater dry | deep 0.00s | ripples 0"
+    },
+    {
+      "name": "recovery clears latched input and all tether objects",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 27.9 fps (last 300 active frames)\nPosition 400.0, 1260.0, 0.0\nVelocity 0.0, 0.0, 0.0\nUpdate 1.12 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 1\nAudio running | enabled | voices 1\nLinks 0 | shot none\nShots 1 | catches 1 | returned 0\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 21.3s | stalls 2 | p95 53.6 ms | max 180 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 21.7s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 455 | triangles 48176 | wind checkpoint false\nSluice block 300.0 | plate waiting | water 0%\nJourney playing | seal 0.00s | reveal 0.00s | route 21.5s\nMouse reel off | transfer aim none | transfers 0\nWater dry | deep 0.00s | ripples 0"
+    }
+  ],
+  "consoleErrors": []
+}
