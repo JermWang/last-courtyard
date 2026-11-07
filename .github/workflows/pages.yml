@@ -26,6 +26,7 @@ jobs:
           node tests/animation.test.cjs
           node tests/puzzle.test.cjs
           node tests/elevation.test.cjs
+          node tests/journey.test.cjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

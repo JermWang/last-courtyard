@@ -20,7 +20,7 @@ const base=path.resolve(__dirname,'..');
     inst.setObjectName(b.name);inst.setX(b.x);inst.setY(b.y);inst.setZ(b.z);
     inst.setHasCustomSize(true);inst.setCustomWidth(b.w);inst.setCustomHeight(b.h);inst.setHasCustomDepth(true);inst.setCustomDepth(b.d);
   }
-  const scripts=['physics.js','animation.js','shot.js','puzzle.js','elevation.js','chain-view.js','grass-view.js','runtime.js'].map(f=>fs.readFileSync(path.join(base,'src',f),'utf8'));
+  const scripts=['physics.js','animation.js','shot.js','puzzle.js','elevation.js','journey.js','chain-view.js','grass-view.js','runtime.js'].map(f=>fs.readFileSync(path.join(base,'src',f),'utf8'));
   const ev=layout.getEvents().insertNewEvent(project,'BuiltinCommonInstructions::JsCode',0);
   gd.asJsCodeEvent(ev).setInlineCode('if (!runtimeScene.__courtyard) {\n'+scripts[0]+'\nconst COURTYARD_LEVEL='+JSON.stringify(level)+';\n'+scripts.slice(1).join('\n')+'\n}\nruntimeScene.__courtyard.tick();');
   const data=serialize(project),scene=data.layouts[0];

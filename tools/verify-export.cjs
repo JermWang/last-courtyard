@@ -17,7 +17,7 @@ const scripts = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map(m => m[1]);
 if (!scripts.includes('code0.js') || !scripts.includes('data.js')) throw Error('Missing game scripts');
 for (const file of scripts) new vm.Script(read(file).toString(), {filename: file});
 const code = read('code0.js').toString().replace(/\r\n/g, '\n');
-for (const name of ['physics.js','animation.js','shot.js','puzzle.js','elevation.js','chain-view.js','grass-view.js','runtime.js']) {
+for (const name of ['physics.js','animation.js','shot.js','puzzle.js','elevation.js','journey.js','chain-view.js','grass-view.js','runtime.js']) {
   const maintained = fs.readFileSync(path.join(base, 'src', name), 'utf8').replace(/\r\n/g, '\n');
   if (!code.includes(maintained)) throw Error('Export does not contain current source: ' + name);
 }

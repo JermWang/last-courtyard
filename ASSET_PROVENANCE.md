@@ -73,3 +73,7 @@ Built-in OpenAI imagegen created `assets/source/grass-tile-source.png` using `as
 ## Y3K grass replacement
 
 At the user's explicit request, the current grass was sourced from their local `C:/Users/dejes/GameDev/y3k` project. Read-only copies of `city/green_grass.gd`, `env/grass.gdshader`, the shared wind/noise includes, `block_lawn.gd` and the planted material are retained in `assets/source/y3k-grass`; `provenance.json` records hashes, authorization and adaptation details. `src/grass-view.js` ports the eight-blade curved tuft geometry, grass colors and GPU wind to the existing GDevelop renderer. This is reused procedural artwork, not an imagegen asset or a stock photograph. No public redistribution license for Y3K is asserted. The former generated grass tile remains archived but is excluded from project resources and gameplay. Source PBR lighting/backlight is replaced by unlit root-to-tip shading; Y3K's soft blade color transitions are retained intentionally.
+
+## First-level ending
+
+The restoration reveal reuses the existing generated tree cutout, water geometry and courtyard materials. Growth is rooted scaling plus tint animation; no new generated or downloaded artwork. The four-note completion cue is original Web Audio oscillator synthesis in `src/runtime.js`, routed through effects/master/mute settings. The existing licensed flute track remains the music.
