@@ -773,10 +773,10 @@
     {
       "name": "CanopyWalk",
       "x": 700,
-      "y": -650,
-      "z": 436,
+      "y": -590,
+      "z": 376,
       "w": 190,
-      "h": 960,
+      "h": 130,
       "d": 24,
       "color": "#d8ccb3",
       "solid": true
@@ -837,28 +837,6 @@
       "solid": true
     },
     {
-      "name": "HighColumn700_-300",
-      "x": 700,
-      "y": -300,
-      "z": -120,
-      "w": 22,
-      "h": 22,
-      "d": 556,
-      "color": "#d8ccb3",
-      "solid": true
-    },
-    {
-      "name": "HighColumn865_-300",
-      "x": 865,
-      "y": -300,
-      "z": -120,
-      "w": 22,
-      "h": 22,
-      "d": 556,
-      "color": "#d8ccb3",
-      "solid": true
-    },
-    {
       "name": "HighColumn580_510",
       "x": 580,
       "y": 350,
@@ -883,10 +861,10 @@
     {
       "name": "CanopyRail680",
       "x": 700,
-      "y": -630,
-      "z": 460,
+      "y": -590,
+      "z": 400,
       "w": 10,
-      "h": 915,
+      "h": 107,
       "d": 48,
       "color": "#c5bca8",
       "solid": true
@@ -894,10 +872,10 @@
     {
       "name": "CanopyRail890",
       "x": 880,
-      "y": -630,
-      "z": 460,
+      "y": -510,
+      "z": 400,
       "w": 10,
-      "h": 915,
+      "h": 27,
       "d": 48,
       "color": "#c5bca8",
       "solid": true
@@ -1042,28 +1020,6 @@
       "w": 20,
       "h": 180,
       "d": 18,
-      "color": "#65513f",
-      "solid": false
-    },
-    {
-      "name": "WindPaddle",
-      "x": 755,
-      "y": -155,
-      "z": 480,
-      "w": 70,
-      "h": 24,
-      "d": 75,
-      "color": "#65513f",
-      "solid": false
-    },
-    {
-      "name": "WindRail",
-      "x": 590,
-      "y": -155,
-      "z": 670,
-      "w": 400,
-      "h": 16,
-      "d": 16,
       "color": "#65513f",
       "solid": false
     },
@@ -1233,39 +1189,6 @@
       "solid": true
     },
     {
-      "name": "WindPostWest",
-      "x": 700,
-      "y": -165,
-      "z": 460,
-      "w": 12,
-      "h": 20,
-      "d": 305,
-      "color": "#65513f",
-      "solid": true
-    },
-    {
-      "name": "WindPostEast",
-      "x": 878,
-      "y": -165,
-      "z": 460,
-      "w": 12,
-      "h": 20,
-      "d": 305,
-      "color": "#65513f",
-      "solid": true
-    },
-    {
-      "name": "WindAnchorBeam",
-      "x": 700,
-      "y": -165,
-      "z": 760,
-      "w": 190,
-      "h": 20,
-      "d": 12,
-      "color": "#65513f",
-      "solid": false
-    },
-    {
       "name": "WeightFrameWest",
       "x": 1240,
       "y": -160,
@@ -1294,17 +1217,6 @@
       "z": -144,
       "w": 460,
       "h": 470,
-      "d": 24,
-      "color": "#d8ccb3",
-      "solid": true
-    },
-    {
-      "name": "WindFoundation",
-      "x": 680,
-      "y": -330,
-      "z": -144,
-      "w": 230,
-      "h": 70,
       "d": 24,
       "color": "#d8ccb3",
       "solid": true
@@ -1572,6 +1484,380 @@
       "d": 10,
       "color": "#65513f",
       "solid": false
+    },
+    {
+      "name": "CanopyStepA",
+      "x": 700,
+      "y": -650,
+      "z": 416,
+      "w": 190,
+      "h": 30,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "CanopyStepB",
+      "x": 700,
+      "y": -620,
+      "z": 396,
+      "w": 190,
+      "h": 30,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "LaunchFooting",
+      "x": 690,
+      "y": -570,
+      "z": -144,
+      "w": 210,
+      "h": 90,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "LaunchPierWest",
+      "x": 700,
+      "y": -562,
+      "z": -120,
+      "w": 22,
+      "h": 65,
+      "d": 496,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "LaunchPierEast",
+      "x": 868,
+      "y": -562,
+      "z": -120,
+      "w": 22,
+      "h": 65,
+      "d": 496,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayCatchShelf",
+      "x": 715,
+      "y": -485,
+      "z": 316,
+      "w": 165,
+      "h": 242,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayShelfPier",
+      "x": 860,
+      "y": -313,
+      "z": -120,
+      "w": 20,
+      "h": 30,
+      "d": 436,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayShelfFooting",
+      "x": 843,
+      "y": -333,
+      "z": -144,
+      "w": 56,
+      "h": 70,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayReturnStepA",
+      "x": 890,
+      "y": -486,
+      "z": 322,
+      "w": 51,
+      "h": 28,
+      "d": 38,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayReturnStepB",
+      "x": 890,
+      "y": -514,
+      "z": 322,
+      "w": 51,
+      "h": 28,
+      "d": 58,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayReturnStepC",
+      "x": 890,
+      "y": -542,
+      "z": 322,
+      "w": 51,
+      "h": 28,
+      "d": 78,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayReturnShoulder",
+      "x": 874,
+      "y": -559,
+      "z": 376,
+      "w": 67,
+      "h": 31,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayShelfSide",
+      "x": 880,
+      "y": -486,
+      "z": 316,
+      "w": 61,
+      "h": 121,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayBase1",
+      "x": 964,
+      "y": -375,
+      "z": -144,
+      "w": 112,
+      "h": 70,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayButtress1",
+      "x": 1000,
+      "y": -355,
+      "z": -120,
+      "w": 37,
+      "h": 30,
+      "d": 390,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayMast1",
+      "x": 1005,
+      "y": -350,
+      "z": 270,
+      "w": 23,
+      "h": 20,
+      "d": 431,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "RelayCrossarm1",
+      "x": 715,
+      "y": -349,
+      "z": 701,
+      "w": 313,
+      "h": 18,
+      "d": 17,
+      "color": "#65513f",
+      "solid": false
+    },
+    {
+      "name": "RelayBase2",
+      "x": 964,
+      "y": -30,
+      "z": -144,
+      "w": 112,
+      "h": 70,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayButtress2",
+      "x": 1000,
+      "y": -10,
+      "z": -120,
+      "w": 37,
+      "h": 30,
+      "d": 390,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayMast2",
+      "x": 1005,
+      "y": -5,
+      "z": 270,
+      "w": 23,
+      "h": 20,
+      "d": 521,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "RelayCrossarm2",
+      "x": 715,
+      "y": -4,
+      "z": 791,
+      "w": 313,
+      "h": 18,
+      "d": 17,
+      "color": "#65513f",
+      "solid": false
+    },
+    {
+      "name": "RelayBase3",
+      "x": 964,
+      "y": 310,
+      "z": -144,
+      "w": 112,
+      "h": 70,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayButtress3",
+      "x": 1000,
+      "y": 330,
+      "z": -120,
+      "w": 37,
+      "h": 30,
+      "d": 390,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "RelayMast3",
+      "x": 1005,
+      "y": 335,
+      "z": 270,
+      "w": 23,
+      "h": 20,
+      "d": 576,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "RelayCrossarm3",
+      "x": 715,
+      "y": 336,
+      "z": 846,
+      "w": 313,
+      "h": 18,
+      "d": 17,
+      "color": "#65513f",
+      "solid": false
+    },
+    {
+      "name": "OverlookEntryRail580",
+      "x": 580,
+      "y": 310,
+      "z": 460,
+      "w": 110,
+      "h": 12,
+      "d": 44,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "OverlookEntryRail870",
+      "x": 870,
+      "y": 310,
+      "z": 460,
+      "w": 130,
+      "h": 12,
+      "d": 44,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "OverlookWestRail",
+      "x": 580,
+      "y": 322,
+      "z": 460,
+      "w": 12,
+      "h": 204,
+      "d": 44,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "OverlookEastRailNorth",
+      "x": 988,
+      "y": 322,
+      "z": 460,
+      "w": 12,
+      "h": 104,
+      "d": 44,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "OverlookEastRailSouth",
+      "x": 988,
+      "y": 518,
+      "z": 460,
+      "w": 12,
+      "h": 8,
+      "d": 44,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "GardenLiftDeck",
+      "x": 1000,
+      "y": 426,
+      "z": 82,
+      "w": 94,
+      "h": 92,
+      "d": 18,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "GardenLiftGuideA",
+      "x": 1094,
+      "y": 424,
+      "z": 100,
+      "w": 12,
+      "h": 13,
+      "d": 370,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "GardenLiftGuideB",
+      "x": 1094,
+      "y": 506,
+      "z": 100,
+      "w": 12,
+      "h": 13,
+      "d": 370,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "LaunchEastRail",
+      "x": 880,
+      "y": -590,
+      "z": 400,
+      "w": 10,
+      "h": 12,
+      "d": 48,
+      "color": "#c5bca8",
+      "solid": true
     }
   ],
   "anchors": [
@@ -1580,7 +1866,7 @@
       "x": 280,
       "y": 1198,
       "z": 312,
-      "label": "Practice ring \u00b7 learn reel and release safely here",
+      "label": "Practice ring Ãƒâ€šÃ‚Â· learn reel and release safely here",
       "purpose": "Safe first reel and release on broad ground"
     },
     {
@@ -1594,20 +1880,41 @@
     {
       "id": "ascent",
       "kind": "fixed",
-      "label": "Tower ring \u00b7 reel up, steer north, release above the garden",
+      "label": "Tower ring Ãƒâ€šÃ‚Â· reel up, steer north, release above the garden",
       "x": 1500,
       "y": -700,
       "z": 680,
       "purpose": "Reach the tower; no stair route exists"
     },
     {
-      "id": "wind",
+      "id": "relay-1",
       "kind": "fixed",
-      "label": "Wind walk \u00b7 swing over the slow paddle or wait for the opening",
+      "relay": 1,
       "x": 790,
-      "y": -150,
-      "z": 740,
-      "purpose": "Swing above the moving paddle"
+      "y": -340,
+      "z": 665,
+      "label": "First relay ring",
+      "purpose": "Cross the suspended approach to the sky cistern"
+    },
+    {
+      "id": "relay-2",
+      "kind": "fixed",
+      "relay": 2,
+      "x": 790,
+      "y": 5,
+      "z": 755,
+      "label": "Middle relay ring",
+      "purpose": "Cross the suspended approach to the sky cistern"
+    },
+    {
+      "id": "relay-3",
+      "kind": "moving",
+      "relay": 3,
+      "x": 790,
+      "y": 345,
+      "z": 810,
+      "label": "Moving landing ring",
+      "purpose": "Cross the suspended approach to the sky cistern"
     }
   ],
   "puzzle": {
@@ -1749,6 +2056,20 @@
       "z": 220,
       "w": 115,
       "h": 120
+    },
+    {
+      "x": 595,
+      "y": 325,
+      "z": 460,
+      "w": 76,
+      "h": 37
+    },
+    {
+      "x": 717,
+      "y": -476,
+      "z": 340,
+      "w": 31,
+      "h": 185
     }
   ],
   "water": [

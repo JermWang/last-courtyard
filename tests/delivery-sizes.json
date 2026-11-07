@@ -1,6 +1,6 @@
 {
-  "status": "Mouse reel toggle and momentum-preserving anchor transfer exported; eight suites and focused browser checks passed",
-  "export_uncompressed_bytes": 13942164,
+  "status": "Sky relay, restoration lift and camera pass exported and playtested. Eight gameplay suites passed.",
+  "export_uncompressed_bytes": 13996707,
   "export_files": 131,
   "observed_fps_recent_windows": [
     54,
@@ -10,8 +10,8 @@
   "full_route_stalls": 7,
   "maximum_stall_ms": 2276,
   "browser_console_errors": 0,
-  "source_zip_bytes": 78520411,
-  "web_zip_bytes": 11964844,
+  "source_zip_bytes": 78532174,
+  "web_zip_bytes": 11970292,
   "y3k_grass_observed_fps": 21.8,
   "y3k_grass_visible_fps": 50.2,
   "water_pass_observed_fps": [
@@ -21,5 +21,12 @@
   "mouse_reel_pass_observed_fps": [
     23.7,
     35.8
-  ]
+  ],
+  "sky_relay_arrival_comparison": {
+    "before_fps": 37.2,
+    "after_fps": 60,
+    "before_draw_calls": 455,
+    "after_draw_calls": 263
+  },
+  "sky_relay_browser_console_errors": 0
 }

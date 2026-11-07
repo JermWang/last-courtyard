@@ -1,0 +1,17 @@
+{
+  "arrival": {
+    "viewport": "1280 x 720",
+    "before": {
+      "fps": 37.2,
+      "drawCalls": 455
+    },
+    "after": {
+      "fps": 60,
+      "drawCalls": 263
+    }
+  },
+  "relayCatch": "TEST FIXTURE: relay (seeded prerequisites)\nGDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 799.1, 364.3, 693.3\nVelocity 78.4, 273.6, 50.9\nUpdate 1.08 ms | grounded false | checkpoint true\nTether relay-3 90.0 taut\nArrows 0 | chains 1 | resets 0\nAudio running | enabled | voices 1\nLinks 15 | shot none\nShots 3 | catches 3 | returned 0\nSprite back | swing 14\nF3 diagnostics | C compare projection\nActive 30.3s | stalls 0 | p95 18.0 ms | max 111 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 30.3s\nBridge 100% | locked | tower true | canopy true | complete false\nDraw calls 159 | triangles 47849 | relay checkpoint true | lift 102\nSluice block 660.0 | plate latched | water 100%\nJourney playing | seal 0.00s | reveal 0.00s | route 30.3s\nMouse reel off | transfer aim none | transfers 2\nWater dry | deep 0.00s | ripples 3",
+  "ending": "TEST FIXTURE: relay (seeded prerequisites)\nGDevelop 5.6.287 | perspective\nRUNNING | 59.3 fps (last 300 active frames)\nPosition 774.3, 445.8, 460.0\nVelocity 0.0, 0.0, 0.0\nUpdate 1.26 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 0\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 3 | catches 3 | returned 1\nSprite front-left | idle 0\nF3 diagnostics | C compare projection\nActive 64.6s | stalls 0 | p95 19.0 ms | max 111 ms\nDocument visible | focus yes | frame cap 30\nFlute playing | 64.5s\nBridge 100% | locked | tower true | canopy true | complete true\nDraw calls 199 | triangles 46850 | relay checkpoint true | lift 460\nSluice block 660.0 | plate latched | water 100%\nJourney complete | seal 0.00s | reveal 7.00s | route 57.5s\nMouse reel off | transfer aim none | transfers 2\nWater dry | deep 0.00s | ripples 8",
+  "liftBottom": "TEST FIXTURE: relay (seeded prerequisites)\nGDevelop 5.6.287 | perspective\nRUNNING | 58.7 fps (last 300 active frames)\nPosition 1042.6, 466.6, 102.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.76 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 1\nAudio running | enabled | voices 1\nLinks 0 | shot none\nShots 3 | catches 3 | returned 1\nSprite right | idle 0\nF3 diagnostics | C compare projection\nActive 72.2s | stalls 0 | p95 21.4 ms | max 111 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 72.1s\nBridge 100% | locked | tower true | canopy true | complete true\nDraw calls 232 | triangles 48364 | relay checkpoint true | lift 102\nSluice block 660.0 | plate latched | water 100%\nJourney exploring | seal 0.00s | reveal 7.00s | route 57.5s\nMouse reel off | transfer aim none | transfers 2\nWater dry | deep 0.00s | ripples 8",
+  "consoleErrors": []
+}

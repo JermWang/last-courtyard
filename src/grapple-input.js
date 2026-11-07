@@ -4,7 +4,8 @@
 (function(root){
   function clear(s){s.mouseReel=false;s.drawing=false;s.draw=0;s.drawTarget=null;s.transferFrom=null;}
   function press(s,target,valid){
-    if(s.tether&&(!valid||!target||target.id===s.tether.anchor.id)){
+    if (s.tether && target && target.id !== s.tether.anchor.id && !valid) return 'blocked';
+    if(s.tether&&(!target||target.id===s.tether.anchor.id)){
       s.mouseReel=!s.mouseReel;return 'reel';
     }
     s.mouseReel=false;s.drawing=true;s.draw=0;s.drawTarget=valid?target:null;

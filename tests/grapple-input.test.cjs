@@ -4,7 +4,7 @@ const a={id:'a',x:0,y:0,z:400},b={id:'b',x:400,y:0,z:400};
 function state(){return {tether:{anchor:a,length:200},keys:new Set(),drawing:false,mouseReel:false};}
 let s=state();assert.equal(G.press(s,a,true),'reel');assert.ok(G.reel(s));assert.equal(s.drawing,false);
 G.press(s,null,false);assert.ok(!G.reel(s));s.keys.add('KeyE');assert.ok(G.reel(s));s.keys.add('KeyQ');assert.ok(!G.reel(s));
-s=state();const old=s.tether;assert.equal(G.press(s,b,true),'transfer');assert.equal(s.tether,old,'Aiming never releases the current anchor');assert.equal(s.drawTarget,b);
+s=state();const old=s.tether;assert.equal(G.press(s,b,false),'blocked');assert.equal(s.tether,old);assert.ok(!G.reel(s),'A blocked ring is never mistaken for a reel click');assert.equal(G.press(s,b,true),'transfer');assert.equal(s.tether,old,'Aiming never releases the current anchor');assert.equal(s.drawTarget,b);
 assert.deepEqual(G.fire(s,false),{fired:false,cancelled:true});assert.equal(s.tether,old,'Blocked transfer keeps the safety attachment');
 G.press(s,b,true);assert.deepEqual(G.fire(s,true),{fired:true,from:'a'});assert.equal(s.tether,null);assert.ok(!s.mouseReel&&!s.drawing);
 s=state();G.press(s,a,true);G.clear(s);assert.ok(!G.reel(s));assert.equal(s.tether.anchor,a,'Pause cancels mouse intent while retaining tether');
