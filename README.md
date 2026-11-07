@@ -1,0 +1,72 @@
+# The Last Courtyard — garden and swing prototype
+
+Editable **GDevelop 5.6.287** browser adventure for BIG Game Jam #10, theme **Keep it Alive**. Restore water to a courtyard tree using a bow, a real 3D chain, a guided block and a pressure plate. This is one connected courtyard with a raised garden, an aqueduct and a lower maintenance route. A GitHub Pages deployment is included; no jam entry has been submitted.
+
+## Play and edit
+
+Browser play link: https://jermwang.github.io/last-courtyard/ . Desktop keyboard and mouse recommended. The public build is served from the committed `build` folder by `.github/workflows/pages.yml`; changes to `main` run the gameplay checks and verify export freshness before deployment.
+
+Run `python tools/serve.py` and open http://localhost:8174. The loopback server serves `build` without caching; stop it with Ctrl+C. Serve a downloaded HTML5 export over HTTP rather than opening `index.html` directly.
+
+Open `courtyard.json` in GDevelop. The 100 native 3D terrain/mechanism objects remain editable. Gameplay runs in a documented JavaScript event on GDevelop's own scene, renderer and loop. Maintained source is in `src`; `puzzle.js` owns the guided block and latched restoration, while `physics.js` owns the common movement/tether solver.
+
+Rebuild with `node tools/build-project.cjs`, then `powershell -File tools/export.ps1`. The latter uses the official engine installed under `.tooling`, stages the export, verifies source/resource freshness, then publishes changed files to `build`. **Regenerating the project overwrites editor changes**: transfer editor edits to the maintained source first. Ordinary GDevelop preview/export does not need the builder or the local `.tooling` folder.
+
+## Controls
+
+| Input | Action |
+| --- | --- |
+| WASD / Space | Camera-relative movement / jump |
+| Hold / release left mouse | Draw / fire |
+| E / Q | Reel in / pay out |
+| Right mouse | Release tether / cancel draw |
+| R | Recover at the current checkpoint |
+| Escape | Pause, audio settings, restart courtyard |
+| C / F3 | Compare camera / diagnostics |
+
+Audio starts after entering. Master, effects, music and mute settings persist locally. Restart courtyard resets all puzzle progress; ordinary recovery preserves completed restoration but resets an unfinished block pull.
+
+## Courtyard route
+
+1. Practise with the nearby ring, then swing across the water to the checkpoint terrace.
+2. Walk around the south side of the tree planter and follow the east gallery to the waterworks.
+3. Stand on the brass standing mark beyond the pressure plate, catch the ring on the wooden sluice block, and hold E. The weighted block follows its marked lane; slack chain winds in before pulling. It stops safely before the player. If fully reeled before docking, step backward and continue E; the hint explains this.
+4. Docking the block depresses and latches the plate. The sluice rises, water travels along the aqueduct to the tree, the guide/plate marks turn green, and a short completion cue plays.
+5. Climb the eastern stairs to the upper garden. Walk beneath the stone lintel and toward the brass operating mark. Shoot the hanging counterweight and hold E. If fully reeled, step sideways away from the weight to maintain tension. The ratchet preserves partial travel; full travel locks the bridge at garden height. Restored water is required to power this mechanism.
+6. Cross the bridge north and turn right to the brass launch mark. Catch the high tower ring, hold E and move north, then release above the ledge. This ascent has no stairs: the chain brings you to the Z=400 checkpoint. Move toward the west side of the tower.
+7. Catch the moving ring while it passes nearby. A valid target stays locked during the draw; the arrow leads its motion. Reel upward, ride west over the gap and release above the broad Z=460 canopy landing. Each high terrace has a recovery checkpoint.
+8. Follow the suspended walkway south to the wind-walk checkpoint. Wait for the slow wooden paddle to sweep aside, or catch the overhead ring and swing over it. Continue above the old courtyard and stand on the brass seal overlooking the tree. The sky cistern opens a second visible water feed. You can also explore beneath the overhead decks and use the lower return gate.
+
+The playable floor elevations are 0, 20, 100, 220, 400 and 460 engine units, plus steps and the tree planter. The scene uses X/Y as the ground plane and Z as height. Platforms, stairs, walls, block and gates are real geometry with 3D collision volumes. The character and foliage are upright illustrated billboard planes. Near-camera overhead anchor hardware fades to preserve the close third-person view; aiming and collision remain intact.
+
+## Artwork, sound and validation
+
+Generated originals and exact prompts are in `assets/source`; optimized runtime images are in `assets/runtime`. Source concepts do not load during gameplay. Existing generated stone, wood, brass, character and foliage art is reused across the expanded area. The chain, arrow and mechanisms use simple geometry. Sound effects are procedural Web Audio synthesis, including block drag, plate click and sluice movement. Music is the locally packaged CC0 flute/piano/strings track “Children’s Game Music 3 - Home” by heartade. Master, music and mute controls apply; pause stops playback and resume continues it. Generated foliage now bends on subdivided billboard planes, with rooted feet and gentle synchronized gusts. A blue sky and drifting low-poly clouds surround the real floating geometry. Full sources and provenance are recorded in `ASSET_PROVENANCE.md`.
+
+Run `node tests/physics.test.cjs`, `node tests/shot.test.cjs`, `node tests/animation.test.cjs`, `node tests/puzzle.test.cjs`, and `node tests/elevation.test.cjs`. The five suites pass, including the original routes and the new moving-anchor transfer. Tests cover the original crossing, collision/tether stability, shot ordering/recall, animation, block docking, player clearance, slack, reset persistence and connected upper/lower routes.
+
+The normal in-app-browser run completed the entire route without seeded prerequisites: arrival crossing, block/plate, counterweight bridge, chain-only tower ascent, moving carriage, wind-paddle swing bypass and sky cistern. Two early falls recovered safely; three subsequent R resets and a deliberate canopy fall retained completion and left no arrows/chains/voices. Pause/resume during a tethered ride and a 1280 x 720 resize also preserved state. `tests/garden-browser.json` records the DOM diagnostics. The run took about 263 active seconds plus observation pauses. There were no console errors; GDevelop emitted a nonblocking empty-texture warning at startup.
+
+Recent measured frame windows during the route were about 54-60 fps, with roughly 0.5-1.2 ms of gameplay update time. The browser recorded seven stalls (maximum 2.276 seconds); those intervals were discarded by the physics stall guard. This is not a universal 60 fps guarantee. F3 now exposes measured draw calls/triangles; clouds are batched and visual mechanism updates run once per rendered frame instead of every simulation substep. Export sizes are measured in `tests/delivery-sizes.json`.
+
+The full browser run preceded a final minor pass moving one obstructing support, adding the block's standing mark/hint and making elevated water a finite recovery volume. The final pass has targeted regression tests and a fresh browser check. Source art, runtime assets, GDevelop project and HTML5 export remain separate.
+
+## Known limitations
+
+This prototype contains the block/plate, counterweight bridge, moving-anchor crossing and final sky-cistern sequence; it is still subject to the broader original acceptance checks. The guided bridge uses a translating deck and a latching counterweight, rather than rotating planks or simulated joints. The chain uses a unilateral constraint and inexpensive visual links; it does not wrap around geometry. Generated animation retains some detail variation. Audio is implemented, but listening-based balance is still pending. An uninterrupted ten-minute stress run and broad hardware/browser performance coverage remain outstanding. The completed normal-route run includes pauses for observations. The wind paddle uses a visible soft-reset contact rule rather than applying a knockback impulse. Out-of-bounds recovery uses the level envelope, and extreme upward speed is bounded; normal tangential release momentum is retained.
+
+## Next flow direction (proposal)
+
+Keep the courtyard as the home garden. Future pockets should repeat a clear rhythm: discover a dry water route, learn one physical use of the chain, solve a mechanism, return by a newly opened shortcut, and see permanent growth at home. No countdown or health system is needed.
+
+- **Hanging orchard:** broad swing-only ledges, one deliberate release across depth, then a safe grassy rest point. An optional higher route rewards momentum control without blocking progress.
+- **Mill passage:** water-powered moving anchors and slow paddles introduce readable timing. A block changes the water route, creating a new traversal path rather than merely opening a distant door.
+- **Root terraces:** combine a counterweight ascent, a moving-anchor transfer and a final visible water feed. Earlier areas remain visible below, with shortcuts replacing repeated climbs.
+
+Build one pocket at a time after tuning this courtyard. These are proposed extensions, not additional implemented levels.
+
+## Y3K grass
+
+The lawns now reuse the owner's Y3K grass: 510 instanced tufts, 4,080 curved blades and shared GPU wind. `src/grass-view.js` adapts the Godot geometry/shaders to GDevelop's existing Three renderer; `assets/source/y3k-grass` retains exact source snapshots and provenance. This supersedes the earlier generated turf pattern and sparse triangles. Grass motion uses gameplay time, so pause freezes it. No new texture download is required.
+
+Y3K grass validation: the exported shader rendered in the browser without console errors, and walking over the lawns remained unobstructed. The hidden-preview sample measured 21.8 fps; showing the preview produced a later 50.2 fps window (0.66 ms gameplay update, p95 26.8 ms). These are session measurements, not a controlled comparison with the earlier 54-60 fps run. See `tests/y3k-grass-browser.json`.

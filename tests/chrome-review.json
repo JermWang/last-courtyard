@@ -1,0 +1,6 @@
+{
+  "recorded": "2026-11-07T03:07:02.917Z",
+  "diagnostics": "GDevelop 5.6.287 | perspective\nPAUSED | 13.2 fps (last 300 active frames)\nPosition 406.3, 1259.7, 0.0\nVelocity 0.0, -0.0, 0.0\nUpdate 0.53 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 0\nAudio suspended | enabled | voices 0\nLinks 0 | shot none\nShots 0 | catches 0 | returned 0\nSprite right | idle 0\nF3 diagnostics | C compare projection\nActive 35.8s | stalls 47 | p95 84.2 ms | max 3699 ms",
+  "errors": [],
+  "note": "Fresh candidate; held input badly affected by long frame stalls. New-tab probe did not hide the game. Neither ten-minute acceptance nor real focus loss is proven."
+}

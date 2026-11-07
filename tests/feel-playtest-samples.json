@@ -1,0 +1,87 @@
+{
+  "start": "2026-11-07T01:47:59Z",
+  "end": "2026-11-07T01:56:37.192Z",
+  "status": "Stopped for camera framing and planter cap fixes; not a completed ten-minute acceptance pass.",
+  "samples": [
+    {
+      "time": "2026-11-07T01:48:20.426Z",
+      "check": "catch/reel/payout/release/reset",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 59.3 fps (last 300 active frames)\nPosition 400.0, 1260.0, 0.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.72 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 1\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 1 | catches 1 | returned 0\nSprite back | idle 0\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:48:23.829Z",
+      "check": "catch/reel/payout/release/reset",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 59.8 fps (last 300 active frames)\nPosition 400.0, 1260.0, 0.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.58 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 2\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 2 | catches 2 | returned 0\nSprite back | idle 0\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:48:27.148Z",
+      "check": "catch/reel/payout/release/reset",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 400.0, 1260.0, 0.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.62 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 3\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 3 | catches 3 | returned 0\nSprite back | idle 0\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:48:51.282Z",
+      "check": "wall collision and obstructed shot return",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 337.2, 1272.4, 0.0\nVelocity 0.9, -0.0, 0.0\nUpdate 0.33 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 3\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 4 | catches 3 | returned 1\nSprite right | idle 0\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:49:57.476Z",
+      "check": "held reel to minimum",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 298.8, 1200.3, 192.0\nVelocity -36.7, 10.5, -7.6\nUpdate 0.44 ms | grounded false | checkpoint false\nTether practice 90.0 taut\nArrows 0 | chains 1 | resets 6\nAudio running | enabled | voices 0\nLinks 8 | shot none\nShots 5 | catches 4 | returned 1\nSprite back-left | swing 14\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:50:07.685Z",
+      "check": "held payout to maximum",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 293.1, 1201.3, 36.0\nVelocity -0.0, 0.0, 0.0\nUpdate 0.46 ms | grounded true | checkpoint false\nTether practice 620.0 slack\nArrows 0 | chains 1 | resets 6\nAudio running | enabled | voices 1\nLinks 39 | shot none\nShots 5 | catches 4 | returned 1\nSprite back-left | idle 0\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:50:27.860Z",
+      "check": "water fall and automatic recovery",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 400.0, 1260.0, 0.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.42 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 7\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 5 | catches 4 | returned 2\nSprite back | idle 0\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:51:02.133Z",
+      "check": "ten rapid free shots and automatic returns",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 60.0 fps (last 300 active frames)\nPosition 565.8, 1252.2, 0.0\nVelocity 11.7, -0.6, 0.0\nUpdate 0.33 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 8\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 15 | catches 4 | returned 3\nSprite right | walk 7\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:51:13.289Z",
+      "check": "pause while suspended",
+      "hud": "GDevelop 5.6.287 | perspective\nPAUSED | 59.7 fps (last 300 active frames)\nPosition 243.7, 1194.2, 81.2\nVelocity -228.9, 2.5, 157.0\nUpdate 0.26 ms | grounded false | checkpoint false\nTether practice 202.2 taut\nArrows 0 | chains 1 | resets 9\nAudio suspended | enabled | voices 0\nLinks 26 | shot none\nShots 16 | catches 5 | returned 3\nSprite back-left | swing 14\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:51:21.209Z",
+      "check": "paused input leaves position unchanged",
+      "hud": "GDevelop 5.6.287 | perspective\nPAUSED | 59.7 fps (last 300 active frames)\nPosition 243.7, 1194.2, 81.2\nVelocity -228.9, 2.5, 157.0\nUpdate 0.24 ms | grounded false | checkpoint false\nTether practice 202.2 taut\nArrows 0 | chains 1 | resets 9\nAudio suspended | enabled | voices 0\nLinks 26 | shot none\nShots 16 | catches 5 | returned 3\nSprite back-left | swing 14\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:51:38.892Z",
+      "check": "focus-loss probe",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 60.1 fps (last 300 active frames)\nPosition 151.8, 1199.9, 0.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.36 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 9\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 16 | catches 5 | returned 4\nSprite back-left | idle 0\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:52:23.103Z",
+      "check": "short-draw crossing and checkpoint",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 60.0 fps (last 300 active frames)\nPosition 656.0, 548.6, 100.0\nVelocity 22.4, -27.8, 0.0\nUpdate 0.49 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 10\nAudio running | enabled | voices 5\nLinks 0 | shot none\nShots 17 | catches 6 | returned 5\nSprite back | land 15\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:53:47.354Z",
+      "check": "fall after checkpoint restores rear terrace",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 540.0, 510.0, 100.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.27 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 11\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 18 | catches 7 | returned 6\nSprite back | idle 0\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:54:33.218Z",
+      "check": "seven held draws into rear wall",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 388.4, 517.1, 100.0\nVelocity -1.3, 0.1, 0.0\nUpdate 0.28 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 11\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 25 | catches 7 | returned 7\nSprite left | walk 7\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:55:20.282Z",
+      "check": "elevated target picking after resize",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 503.1, 784.2, 107.7\nVelocity -53.6, 398.1, 20.9\nUpdate 0.42 ms | grounded false | checkpoint true\nTether crossing 275.6 taut\nArrows 0 | chains 1 | resets 12\nAudio running | enabled | voices 1\nLinks 38 | shot none\nShots 26 | catches 8 | returned 7\nSprite front | swing 14\nF3 diagnostics | C compare projection"
+    },
+    {
+      "time": "2026-11-07T01:56:33.669Z",
+      "check": "FAIL: camera over-shortens behind tree; avatar cropped",
+      "hud": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 668.6, 266.0, 100.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.37 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 13\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 26 | catches 8 | returned 7\nSprite right | idle 0\nF3 diagnostics | C compare projection"
+    }
+  ]
+}

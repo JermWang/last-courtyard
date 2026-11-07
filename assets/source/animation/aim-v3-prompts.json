@@ -1,0 +1,13 @@
+{
+  "tool": "Built-in OpenAI imagegen",
+  "date": "2026-11-06",
+  "rejectedPriorSet": "The v2 four-pose sets changed standing proportions and were not integrated.",
+  "front": {
+    "source": "exec-b6f59747-007a-45d5-a396-418fe1727611.png",
+    "prompt": "Precise object edit of the attached existing game animation frame. Contemporary browser adventure artwork, flat opaque colors, three discrete cel-shading bands, thin colored outlines, clean silhouette, no texture noise, no gradients, no pastel wash, no photorealism. Preserve this exact character, its short stumpy proportions, hood/head shape and size, minimal face, cloak, navy torso, belt, brass reel on viewer left, chunky boots, silhouette height and feet baseline. Do not lengthen the torso or legs, and do not redesign or enlarge the bow. Change ONLY the arrow perspective and minimal hand/bow positioning required: this is a FRONT view aiming straight toward the viewer. Replace the long sideways arrow pointing right with a strongly foreshortened arrow aimed out of the image, visible as a small end-on diamond arrowhead near the bow hand. No long horizontal shaft beyond the bow. Left hand holds bow on viewer right; right hand draws string near cheek. Keep all other artwork and its scale unchanged. One single full-body cutout, genuine transparent background, safe padding, no ground/shadow/text/grid. Clean alpha without stray pixels."
+  },
+  "back": {
+    "source": "exec-9560c660-dcce-4e76-9678-fe5c44ed76e2.png",
+    "prompt": "Precise object edit of the attached existing game animation frame. Contemporary browser adventure artwork, flat opaque colors, three discrete cel-shading bands, thin colored outlines, clean silhouette, no texture noise, no gradients, no pastel wash, no photorealism. Preserve this exact miniature character, its short stumpy proportions, red hood/head shape and size, cloak, navy torso, belt, brass reel on viewer right, chunky boots, total silhouette height and feet baseline. Do not lengthen the body or change the pose. Change ONLY the visible sideways arrow: this BACK view must aim away from the viewer into the image. Remove the sideways arrow protruding to the viewer's left. The arrow is now fully foreshortened and concealed ahead of the hood and bow hand; do not draw a visible horizontal shaft or side-facing arrowhead anywhere. Keep existing bow in left hand (viewer left), hands, hood, body and equipment exactly unchanged otherwise. No face visible. One single full-body cutout, genuine transparent background, safe padding, no ground/shadow/text/grid. Clean alpha without stray pixels."
+  }
+}

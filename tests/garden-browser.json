@@ -1,0 +1,80 @@
+{
+  "url": "http://localhost:8174/?debug",
+  "seeded": false,
+  "notes": "One normal game. Pause used between observations. Resize to 1280x720 and back preserved progress.",
+  "stages": [
+    {
+      "stage": "first crossing",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 502.9, 533.7, 100.0\nVelocity -0.0, -0.0, 0.0\nUpdate 0.63 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 1\nAudio running | enabled | voices 2\nLinks 0 | shot none\nShots 3 | catches 2 | returned 3\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 68.5s | stalls 0 | p95 22.4 ms | max 77 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 68.5s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 216 | triangles 10314 | wind checkpoint false\nSluice block 300.0 | plate waiting | water 0%"
+    },
+    {
+      "stage": "block and plate",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.7 fps (last 300 active frames)\nPosition 1315.0, 764.6, 100.0\nVelocity -0.0, 0.0, 0.0\nUpdate 0.90 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 2\nAudio running | enabled | voices 1\nLinks 0 | shot none\nShots 4 | catches 3 | returned 4\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 121.9s | stalls 5 | p95 23.5 ms | max 947 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 38.6s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 277 | triangles 12600 | wind checkpoint false\nSluice block 645.0 | plate waiting | water 0%"
+    },
+    {
+      "stage": "restored sluice",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 55.4 fps (last 300 active frames)\nPosition 1342.1, -39.9, 220.0\nVelocity -0.2, 0.0, 0.0\nUpdate 0.91 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 2\nAudio running | enabled | voices 2\nLinks 0 | shot none\nShots 5 | catches 4 | returned 5\nSprite left | idle 0\nF3 diagnostics | C compare projection\nActive 168.8s | stalls 7 | p95 25.3 ms | max 2276 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 0.4s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 153 | triangles 10288 | wind checkpoint false\nSluice block 660.0 | plate latched | water 100%"
+    },
+    {
+      "stage": "counterweight and bridge",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 1481.8, -535.4, 220.0\nVelocity 0.0, -0.0, 0.0\nUpdate 0.83 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 2\nAudio running | enabled | voices 1\nLinks 0 | shot none\nShots 6 | catches 5 | returned 6\nSprite right | idle 0\nF3 diagnostics | C compare projection\nActive 205.7s | stalls 7 | p95 22.9 ms | max 2276 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 37.3s\nBridge 100% | locked | tower false | canopy false | complete false\nDraw calls 78 | triangles 7914 | wind checkpoint false\nSluice block 660.0 | plate latched | water 100%"
+    },
+    {
+      "stage": "chain-only tower ascent",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 1483.6, -781.5, 400.0\nVelocity -0.0, -0.0, 0.0\nUpdate 0.57 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 2\nAudio running | enabled | voices 2\nLinks 0 | shot none\nShots 7 | catches 6 | returned 7\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 217.1s | stalls 7 | p95 22.9 ms | max 2276 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 48.7s\nBridge 100% | locked | tower true | canopy false | complete false\nDraw calls 58 | triangles 7746 | wind checkpoint false\nSluice block 660.0 | plate latched | water 100%"
+    },
+    {
+      "stage": "moving anchor landing",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 60.0 fps (last 300 active frames)\nPosition 669.1, -784.8, 460.0\nVelocity -0.0, 0.0, 0.0\nUpdate 0.85 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 2\nAudio running | enabled | voices 1\nLinks 0 | shot none\nShots 9 | catches 7 | returned 9\nSprite left | idle 0\nF3 diagnostics | C compare projection\nActive 237.2s | stalls 7 | p95 17.1 ms | max 2276 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 68.9s\nBridge 100% | locked | tower true | canopy true | complete false\nDraw calls 51 | triangles 7608 | wind checkpoint false\nSluice block 660.0 | plate latched | water 100%"
+    },
+    {
+      "stage": "wind checkpoint approach",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nPAUSED | 59.8 fps (last 300 active frames)\nPosition 816.0, -379.9, 460.0\nVelocity 5.0, 105.6, 0.0\nUpdate 0.74 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 2\nAudio suspended | enabled | voices 0\nLinks 0 | shot none\nShots 9 | catches 7 | returned 9\nSprite front | walk 6\nF3 diagnostics | C compare projection\nActive 254.5s | stalls 7 | p95 24.1 ms | max 2276 ms\nDocument visible | focus yes | frame cap 15\nFlute paused | 0.6s\nBridge 100% | locked | tower true | canopy true | complete false\nDraw calls 80 | triangles 8452 | wind checkpoint true\nSluice block 660.0 | plate latched | water 100%"
+    },
+    {
+      "stage": "wind paddle swing bypass",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nPAUSED | 58.6 fps (last 300 active frames)\nPosition 801.9, -100.5, 460.0\nVelocity 5.0, 105.5, 0.0\nUpdate 0.36 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 2\nAudio suspended | enabled | voices 0\nLinks 0 | shot none\nShots 10 | catches 8 | returned 10\nSprite front | walk 2\nF3 diagnostics | C compare projection\nActive 260.2s | stalls 7 | p95 24.6 ms | max 2276 ms\nDocument visible | focus yes | frame cap 15\nFlute paused | 6.5s\nBridge 100% | locked | tower true | canopy true | complete false\nDraw calls 110 | triangles 8770 | wind checkpoint true\nSluice block 660.0 | plate latched | water 100%"
+    },
+    {
+      "stage": "normal route completion",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.5 fps (last 300 active frames)\nPosition 827.3, 440.4, 460.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.70 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 2\nAudio running | enabled | voices 2\nLinks 0 | shot none\nShots 10 | catches 8 | returned 10\nSprite front | idle 0\nF3 diagnostics | C compare projection\nActive 263.4s | stalls 7 | p95 21.9 ms | max 2276 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 9.7s\nBridge 100% | locked | tower true | canopy true | complete true\nDraw calls 283 | triangles 11214 | wind checkpoint true\nSluice block 660.0 | plate latched | water 100%"
+    },
+    {
+      "stage": "three repeated recoveries",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nPAUSED | 59.5 fps (last 300 active frames)\nPosition 790.0, -350.0, 460.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.52 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 5\nAudio suspended | enabled | voices 0\nLinks 0 | shot none\nShots 10 | catches 8 | returned 10\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 264.2s | stalls 7 | p95 21.0 ms | max 2276 ms\nDocument visible | focus yes | frame cap 15\nFlute paused | 10.5s\nBridge 100% | locked | tower true | canopy true | complete true\nDraw calls 81 | triangles 8464 | wind checkpoint true\nSluice block 660.0 | plate latched | water 100%"
+    },
+    {
+      "stage": "edge rail containment",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nPAUSED | 59.9 fps (last 300 active frames)\nPosition 712.0, -329.8, 460.0\nVelocity 0.0, 0.4, 0.0\nUpdate 0.66 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 5\nAudio suspended | enabled | voices 0\nLinks 0 | shot none\nShots 10 | catches 8 | returned 10\nSprite left | idle 0\nF3 diagnostics | C compare projection\nActive 266.7s | stalls 7 | p95 19.2 ms | max 2276 ms\nDocument visible | focus yes | frame cap 15\nFlute paused | 12.8s\nBridge 100% | locked | tower true | canopy true | complete true\nDraw calls 87 | triangles 8476 | wind checkpoint true\nSluice block 660.0 | plate latched | water 100%"
+    },
+    {
+      "stage": "deliberate fall recovery",
+      "diagnostics": "GDevelop 5.6.287 | perspective\nPAUSED | 59.9 fps (last 300 active frames)\nPosition 790.0, -350.0, 460.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.75 ms | grounded false | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 6\nAudio suspended | enabled | voices 0\nLinks 0 | shot none\nShots 10 | catches 8 | returned 10\nSprite back | fall 13\nF3 diagnostics | C compare projection\nActive 268.9s | stalls 7 | p95 17.2 ms | max 2276 ms\nDocument visible | focus yes | frame cap 15\nFlute paused | 14.8s\nBridge 100% | locked | tower true | canopy true | complete true\nDraw calls 83 | triangles 9024 | wind checkpoint true\nSluice block 660.0 | plate latched | water 100%"
+    }
+  ],
+  "console": [
+    {
+      "level": "warn",
+      "message": "[PIXI Image manager] Unable to find texture for resource \"\".",
+      "timestamp": "2026-11-07T04:44:50.382Z",
+      "url": "http://localhost:8174/logger.js"
+    },
+    {
+      "level": "warn",
+      "message": "[PIXI Image manager] Unable to find texture for resource \"\".",
+      "timestamp": "2026-11-07T04:48:57.610Z",
+      "url": "http://localhost:8174/logger.js"
+    },
+    {
+      "level": "warn",
+      "message": "[PIXI Image manager] Unable to find texture for resource \"\".",
+      "timestamp": "2026-11-07T04:52:48.642Z",
+      "url": "http://localhost:8174/logger.js"
+    }
+  ],
+  "finalExportCheck": {
+    "stage": "final exported build: clear gallery and block pull",
+    "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 58.4 fps (last 300 active frames)\nPosition 1291.5, 796.7, 100.0\nVelocity -0.0, 0.0, 0.0\nUpdate 0.74 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 0\nAudio running | enabled | voices 4\nLinks 0 | shot none\nShots 2 | catches 2 | returned 2\nSprite front | idle 0\nF3 diagnostics | C compare projection\nActive 43.9s | stalls 0 | p95 23.1 ms | max 40 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 43.8s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 317 | triangles 12736 | wind checkpoint false\nSluice block 660.0 | plate latched | water 100%",
+    "console": []
+  }
+}

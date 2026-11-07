@@ -1,0 +1,98 @@
+{
+  "local_date": "2026-11-06",
+  "timezone": "America/Chicago",
+  "status": "incomplete acceptance; review build",
+  "changes": [
+    "Active tether and aim feedback take priority over the checkpoint message.",
+    "F3 includes active time excluding pauses/stalls, stall count, recent p95 frame interval and longest observed interval.",
+    "Paused scenes use GDevelop maximum FPS 15; active scenes restore 60. F3 reports document visibility/focus and configured cap.",
+    "Stalled frames discard elapsed time but retain held movement/draw/reel intent; blur and pause still clear input.",
+    "Visual chain outlet aligns to directional waist reels, with a separate stable physics attachment.",
+    "HUD chain-length gauge and minimum/maximum messages.",
+    "Near-camera anchor hardware fades to preserve the close third-person view."
+  ],
+  "validation": {
+    "export": "Official GDevelop 5.6.287 export succeeded; 82 scripts, 40 assets, one scene; freshness verification passed.",
+    "tests": "Physics, shot and animation suites passed.",
+    "browser": "In-app browser, actual DOM canvas size 1600x900.",
+    "observed_checks": [
+      "Escape entry unlocked audio; paused state suspended audio and cleared voices.",
+      "Grounded walking climbed low steps to Z=44.",
+      "Practice tether reached minimum length 90; payout then reel and sideways movement remained stable.",
+      "Elevated crossing completed through keyboard/mouse input and saved checkpoint.",
+      "Rear-tree camera stayed at normal distance and the tree occluded the sprite.",
+      "Planter landing grounded at visible cap Z=142.",
+      "Front-facing held draw visually inspected in the running build.",
+      "After checkpoint, tether and aim instructions were visible.",
+      "Repeated catch, reel, swing, payout, release and recovery left zero arrows, chains and links after reset."
+    ],
+    "last_completed_sample": {
+      "active_seconds": 227.8,
+      "shots": 7,
+      "catches": 7,
+      "recoveries": 11,
+      "arrows": 0,
+      "chains": 0,
+      "links": 0,
+      "voices": 0,
+      "fps_last_300_frames": 59.9,
+      "p95_ms_last_300_frames": 17.2,
+      "longest_interval_ms": 94,
+      "stalls_over_150ms": 0
+    },
+    "measurement_limits": "Active seconds include observation intervals, not continuous held input. Early run sample was 44.1 fps; later samples were about 59-60. Subsequent UI batch timed out; its completion is unknown and is excluded."
+  },
+  "outstanding": [
+    "Clean uninterrupted ten-minute acceptance playtest.",
+    "Resume movement after the user-confirmed real focus-loss pause.",
+    "Listening-based sound balance.",
+    "Final candidate resize and cross-browser performance coverage.",
+    "Remaining directional art transitions beyond the inspected front, back and front-left states."
+  ],
+  "environment_observation": "System CPU samples were approximately 90% during initial slowdown and 99% during later browser-control timeout recovery. No unrelated processes were stopped; cause remains unproven.",
+  "export_code_sha256": "84a1a4acc55b0abecdc6194851725126d1cfd9f1851cf46eead64bceaaea6069",
+  "static_art_review": {
+    "reviewed": [
+      "all eight 16-frame directional action contact sheets",
+      "front/back v3 draw corrections",
+      "all sixteen runtime reel poses"
+    ],
+    "finding": "Front-left reeling equipment switched screen sides relative to that approved direction.",
+    "correction": "Generated two-pose v2 strip; retained exact prompt/source; normalized hood width and feet; inspected ivory/navy alpha; integrated versioned runtime atlas.",
+    "in_engine_transition": "Front-left idle/reel transition inspected in the in-app browser; equipment stays on the approved sides."
+  },
+  "current_candidate_code_sha256": "b1d185ea709364a5ba21681bc31fba64a249e95758377f5bce72f6fcc0b52f4a",
+  "current_candidate_export": "82 scripts, 41 assets, one scene; official export and freshness verifier passed",
+  "previous_session_followup": {
+    "active_seconds": 655.5,
+    "shots": 10,
+    "catches": 10,
+    "recoveries": 17,
+    "stalls": 6,
+    "longest_ms": 1575,
+    "paused_voices": 0,
+    "interpretation": "Surviving session was recovered after tooling interruption; includes unattended time and is not a clean ten-minute playtest."
+  },
+  "current_browser_attempt": "See chrome-review.json: startup succeeded without captured console errors; long frame stalls prevented reliable playtest; real focus-loss probe inconclusive.",
+  "manual_focus_check": {
+    "result": "User confirmed automatic pause after switching away from Chrome and returning.",
+    "source": "User reply: Yes, it paused",
+    "local_date": "2026-11-06",
+    "scope": "Manual observation of pause; automated resume movement remains unverified."
+  },
+  "latest_retry": "See focus-resize-retry.json. Fresh Chrome tab launched, configured caps 15/60 observed, resume state and audio recovered; no captured console errors. Pause settings reachable at actual 800x400 and 600x900. Severe stalls persisted with document visible/focused; reliable movement and ten-minute acceptance incomplete.",
+  "latest_in_app_pass": {
+    "date": "2026-11-06",
+    "evidence": "in-app-feel-pass.jsonl",
+    "checks": [
+      "Completed crossing and checkpoint after each new export, including final candidate.",
+      "Front-left reel animation and waist outlet inspected in game.",
+      "Reached 90 minimum and 620 maximum; HUD limits visible.",
+      "Lateral swing, payout, release, misses, recovery and repeated reset exercised.",
+      "Pause while attached suspended audio and cleared voices; resume restored movement, release and recovery.",
+      "Near-camera foreground fade visually verified behind the rear terrace."
+    ],
+    "performance": "Recent samples about 59-60 fps at observed 1600x900 canvas; earlier iteration had stalls including during export. Not a ten-minute uninterrupted acceptance run.",
+    "console_errors": []
+  }
+}

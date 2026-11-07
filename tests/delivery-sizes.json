@@ -1,0 +1,17 @@
+{
+  "status": "Y3K grass replacement exported and browser rendered; original full-route evidence retained",
+  "export_uncompressed_bytes": 13844749,
+  "export_files": 130,
+  "observed_fps_recent_windows": [
+    54,
+    60
+  ],
+  "full_route_active_seconds": 262.8,
+  "full_route_stalls": 7,
+  "maximum_stall_ms": 2276,
+  "browser_console_errors": 0,
+  "source_zip_bytes": 78485245,
+  "web_zip_bytes": 11952749,
+  "y3k_grass_observed_fps": 21.8,
+  "y3k_grass_visible_fps": 50.2
+}

@@ -1,0 +1,17 @@
+{
+  "local_date": "2026-11-06",
+  "candidate": "paused-render-cap",
+  "manual_focus_pause": {
+    "result": "passed",
+    "source": "User confirmed: Yes, it paused",
+    "resume_from_that_specific_focus_event": "not observed by automation"
+  },
+  "latest_diagnostics": "GDevelop 5.6.287 | perspective\nPAUSED | 6.4 fps (last 300 active frames)\nPosition 400.0, 1260.0, 0.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.29 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 0\nAudio suspended | enabled | voices 0\nLinks 0 | shot none\nShots 0 | catches 0 | returned 0\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 2.6s | stalls 19 | p95 1001.1 ms | max 1050 ms\nDocument visible | focus yes | frame cap 15",
+  "errors": [],
+  "resize": {
+    "short": "800x400 actual canvas; pause card scrolled to visible audio controls and return button",
+    "portrait": "600x900 actual canvas; return button y622.5 height44.3 within screen"
+  },
+  "resume": "Return button closed menu; diagnostics became RUNNING, audio running, cap60. Movement input did not produce reliable movement during severe frame stalls.",
+  "acceptance": "Incomplete; no clean ten-minute playtest"
+}

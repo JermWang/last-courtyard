@@ -1,0 +1,72 @@
+{
+  "sampleRate": 44100,
+  "duration": 28.6,
+  "clippedSamples": 0,
+  "measurements": [
+    {
+      "sound": "draw",
+      "peak": 0.00538,
+      "rmsDb": -72.8
+    },
+    {
+      "sound": "fire",
+      "peak": 0.18402,
+      "rmsDb": -52.3
+    },
+    {
+      "sound": "hit",
+      "peak": 0.21521,
+      "rmsDb": -51.2
+    },
+    {
+      "sound": "reel",
+      "peak": 0.00625,
+      "rmsDb": -75.9
+    },
+    {
+      "sound": "tension",
+      "peak": 0.0074,
+      "rmsDb": -69
+    },
+    {
+      "sound": "miss",
+      "peak": 0.01122,
+      "rmsDb": -66.8
+    },
+    {
+      "sound": "release",
+      "peak": 0.02942,
+      "rmsDb": -60.5
+    },
+    {
+      "sound": "step",
+      "peak": 0.05211,
+      "rmsDb": -70.1
+    },
+    {
+      "sound": "land",
+      "peak": 0.04581,
+      "rmsDb": -54.5
+    },
+    {
+      "sound": "splash",
+      "peak": 0.03668,
+      "rmsDb": -56.2
+    },
+    {
+      "sound": "checkpoint",
+      "peak": 0.04439,
+      "rmsDb": -49.5
+    },
+    {
+      "sound": "music",
+      "peak": 0.00284,
+      "rmsDb": -63.6
+    },
+    {
+      "sound": "water",
+      "peak": 0.00598,
+      "rmsDb": -65.9
+    }
+  ]
+}

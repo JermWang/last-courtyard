@@ -1,0 +1,42 @@
+[
+  {
+    "label": "Plate latched; water fully restored; upper garden reached at Z220",
+    "time": "2026-11-07T03:56:42.848Z",
+    "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 1477.2, 26.9, 220.0\nVelocity -0.0, -0.0, 0.0\nUpdate 0.34 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 2\nAudio running | enabled | voices 2\nLinks 0 | shot none\nShots 3 | catches 3 | returned 2\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 153.5s | stalls 1 | p95 21.6 ms | max 1798 ms\nDocument visible | focus yes | frame cap 60\nSluice block 660.0 | plate latched | water 100%"
+  },
+  {
+    "label": "Opened return gate traversed back to arrival; restored state retained",
+    "time": "2026-11-07T03:57:20.045Z",
+    "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.8 fps (last 300 active frames)\nPosition 816.0, 1196.6, 0.0\nVelocity 0.0, 0.8, 0.0\nUpdate 0.34 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 3\nAudio running | enabled | voices 2\nLinks 0 | shot none\nShots 3 | catches 3 | returned 2\nSprite left | idle 0\nF3 diagnostics | C compare projection\nActive 190.5s | stalls 1 | p95 23.4 ms | max 1798 ms\nDocument visible | focus yes | frame cap 60\nSluice block 660.0 | plate latched | water 100%"
+  },
+  {
+    "label": "Final build: taking up payout slack leaves block at start",
+    "time": "2026-11-07T04:01:33.092Z",
+    "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 1295.6, 842.3, 100.0\nVelocity 0.0, 0.0, 0.0\nUpdate 1.09 ms | grounded true | checkpoint true\nTether sluice-block 561.3 slack\nArrows 0 | chains 1 | resets 1\nAudio running | enabled | voices 1\nLinks 73 | shot none\nShots 2 | catches 2 | returned 1\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 21.8s | stalls 0 | p95 19.6 ms | max 45 ms\nDocument visible | focus yes | frame cap 60\nSluice block 300.0 | plate waiting | water 0%"
+  },
+  {
+    "label": "Final build: plate latched, water restored, upper camera checked",
+    "time": "2026-11-07T04:02:11.120Z",
+    "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 1480.0, 26.4, 220.0\nVelocity -0.0, -0.0, 0.0\nUpdate 0.74 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 1\nAudio running | enabled | voices 2\nLinks 0 | shot none\nShots 2 | catches 2 | returned 2\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 59.9s | stalls 0 | p95 23.0 ms | max 45 ms\nDocument visible | focus yes | frame cap 60\nSluice block 660.0 | plate latched | water 100%"
+  },
+  {
+    "label": "Upper garden reached; shot missed after viewport changed, restoration not completed in this attempt",
+    "time": "2026-11-07T04:05:12.680Z",
+    "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 1480.9, 28.2, 220.0\nVelocity -0.0, -0.0, 0.0\nUpdate 0.59 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 3\nAudio running | enabled | voices 1\nLinks 0 | shot none\nShots 3 | catches 1 | returned 2\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 51.3s | stalls 9 | p95 17.0 ms | max 1002 ms\nDocument visible | focus yes | frame cap 60\nSluice block 300.0 | plate waiting | water 0%"
+  },
+  {
+    "label": "Delivered build: actual narrow-window block pull with payout slack",
+    "time": "2026-11-07T04:08:25.532Z",
+    "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.8 fps (last 300 active frames)\nPosition 1337.2, 843.5, 100.0\nVelocity -0.0, 0.0, 0.0\nUpdate 0.76 ms | grounded true | checkpoint true\nTether sluice-block 158.3 slack\nArrows 0 | chains 1 | resets 4\nAudio running | enabled | voices 3\nLinks 18 | shot none\nShots 4 | catches 2 | returned 2\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 243.2s | stalls 13 | p95 22.4 ms | max 1002 ms\nDocument visible | focus yes | frame cap 60\nSluice block 660.0 | plate latched | water 46%"
+  },
+  {
+    "label": "Delivered build: restored water and upper garden Z220",
+    "time": "2026-11-07T04:08:35.772Z",
+    "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 1444.9, 36.8, 220.0\nVelocity -0.0, -0.0, 0.0\nUpdate 0.55 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 4\nAudio running | enabled | voices 2\nLinks 0 | shot none\nShots 4 | catches 2 | returned 3\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 253.6s | stalls 13 | p95 16.9 ms | max 1002 ms\nDocument visible | focus yes | frame cap 60\nSluice block 660.0 | plate latched | water 100%"
+  },
+  {
+    "label": "Delivered build: solved recovery preserves restoration",
+    "time": "2026-11-07T04:08:49.998Z",
+    "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 59.9 fps (last 300 active frames)\nPosition 1294.3, 836.7, 100.0\nVelocity 4.3, 104.7, 0.0\nUpdate 0.52 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 5\nAudio running | enabled | voices 3\nLinks 0 | shot none\nShots 4 | catches 2 | returned 3\nSprite front | walk 0\nF3 diagnostics | C compare projection\nActive 267.8s | stalls 13 | p95 17.7 ms | max 1002 ms\nDocument visible | focus yes | frame cap 60\nSluice block 660.0 | plate latched | water 100%"
+  }
+]

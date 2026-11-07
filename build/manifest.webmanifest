@@ -1,0 +1,12 @@
+{
+  "name": "The Last Courtyard — Keep it Alive",
+  "short_name": "The Last Courtyard — Keep it Alive",
+  "id": "com.courtyard.keepitalive",
+  "description": "Keep it Alive: restore the courtyard tree through a bow-and-chain sluice puzzle. Explore a real 3D courtyard, upper garden and lower maintenance route with illustrated directional sprites.",
+  "orientation": "landscape",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "black",
+  "categories": ["games", "entertainment"],
+  "icons": []
+}

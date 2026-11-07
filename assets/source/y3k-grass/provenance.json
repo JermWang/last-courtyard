@@ -1,0 +1,32 @@
+{
+  "sourceProject": "C:/Users/dejes/GameDev/y3k",
+  "authorization": "User requested reuse of grass from their local Y3K game in this chat.",
+  "license": "Local project reuse at user direction; no independent public or third-party license is asserted.",
+  "adaptation": "src/grass-view.js ports GreenGrass.tuft_mesh, density 11, eight blades/four segments, blade_scale 0.6, source root/tip/dry colors and shared wind. Godot Y-up to courtyard Z-up at 100 units/m; deterministic JS PRNG replaces Godot RNG. One THREE.InstancedMesh on the existing GDevelop renderer. Source PBR/backlight replaced by unlit root-tip shading to match this renderer. Turf uses BlockLawn green. Source soft color transitions intentionally retained. Generated grass tile is superseded and excluded from project resources.",
+  "files": [
+    {
+      "file": "aero_planted.tres",
+      "sha256": "47399b2dea156ca16f110079a83bd3d7298dbaa920ac374722f73b6a830bc544"
+    },
+    {
+      "file": "block_lawn.gd",
+      "sha256": "d7039f3c0c5a0b623e44032d17baa6a5b4050a66a22b0348bd305c32544c67eb"
+    },
+    {
+      "file": "grass.gdshader",
+      "sha256": "ae093c91e109530b84d7a4c5864522ad736411de63f4e1c42c935183118dd8a6"
+    },
+    {
+      "file": "green_grass.gd",
+      "sha256": "08c1cf53b74650bf8705c682866a637d15eca895bd2efe40327f6f6bdc4cbf27"
+    },
+    {
+      "file": "noise.gdshaderinc",
+      "sha256": "d3b33aa1a49f2f07a8eca60d8a2913843cd09d950cd7c36894d2d2a6d5a06ef9"
+    },
+    {
+      "file": "wind.gdshaderinc",
+      "sha256": "c908153efc062ac59ec31ba218f2b75bde2065f8a72aee96e842ae1518102e06"
+    }
+  ]
+}

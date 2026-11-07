@@ -1,0 +1,33 @@
+{
+  "recorded_utc": "2026-11-07T02:06:27.854007+00:00",
+  "export_code_sha256": "1a7299e71bb3e525097de5faff706d327d553631547f3e71863607e822a8a95b",
+  "environment": "Windows; in-app browser; desktop keyboard and mouse UI automation",
+  "checks": [
+    "Physics, shot and animation tests passed.",
+    "Export integrity: 82 scripts, 38 assets, 1 scene; current maintained source embedded.",
+    "Nearby catch, reel lift, payout, release and return observed.",
+    "High-anchor crossing completed through UI input; raised checkpoint saved.",
+    "Grounded walking reached Z=44 on the two low steps.",
+    "Seven resets in an earlier run cleared arrows, chains and sound voices.",
+    "Pause suspended audio and cleared voices; resumed successfully.",
+    "Mute yielded zero voices during shot/reel and persisted on reload; restored false.",
+    "800x600 HUD leaves feet visible; 600x900 shows both anchors; 800x400 pause panel scrolls to all controls.",
+    "Latest export: fresh-tab startup and subsequent reload succeeded with no captured console errors.",
+    "Extended UI playtest reached 26 shots, 8 catches and 13 recoveries before stopping for camera/cap defects; see feel-playtest-samples.json.",
+    "Targeted retest: same rear-tree position keeps normal camera distance; tree correctly occludes sprite.",
+    "Targeted retest: planter landing Z=142 matches visible cap; crossing and reset still work.",
+    "HTTP/1.1 server with queue 128 passed five consecutive startup checks on port 8175; normal port 8174 then served HTTP/1.1 and passed the gameplay regression route."
+  ],
+  "performance": {
+    "representative_fps": "58–60",
+    "viewport": "1280x720",
+    "scope": "Short observed samples, not a sustained hardware-wide benchmark"
+  },
+  "unresolved": [
+    "Uninterrupted ten-minute acceptance pass must be rerun after the camera/cap fixes.",
+    "Focus-loss probe did not trigger a real blur; not browser-verified.",
+    "Listening-based sound balance and final equipment/art review remain pending.",
+    "Cross-browser startup/performance coverage remains limited.",
+    "Full restoration puzzles intentionally unbuilt."
+  ]
+}

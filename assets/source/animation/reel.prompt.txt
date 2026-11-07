@@ -1,0 +1,11 @@
+Production action sprite sheet for the exact attached miniature red-hood adventurer. Genuine transparent background. Exactly 4 columns by 4 rows, 16 equal square cells, square overall canvas. No text, labels, grid lines, shadows or scenery. Each pair of adjacent cells is a two-frame STANDING REEL/PULL cycle from one view. Figure only 65% cell height to leave safe space, equal scale and shared feet baseline at85% height. Keep identity, hood, navy clothes, short cloak, chunky boots and simple face from references. Wooden bow ALWAYS in anatomical LEFT hand; brass chain reel ALWAYS at anatomical RIGHT hip. Right hand actively cranks reel at hip, body braces with mild knee flex and backward lean, both boots on ground. Frame A right hand at top of crank, frame B right hand at bottom of crank, tiny corresponding shoulder/cape change. Do not turn this into a seated or airborne pose. No visible drawn chain extending outside cell.
+Cell order row-major:
+1–2 straight BACK view, bow image left reel image right;
+3–4 BACK THREE-QUARTER facing upper RIGHT away;
+5–6 strict RIGHT-FACING profile;
+7–8 FRONT THREE-QUARTER facing RIGHT toward viewer;
+9–10 straight FRONT view, bow image right reel image left;
+11–12 FRONT THREE-QUARTER facing LEFT toward viewer;
+13–14 strict LEFT-FACING profile;
+15–16 BACK THREE-QUARTER facing upper LEFT away.
+These are 8 directions of the SAME anatomy, not mirrored equipment. Exact two frames per direction. Contemporary browser adventure artwork, flat opaque colors, three discrete cel-shading bands, thin colored outlines, clean silhouette, no texture noise, no gradients, no pastel wash, no photorealism. Upper-left light. Transparent spaces between cells; entire bow, hood and boots stay inside each cell. Match attached front-right and back views.

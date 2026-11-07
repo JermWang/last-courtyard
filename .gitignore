@@ -1,0 +1,7 @@
+.tooling/
+deliverables/*
+!deliverables/y3k-grass.png
+!deliverables/garden-complete.png
+*.log
+__pycache__/
+*.export-tmp
