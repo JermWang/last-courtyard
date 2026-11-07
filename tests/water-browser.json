@@ -1,0 +1,30 @@
+{
+  "checks": [
+    {
+      "name": "arrow surface impact and recall",
+      "seeded": false,
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 48.7 fps (last 300 active frames)\nPosition 388.4, 1013.2, 0.0\nVelocity -0.0, -0.0, 0.0\nUpdate 0.77 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 0\nAudio running | enabled | voices 1\nLinks 0 | shot none\nShots 1 | catches 0 | returned 1\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 24.1s | stalls 0 | p95 32.9 ms | max 76 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 24.0s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 423 | triangles 47410 | wind checkpoint false\nSluice block 300.0 | plate waiting | water 0%\nJourney playing | seal 0.00s | reveal 0.00s | route 24.1s\nWater dry | deep 0.00s | ripples 0"
+    },
+    {
+      "name": "deep water recovery",
+      "seeded": false,
+      "diagnostics": "GDevelop 5.6.287 | perspective\nRUNNING | 58.3 fps (last 300 active frames)\nPosition 400.0, 1260.0, 0.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.34 ms | grounded true | checkpoint false\nTether none\nArrows 0 | chains 0 | resets 1\nAudio running | enabled | voices 1\nLinks 0 | shot none\nShots 1 | catches 0 | returned 1\nSprite back | idle 0\nF3 diagnostics | C compare projection\nActive 38.0s | stalls 1 | p95 22.9 ms | max 161 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 38.1s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 381 | triangles 46268 | wind checkpoint false\nSluice block 300.0 | plate waiting | water 0%\nJourney playing | seal 0.00s | reveal 0.00s | route 38.1s\nWater dry | deep 0.00s | ripples 0"
+    },
+    {
+      "name": "shallow-water movement and pause",
+      "seeded": true,
+      "diagnostics": "TEST FIXTURE: water (seeded prerequisites)\nGDevelop 5.6.287 | perspective\nPAUSED | 45.4 fps (last 300 active frames)\nPosition 1204.8, 149.8, 176.0\nVelocity -0.0, 0.0, 0.0\nUpdate 0.65 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 0\nAudio suspended | enabled | voices 0\nLinks 0 | shot none\nShots 0 | catches 0 | returned 0\nSprite left | idle 0\nF3 diagnostics | C compare projection\nActive 197.1s | stalls 0 | p95 33.0 ms | max 100 ms\nDocument visible | focus yes | frame cap 15\nFlute paused | 26.0s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 254 | triangles 44398 | wind checkpoint false\nSluice block 660.0 | plate latched | water 100%\nJourney playing | seal 0.00s | reveal 0.00s | route 197.1s\nWater wading | deep 0.00s | ripples 5"
+    },
+    {
+      "name": "sky feed and completion with revised geometry",
+      "seeded": true,
+      "diagnostics": "TEST FIXTURE: ending (seeded prerequisites)\nGDevelop 5.6.287 | perspective\nRUNNING | 29.9 fps (last 300 active frames)\nPosition 790.1, 457.7, 460.0\nVelocity 0.0, 0.0, 0.0\nUpdate 0.46 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 0\nAudio running | enabled | voices 0\nLinks 0 | shot none\nShots 0 | catches 0 | returned 0\nSprite front | idle 0\nF3 diagnostics | C compare projection\nActive 29.1s | stalls 0 | p95 34.8 ms | max 65 ms\nDocument visible | focus yes | frame cap 30\nFlute playing | 29.0s\nBridge 100% | locked | tower true | canopy true | complete true\nDraw calls 355 | triangles 45722 | wind checkpoint true\nSluice block 660.0 | plate latched | water 100%\nJourney complete | seal 0.00s | reveal 7.00s | route 2.1s\nWater dry | deep 0.00s | ripples 8"
+    },
+    {
+      "name": "final shallow basin",
+      "seeded": true,
+      "diagnostics": "TEST FIXTURE: water (seeded prerequisites)\nGDevelop 5.6.287 | perspective\nRUNNING | 52.8 fps (last 300 active frames)\nPosition 1235.9, 148.3, 176.0\nVelocity 94.3, -4.4, 0.0\nUpdate 2.22 ms | grounded true | checkpoint true\nTether none\nArrows 0 | chains 0 | resets 0\nAudio running | enabled | voices 2\nLinks 0 | shot none\nShots 0 | catches 0 | returned 0\nSprite right | walk 2\nF3 diagnostics | C compare projection\nActive 0.7s | stalls 0 | p95 31.5 ms | max 55 ms\nDocument visible | focus yes | frame cap 60\nFlute playing | 0.6s\nBridge 0% | waiting | tower false | canopy false | complete false\nDraw calls 157 | triangles 42974 | wind checkpoint false\nSluice block 660.0 | plate latched | water 100%\nJourney playing | seal 0.00s | reveal 0.00s | route 0.8s\nWater wading | deep 0.00s | ripples 5"
+    }
+  ],
+  "consoleErrors": []
+}

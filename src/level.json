@@ -174,7 +174,7 @@
       "h": 200,
       "d": 24,
       "color": "#315565",
-      "solid": false
+      "solid": true
     },
     {
       "name": "BasinLipWest",
@@ -196,28 +196,6 @@
       "h": 240,
       "d": 100,
       "color": "#b4a482",
-      "solid": true
-    },
-    {
-      "name": "StepOne",
-      "x": 670,
-      "y": 1180,
-      "z": 0,
-      "w": 130,
-      "h": 120,
-      "d": 22,
-      "color": "#e3d9c3",
-      "solid": true
-    },
-    {
-      "name": "StepTwo",
-      "x": 710,
-      "y": 1180,
-      "z": 22,
-      "w": 90,
-      "h": 120,
-      "d": 22,
-      "color": "#e3d9c3",
       "solid": true
     },
     {
@@ -321,11 +299,11 @@
     },
     {
       "name": "UpperRearWall",
-      "x": 1060,
-      "y": -210,
+      "x": 1080,
+      "y": -180,
       "z": 220,
-      "w": 210,
-      "h": 30,
+      "w": 190,
+      "h": 16,
       "d": 100,
       "color": "#c5bca8",
       "solid": true
@@ -343,12 +321,12 @@
     },
     {
       "name": "UpperWestWall",
-      "x": 1050,
+      "x": 1080,
       "y": -180,
-      "z": 180,
+      "z": 220,
       "w": 30,
       "h": 240,
-      "d": 140,
+      "d": 100,
       "color": "#c5bca8",
       "solid": true
     },
@@ -478,7 +456,7 @@
       "x": 1080,
       "y": 960,
       "z": -20,
-      "w": 540,
+      "w": 520,
       "h": 225,
       "d": 12,
       "color": "#286c8e",
@@ -493,7 +471,7 @@
       "h": 225,
       "d": 20,
       "color": "#315565",
-      "solid": false
+      "solid": true
     },
     {
       "name": "LowerBasinRim",
@@ -585,11 +563,11 @@
     },
     {
       "name": "Aqueduct",
-      "x": 690,
-      "y": 294,
+      "x": 685,
+      "y": 285,
       "z": 125,
-      "w": 510,
-      "h": 35,
+      "w": 525,
+      "h": 53,
       "d": 23,
       "color": "#d8ccb3",
       "solid": true
@@ -620,10 +598,10 @@
       "name": "AqueductLeg925",
       "x": 925,
       "y": 294,
-      "z": -50,
+      "z": -120,
       "w": 22,
       "h": 35,
-      "d": 175,
+      "d": 245,
       "color": "#d8ccb3",
       "solid": true
     },
@@ -631,10 +609,10 @@
       "name": "AqueductLeg1035",
       "x": 1035,
       "y": 294,
-      "z": -50,
+      "z": -120,
       "w": 22,
       "h": 35,
-      "d": 175,
+      "d": 245,
       "color": "#d8ccb3",
       "solid": true
     },
@@ -642,10 +620,10 @@
       "name": "AqueductLeg1160",
       "x": 1160,
       "y": 294,
-      "z": -50,
+      "z": -120,
       "w": 22,
       "h": 35,
-      "d": 175,
+      "d": 245,
       "color": "#d8ccb3",
       "solid": true
     },
@@ -705,34 +683,12 @@
       "solid": true
     },
     {
-      "name": "EastAnchorMast",
-      "x": 1570,
-      "y": 420,
-      "z": 100,
-      "w": 22,
-      "h": 22,
-      "d": 350,
-      "color": "#65513f",
-      "solid": true
-    },
-    {
-      "name": "EastAnchorBeam",
-      "x": 1435,
-      "y": 420,
-      "z": 450,
-      "w": 157,
-      "h": 22,
-      "d": 22,
-      "color": "#65513f",
-      "solid": true
-    },
-    {
       "name": "UpperRearWallEast",
       "x": 1450,
-      "y": -210,
+      "y": -180,
       "z": 220,
-      "w": 190,
-      "h": 30,
+      "w": 170,
+      "h": 16,
       "d": 70,
       "color": "#c5bca8",
       "solid": true
@@ -794,25 +750,14 @@
     },
     {
       "name": "TowerBackParapet",
-      "x": 1100,
-      "y": -990,
+      "x": 1110,
+      "y": -970,
       "z": 400,
-      "w": 530,
-      "h": 20,
+      "w": 500,
+      "h": 16,
       "d": 65,
       "color": "#c5bca8",
       "solid": true
-    },
-    {
-      "name": "TowerUnderpass",
-      "x": 1100,
-      "y": -520,
-      "z": 100,
-      "w": 170,
-      "h": 20,
-      "d": 96,
-      "color": "#d8ccb3",
-      "solid": false
     },
     {
       "name": "CanopyLanding",
@@ -937,10 +882,10 @@
     },
     {
       "name": "CanopyRail680",
-      "x": 680,
+      "x": 700,
       "y": -630,
       "z": 460,
-      "w": 16,
+      "w": 10,
       "h": 915,
       "d": 48,
       "color": "#c5bca8",
@@ -948,10 +893,10 @@
     },
     {
       "name": "CanopyRail890",
-      "x": 890,
+      "x": 880,
       "y": -630,
       "z": 460,
-      "w": 16,
+      "w": 10,
       "h": 915,
       "d": 48,
       "color": "#c5bca8",
@@ -959,33 +904,33 @@
     },
     {
       "name": "CanopyWestParapet",
-      "x": 560,
+      "x": 580,
       "y": -1080,
       "z": 460,
-      "w": 20,
-      "h": 450,
+      "w": 14,
+      "h": 430,
       "d": 55,
       "color": "#c5bca8",
       "solid": true
     },
     {
       "name": "CanopyRearParapet",
-      "x": 560,
-      "y": -1100,
+      "x": 580,
+      "y": -1080,
       "z": 460,
-      "w": 440,
-      "h": 20,
+      "w": 420,
+      "h": 14,
       "d": 55,
       "color": "#c5bca8",
       "solid": true
     },
     {
       "name": "OverlookFrontParapet",
-      "x": 560,
-      "y": 540,
+      "x": 580,
+      "y": 526,
       "z": 460,
-      "w": 460,
-      "h": 20,
+      "w": 420,
+      "h": 14,
       "d": 55,
       "color": "#c5bca8",
       "solid": true
@@ -997,7 +942,7 @@
       "z": 460,
       "w": 100,
       "h": 100,
-      "d": 55,
+      "d": 38,
       "color": "#d8ccb3",
       "solid": true
     },
@@ -1121,6 +1066,512 @@
       "d": 16,
       "color": "#65513f",
       "solid": false
+    },
+    {
+      "name": "BasinNorthWall",
+      "x": 40,
+      "y": 680,
+      "z": -140,
+      "w": 890,
+      "h": 20,
+      "d": 120,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "BasinSouthWall",
+      "x": 40,
+      "y": 900,
+      "z": -140,
+      "w": 890,
+      "h": 20,
+      "d": 120,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "LowerBasinSouth",
+      "x": 1080,
+      "y": 1185,
+      "z": -130,
+      "w": 542,
+      "h": 20,
+      "d": 130,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "LowerBasinWest",
+      "x": 1068,
+      "y": 960,
+      "z": -130,
+      "w": 12,
+      "h": 225,
+      "d": 130,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "ReservoirBack",
+      "x": 1090,
+      "y": 28,
+      "z": 176,
+      "w": 230,
+      "h": 22,
+      "d": 26,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "SkyRimWest",
+      "x": 590,
+      "y": 370,
+      "z": 498,
+      "w": 10,
+      "h": 100,
+      "d": 26,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "SkyRimEast",
+      "x": 680,
+      "y": 370,
+      "z": 498,
+      "w": 10,
+      "h": 100,
+      "d": 26,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "SkyRimNorth",
+      "x": 600,
+      "y": 370,
+      "z": 498,
+      "w": 80,
+      "h": 10,
+      "d": 26,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "SkyRimSouth",
+      "x": 600,
+      "y": 460,
+      "z": 498,
+      "w": 80,
+      "h": 10,
+      "d": 26,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "SkyDrainCollar",
+      "x": 611,
+      "y": 387,
+      "z": 431,
+      "w": 26,
+      "h": 26,
+      "d": 5,
+      "color": "#b39155",
+      "solid": false
+    },
+    {
+      "name": "AqueductReceivingBed",
+      "x": 1165,
+      "y": 248,
+      "z": 125,
+      "w": 55,
+      "h": 57,
+      "d": 20,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "AqueductReceivingWest",
+      "x": 1165,
+      "y": 248,
+      "z": 145,
+      "w": 9,
+      "h": 57,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "AqueductReceivingEast",
+      "x": 1211,
+      "y": 248,
+      "z": 145,
+      "w": 9,
+      "h": 57,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "CrossingMastFoot",
+      "x": 779,
+      "y": 739,
+      "z": -116,
+      "w": 44,
+      "h": 44,
+      "d": 20,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "AscentPost",
+      "x": 1490,
+      "y": -865,
+      "z": 400,
+      "w": 20,
+      "h": 20,
+      "d": 304,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "WindPostWest",
+      "x": 700,
+      "y": -165,
+      "z": 460,
+      "w": 12,
+      "h": 20,
+      "d": 305,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "WindPostEast",
+      "x": 878,
+      "y": -165,
+      "z": 460,
+      "w": 12,
+      "h": 20,
+      "d": 305,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "WindAnchorBeam",
+      "x": 700,
+      "y": -165,
+      "z": 760,
+      "w": 190,
+      "h": 20,
+      "d": 12,
+      "color": "#65513f",
+      "solid": false
+    },
+    {
+      "name": "WeightFrameWest",
+      "x": 1240,
+      "y": -160,
+      "z": 220,
+      "w": 20,
+      "h": 20,
+      "d": 340,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "WeightCrossbeam",
+      "x": 1240,
+      "y": -160,
+      "z": 560,
+      "w": 230,
+      "h": 20,
+      "d": 18,
+      "color": "#65513f",
+      "solid": false
+    },
+    {
+      "name": "CanopyFoundation",
+      "x": 560,
+      "y": -1100,
+      "z": -144,
+      "w": 460,
+      "h": 470,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "WindFoundation",
+      "x": 680,
+      "y": -330,
+      "z": -144,
+      "w": 230,
+      "h": 70,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "OverlookFoundation",
+      "x": 560,
+      "y": 330,
+      "z": -144,
+      "w": 460,
+      "h": 70,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "TowerFoundation",
+      "x": 1080,
+      "y": -1000,
+      "z": -144,
+      "w": 560,
+      "h": 520,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "PracticeStep",
+      "x": 245,
+      "y": 1205,
+      "z": 0,
+      "w": 70,
+      "h": 26,
+      "d": 18,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "ArrivalBenchSeat",
+      "x": 640,
+      "y": 1330,
+      "z": 29,
+      "w": 125,
+      "h": 28,
+      "d": 9,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "ArrivalBenchFootA",
+      "x": 650,
+      "y": 1334,
+      "z": 0,
+      "w": 12,
+      "h": 20,
+      "d": 29,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "ArrivalBenchFootB",
+      "x": 740,
+      "y": 1334,
+      "z": 0,
+      "w": 12,
+      "h": 20,
+      "d": 29,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "SluiceBenchSeat",
+      "x": 1480,
+      "y": 850,
+      "z": 129,
+      "w": 105,
+      "h": 28,
+      "d": 9,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "SluiceBenchFootA",
+      "x": 1490,
+      "y": 854,
+      "z": 100,
+      "w": 12,
+      "h": 20,
+      "d": 29,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "SluiceBenchFootB",
+      "x": 1560,
+      "y": 854,
+      "z": 100,
+      "w": 12,
+      "h": 20,
+      "d": 29,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "CanopyBenchSeat",
+      "x": 902,
+      "y": -1005,
+      "z": 489,
+      "w": 65,
+      "h": 25,
+      "d": 9,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "CanopyBenchFootA",
+      "x": 907,
+      "y": -1002,
+      "z": 460,
+      "w": 10,
+      "h": 18,
+      "d": 29,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "CanopyBenchFootB",
+      "x": 952,
+      "y": -1002,
+      "z": 460,
+      "w": 10,
+      "h": 18,
+      "d": 29,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "AqueductFoundation",
+      "x": 900,
+      "y": 275,
+      "z": -144,
+      "w": 180,
+      "h": 70,
+      "d": 24,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "LandingRearFooting",
+      "x": 190,
+      "y": 210,
+      "z": -120,
+      "w": 750,
+      "h": 40,
+      "d": 220,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "LandingWestFooting",
+      "x": 190,
+      "y": 250,
+      "z": -120,
+      "w": 30,
+      "h": 320,
+      "d": 220,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "ArrivalWestFooting",
+      "x": 65,
+      "y": 880,
+      "z": -120,
+      "w": 35,
+      "h": 575,
+      "d": 110,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "ArrivalBackFooting",
+      "x": 80,
+      "y": 1420,
+      "z": -120,
+      "w": 780,
+      "h": 35,
+      "d": 120,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "SluiceEastFooting",
+      "x": 1620,
+      "y": 160,
+      "z": -120,
+      "w": 26,
+      "h": 800,
+      "d": 220,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "SluiceRunnerLeft",
+      "x": 1157,
+      "y": 233,
+      "z": 176,
+      "w": 8,
+      "h": 18,
+      "d": 120,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "SluiceRunnerRight",
+      "x": 1220,
+      "y": 233,
+      "z": 176,
+      "w": 8,
+      "h": 18,
+      "d": 120,
+      "color": "#65513f",
+      "solid": true
+    },
+    {
+      "name": "SluiceRunnerBeam",
+      "x": 1157,
+      "y": 233,
+      "z": 296,
+      "w": 71,
+      "h": 18,
+      "d": 10,
+      "color": "#65513f",
+      "solid": false
+    },
+    {
+      "name": "WheelStandRear",
+      "x": 1140,
+      "y": 250,
+      "z": 100,
+      "w": 20,
+      "h": 16,
+      "d": 75,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "WheelStandFront",
+      "x": 1140,
+      "y": 294,
+      "z": 100,
+      "w": 20,
+      "h": 16,
+      "d": 75,
+      "color": "#d8ccb3",
+      "solid": true
+    },
+    {
+      "name": "WheelAxle",
+      "x": 1145,
+      "y": 258,
+      "z": 170,
+      "w": 10,
+      "h": 44,
+      "d": 10,
+      "color": "#65513f",
+      "solid": false
     }
   ],
   "anchors": [
@@ -1129,21 +1580,16 @@
       "x": 280,
       "y": 1198,
       "z": 312,
-      "label": "Practice anchor"
+      "label": "Practice ring \u00b7 learn reel and release safely here",
+      "purpose": "Safe first reel and release on broad ground"
     },
     {
       "id": "crossing",
       "x": 505,
       "y": 770,
       "z": 415,
-      "label": "Crossing anchor"
-    },
-    {
-      "id": "east",
-      "x": 1450,
-      "y": 444,
-      "z": 430,
-      "label": "Waterworks anchor"
+      "label": "Crossing anchor",
+      "purpose": "Cross the arrival basin to the checkpoint"
     },
     {
       "id": "ascent",
@@ -1151,7 +1597,8 @@
       "label": "Tower ring \u00b7 reel up, steer north, release above the garden",
       "x": 1500,
       "y": -700,
-      "z": 680
+      "z": 680,
+      "purpose": "Reach the tower; no stair route exists"
     },
     {
       "id": "wind",
@@ -1159,7 +1606,8 @@
       "label": "Wind walk \u00b7 swing over the slow paddle or wait for the opening",
       "x": 790,
       "y": -150,
-      "z": 740
+      "z": 740,
+      "purpose": "Swing above the moving paddle"
     }
   ],
   "puzzle": {
@@ -1202,7 +1650,7 @@
       "y": 970,
       "z": 0,
       "w": 180,
-      "h": 405
+      "h": 330
     },
     {
       "x": 235,
@@ -1230,7 +1678,7 @@
       "y": 715,
       "z": 100,
       "w": 140,
-      "h": 215
+      "h": 115
     },
     {
       "x": 1090,
@@ -1262,17 +1710,17 @@
     },
     {
       "x": 885,
-      "y": -1065,
+      "y": -955,
       "z": 460,
       "w": 95,
-      "h": 370
+      "h": 260
     },
     {
       "x": 590,
-      "y": 365,
+      "y": 480,
       "z": 460,
       "w": 110,
-      "h": 155
+      "h": 38
     },
     {
       "x": 875,
@@ -1280,6 +1728,73 @@
       "z": 460,
       "w": 110,
       "h": 155
+    },
+    {
+      "x": 1380,
+      "y": 280,
+      "z": 100,
+      "w": 210,
+      "h": 120
+    },
+    {
+      "x": 1380,
+      "y": 580,
+      "z": 100,
+      "w": 210,
+      "h": 100
+    },
+    {
+      "x": 1125,
+      "y": -680,
+      "z": 220,
+      "w": 115,
+      "h": 120
+    }
+  ],
+  "water": [
+    {
+      "name": "Water",
+      "x": 70,
+      "y": 700,
+      "z": -23,
+      "w": 830,
+      "h": 200,
+      "bottom": -116,
+      "flowX": 17,
+      "flowY": 0
+    },
+    {
+      "name": "WaterLower",
+      "x": 1080,
+      "y": 960,
+      "z": -8,
+      "w": 520,
+      "h": 225,
+      "bottom": -110,
+      "flowX": 12,
+      "flowY": 8
+    },
+    {
+      "name": "WaterReservoir",
+      "x": 1100,
+      "y": 50,
+      "z": 183,
+      "w": 210,
+      "h": 180,
+      "bottom": 176,
+      "flowX": 0,
+      "flowY": 10
+    },
+    {
+      "name": "WaterSkyCistern",
+      "x": 600,
+      "y": 380,
+      "z": 514,
+      "w": 80,
+      "h": 80,
+      "bottom": 498,
+      "flowX": 0,
+      "flowY": 8
     }
   ]
 }

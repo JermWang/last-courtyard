@@ -82,7 +82,8 @@
     const n=Math.hypot(input.x,input.y),mx=n?input.x/Math.max(1,n):0,my=n?input.y/Math.max(1,n):0;
     if(wasGrounded){
       const blend=1-Math.exp(-(n?18:22)*dt);
-      p.vx+=(mx*220-p.vx)*blend;p.vy+=(my*220-p.vy)*blend;
+      const speed=220*clamp(input.speedScale??1,0.3,1);
+      p.vx+=(mx*speed-p.vx)*blend;p.vy+=(my*speed-p.vy)*blend;
     }else{
       p.vx+=mx*300*dt;p.vy+=my*300*dt;
       const speed=Math.hypot(p.vx,p.vy);

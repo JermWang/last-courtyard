@@ -77,3 +77,7 @@ At the user's explicit request, the current grass was sourced from their local `
 ## First-level ending
 
 The restoration reveal reuses the existing generated tree cutout, water geometry and courtyard materials. Growth is rooted scaling plus tint animation; no new generated or downloaded artwork. The four-note completion cue is original Web Audio oscillator synthesis in `src/runtime.js`, routed through effects/master/mute settings. The existing licensed flute track remains the music.
+
+## Water and structural finish
+
+Water surfaces, banded wave/foam shader, bounded ripple pool, beveled floating foundations, support beams, garden curbs, benches and landing marks are original procedural geometry/code created in this workspace. They reuse existing generated material textures and shrub art. No new downloaded or generated image/audio assets were introduced. Water footsteps reuse the original procedural splash sound.

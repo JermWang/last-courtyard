@@ -7,6 +7,7 @@ const P=globalThis.CourtyardPhysics, A=globalThis.CourtyardAnimation, S=globalTh
 const B=globalThis.CourtyardPuzzle,puzzle=B.create(L.puzzle);
 const E=globalThis.CourtyardElevation,elevation=E.create();
 const J=globalThis.CourtyardJourney,journey=J.create();
+const W=globalThis.CourtyardWater,wetState=W.create();
 const animation=A.create();let firedThisFrame=false,lastTickClock=performance.now(),previousActive=false;
 const layer=runtimeScene.getLayer(''),renderer=layer.getRenderer();
 const group=renderer.getThreeGroup(),camera=renderer.getThreeCamera();
@@ -17,6 +18,7 @@ const state={time:0,acc:0,tether:null,arrow:null,draw:0,drawing:false,checkpoint
 const fixture=new URLSearchParams(location.search).has('debug')?new URLSearchParams(location.search).get('stage'):null;
 if(fixture==='tower'){puzzle.solved=true;puzzle.flow=1;puzzle.plate=1;puzzle.y=L.puzzle.endY;elevation.locked=true;elevation.drop=160;elevation.tower=true;state.checkpoint=true;Object.assign(p,{x:1300,y:-820,z:400});}
 if(fixture==='ending'){Object.assign(puzzle,{solved:true,flow:1,plate:1,y:L.puzzle.endY});Object.assign(elevation,{locked:true,drop:160,tower:true,canopy:true,wind:true});state.checkpoint=true;Object.assign(p,{x:785,y:350,z:460});}
+if(fixture==='water'){Object.assign(puzzle,{solved:true,flow:1,plate:1,y:L.puzzle.endY});state.checkpoint=true;Object.assign(p,{x:1200,y:150,z:176});}
 const timing={activeSeconds:0,stalls:0,longest:0,p95:0};
 // Native GDevelop frame limiting keeps a paused preview from competing with
 // active play. DOM controls remain immediately responsive between game frames.
@@ -43,7 +45,7 @@ function foregroundFade(object,position,bounds=null){
 // Three deliberate face tones: no dynamic lighting or smooth tonal gradients.
 for(const b of L.boxes){
   const obj=runtimeScene.getObjects(b.name)[0],m=obj.get3DRendererObject();
-  const water=b.name.startsWith('Water'),wood=b.color==='#65513f';
+  const water=L.water.some(w=>w.name===b.name),wood=b.color==='#65513f';
   m.material=water?flatFaces:wood?woodSurface:stoneSurface;
   const tones=water?['#2585a4','#246a86','#234a65']:['#ffffff','#eeebe4','#a0a8ba'];
   const tint=new THREE.Color(b.name==='SluiceCourt'||b.name==='BridgeLanding'?'#c5d2cb':'#ffffff');
@@ -67,7 +69,8 @@ for(const b of L.boxes){
     const edges=new THREE.EdgesGeometry(m.geometry,35),ink=new THREE.LineBasicMaterial({color:b.color==='#65513f'?'#45362f':'#897969',transparent:true,opacity:0.6});
     const outline=new THREE.LineSegments(edges,ink);m.add(outline);own.push(edges,ink);
   }
-  if((b.d<=32&&b.z>150)||['PracticeMast','AnchorMast','AnchorBeam','EastAnchorMast','EastAnchorBeam','WeightFrame','WeightBeam','CarriageRail','RailTower','RailCanopy','AscentBeam','WindRail'].includes(b.name))foregroundFade(m,{x:b.x+b.w/2,y:b.y+b.h/2,z:b.z+b.d/2},b);
+  if(L.water.some(w=>w.name===b.name))obj.hide();
+  if((b.d<=32&&b.z>150)||['PracticeMast','AnchorMast','AnchorBeam','EastAnchorMast','EastAnchorBeam','WeightFrame','WeightBeam','CarriageRail','RailTower','RailCanopy','AscentBeam','WindRail','WindAnchorBeam','WindPostWest','WindPostEast'].includes(b.name))foregroundFade(m,{x:b.x+b.w/2,y:b.y+b.h/2,z:b.z+b.d/2},b);
 }
 const targetDefinitions=[...L.anchors,B.anchor(puzzle,L.puzzle),E.weight(elevation),E.carriage(elevation)];
 const anchorMats=targetDefinitions.map(()=>material('#bc9148'));
@@ -99,7 +102,7 @@ for(const [x,y,z,w] of [[145,1020,0,115],[145,1310,0,100],[277,292,100,135],[815
   const h=w*216/384,mat=new THREE.MeshBasicMaterial({map:imageManager.getThreeTexture('courtyard-shrub'),transparent:true,alphaTest:0.25,side:THREE.DoubleSide,depthWrite:true});own.push(mat);
   const shrub=mesh(new THREE.PlaneGeometry(w,h,4,5),mat);shrub.position.set(x,y,z+h/2-h*6/216);shrubs.push(shrub);
 }
-for(const [x,y,z,w] of [[1110,860,100,100],[1550,860,100,110],[1550,280,100,85],[1125,-115,220,125],[1510,-130,220,120],[965,980,20,65],[875,1190,0,80]]){
+for(const [x,y,z,w] of [[1110,860,100,100],[1550,775,100,110],[1550,280,100,85],[1125,-115,220,125],[1510,-130,220,120],[965,980,20,65],[875,1190,0,80]]){
   const h=w*216/384,mat=new THREE.MeshBasicMaterial({map:imageManager.getThreeTexture('courtyard-shrub'),transparent:true,alphaTest:0.25,side:THREE.DoubleSide,depthWrite:true});own.push(mat);
   const plant=mesh(new THREE.PlaneGeometry(w,h,4,5),mat);plant.position.set(x,y,z+h/2-h*6/216);shrubs.push(plant);
 }
@@ -112,7 +115,7 @@ const treeBaseZ=tree.position.z,treeFoot=142;
 treeMat.color.set('#929575');
 // Wind bends the generated cutouts above rooted feet; it never rotates their
 // vertical billboard axes toward the camera. Shared phases make gusts coherent.
-for(const [x,y,z,w] of [[1160,-610,220,95],[1530,-900,400,95],[630,-920,460,110],[960,-1000,460,85],[755,-350,460,65],[630,485,460,85],[940,470,460,100]]){
+for(const [x,y,z,w] of [[1160,-610,220,95],[1530,-900,400,95],[630,-920,460,110],[950,-890,460,85],[755,-350,460,65],[630,485,460,70],[940,470,460,100],[1480,335,100,130],[1530,620,100,110],[1140,800,100,90],[680,1060,0,110]]){
  const h=w*216/384,mat=treeMat.clone();mat.map=imageManager.getThreeTexture('courtyard-shrub');mat.color.set('#ffffff');own.push(mat);
  const plant=mesh(new THREE.PlaneGeometry(w,h,4,5),mat);plant.position.set(x,y,z+h/2-h*6/216);shrubs.push(plant);
 }
@@ -146,6 +149,45 @@ const stoneTones=['#8b8d9b','#dcc7a6','#dcc7a6','#8b8d9b','#f4e1c1','#8b8d9b'].m
 const brassTones=['#8a6939','#b38b45','#b38b45','#795a36','#ddbb73','#795a36'].map(material);
 for(const m of brassTones){m.map=brassMap;m.color.set('#ffffff');}
 function trim(x,y,z,w,h,d,mats){const t=mesh(new THREE.BoxGeometry(w,h,d),mats);t.position.set(x+w/2,y+h/2,z+d/2);return t;}
+// Finished floating foundations: broad beveled undersides instead of abruptly
+// cut piers. Decorative support geometry stays below the playable collision.
+for(const name of ['Arrival','Landing','SluiceCourt','UpperGarden','CanopyFoundation','WindFoundation','OverlookFoundation','TowerFoundation','AqueductFoundation']){
+ const b=L.boxes.find(b=>b.name===name),inset=Math.min(45,b.w*.15,b.h*.15),drop=Math.min(75,b.h*.35);
+ const points=[[b.x,b.y,b.z],[b.x+b.w,b.y,b.z],[b.x+b.w,b.y+b.h,b.z],[b.x,b.y+b.h,b.z],
+  [b.x+inset,b.y+inset,b.z-drop],[b.x+b.w-inset,b.y+inset,b.z-drop],[b.x+b.w-inset,b.y+b.h-inset,b.z-drop],[b.x+inset,b.y+b.h-inset,b.z-drop]];
+ const positions=[],colors=[],tones=['#859585','#6b7c78','#566977'];
+ for(const [face,indices] of [[0,[0,4,5,0,5,1]],[1,[1,5,6,1,6,2]],[2,[2,6,7,2,7,3]],[1,[3,7,4,3,4,0]],[2,[4,7,6,4,6,5]]]){
+  const color=new THREE.Color(tones[face]);for(const i of indices){positions.push(...points[i]);colors.push(color.r,color.g,color.b);}
+ }
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));mesh(geo,flatFaces);
+}
+// One instanced draw frames every garden bed without adding dozens of materials.
+const curbGeo=new THREE.BoxGeometry(1,1,1),curbColors=[];
+for(let i=0;i<curbGeo.attributes.position.count;i++){const n=curbGeo.attributes.normal,color=new THREE.Color(n.getZ(i)>.5?'#e4d3b1':n.getX(i)>.5?'#a4a393':'#c1b89f');curbColors.push(color.r,color.g,color.b);}
+curbGeo.setAttribute('color',new THREE.Float32BufferAttribute(curbColors,3));own.push(curbGeo);
+const curbs=new THREE.InstancedMesh(curbGeo,flatFaces,L.grass.length*4),curbTransform=new THREE.Object3D();let curbIndex=0;
+for(const lawn of L.grass)for(const [x,y,w,h] of [[lawn.x,lawn.y,lawn.w,4],[lawn.x,lawn.y+lawn.h-4,lawn.w,4],[lawn.x,lawn.y,4,lawn.h],[lawn.x+lawn.w-4,lawn.y,4,lawn.h]]){
+ curbTransform.position.set(x+w/2,y+h/2,lawn.z+1.7);curbTransform.scale.set(w,h,3);curbTransform.updateMatrix();curbs.setMatrixAt(curbIndex++,curbTransform.matrix);
+}
+curbs.instanceMatrix.needsUpdate=true;curbs.computeBoundingSphere();world.add(curbs);own.push(curbs);
+function supportBeam(from,to,width){
+ const a=new THREE.Vector3(...from),b=new THREE.Vector3(...to),direction=b.clone().sub(a);
+ const beam=mesh(new THREE.BoxGeometry(width,width,direction.length()),woodSurface);beam.position.copy(a).add(b).multiplyScalar(.5);beam.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),direction.normalize());
+ // The textured shared material expects vertex colors, including on these props.
+ const attr=beam.geometry.attributes.position,colors=[];for(let i=0;i<attr.count;i++)colors.push(.85,.85,.85);beam.geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+ foregroundFade(beam,{x:beam.position.x,y:beam.position.y,z:beam.position.z});
+}
+supportBeam([1250,-150,480],[1280,-470,560],12);supportBeam([1590,-150,480],[1440,-470,560],12);
+supportBeam([1280,-470,560],[1440,-470,560],12);
+for(const a of L.anchors.filter(a=>['ascent','wind'].includes(a.id))){
+ trim(a.x-3,a.y-3,a.z+18,6,6,a.id==='wind'?24:10,brassTones);
+}
+// Raised landing mark and a separate practice pad communicate intent without
+// adding another collectible, route or misleading grapple target.
+const practicePad=mesh(new THREE.RingGeometry(40,44,32),material('#9f8c5f'));practicePad.position.set(400,1220,.7);
+for(const [x,y,z] of [[505,940,0],[540,510,100],[1450,-810,400],[780,-800,460]]){
+ const mark=mesh(new THREE.RingGeometry(26,29,24),material('#9f8c5f'));mark.position.set(x,y,z+.7);
+}
 for(const name of ['RearWall','LandingWestWall','ArrivalWestWall','TreePlanter']){
   const b=L.boxes.find(b=>b.name===name);
   const cap={name:name+'Cap',x:b.x-3,y:b.y-3,z:b.z+b.d,w:b.w+6,h:b.h+6,d:8,solid:true};
@@ -159,26 +201,19 @@ for(const [x,y,z,w,h,d] of [[197,217,100,44,42,148],[880,217,100,40,42,148],[63,
 for(const [x,y,z,w,h,d] of [[488,747,433,31,28,27],[786,747,420,30,28,40],[268,1158,266,24,24,14],[272,1170,291,16,28,10]]){
   const mount=trim(x,y,z,w,h,d,brassTones);foregroundFade(mount,{x:x+w/2,y:y+h/2,z:z+d/2});
 } // ring stands forward of the post so reeling cannot snag its own mount
-const rippleMat=material('#4ca8bb');
-for(const [x,y,w] of [[150,755,58],[360,817,42],[568,748,65],[730,830,55]]){const r=mesh(new THREE.PlaneGeometry(w,3),rippleMat);r.position.set(x,y,-22.6);}
+const waterView=globalThis.createCourtyardWaterView(THREE,world,own,L.water);
 // Waterworks: broad lane guides, a matching plate mark, and an actual elevated
 // aqueduct deliver water downhill into the tree bed. All streams are cheap boxes.
-const laneMat=material('#a28b60'),plateMat=material('#bc9555'),waterMat=material('#318eaa');
+const laneMat=material('#a28b60'),plateMat=material('#bc9555');
 for(const x of [1236,1320])trim(x,260,101,4,455,3,[laneMat,laneMat,laneMat,laneMat,laneMat,laneMat]);
 const plateMark=mesh(new THREE.RingGeometry(28,34,24),plateMat);plateMark.position.set(1280,660,106);
 const blockMark=mesh(new THREE.RingGeometry(20,24,24),plateMat);blockMark.position.set(1280,300,163);
 // Visible brass signal line connects the plate to the sluice along the deck.
 trim(1150,674,101,76,4,2,[laneMat,laneMat,laneMat,laneMat,laneMat,laneMat]);
 trim(1150,265,101,4,413,2,[laneMat,laneMat,laneMat,laneMat,laneMat,laneMat]);
-const streams=[];
-for(const [x,y,z,w,h,d] of [[1174,248,150,37,57,33],[695,299,149,505,25,4],[694,323,142,28,35,9],[690,350,142,40,70,3]]){
-  const m=trim(x,y,z,w,h,d,[waterMat,waterMat,waterMat,waterMat,waterMat,waterMat]);m.visible=false;streams.push(m);
-}
-const wheel=new THREE.Group();world.add(wheel);wheel.position.set(1350,235,175);wheel.rotation.x=Math.PI/2;
+const wheel=new THREE.Group();world.add(wheel);wheel.position.set(1150,278,175);wheel.rotation.x=Math.PI/2;
 const wheelRim=new THREE.TorusGeometry(48,5,6,20);own.push(wheelRim);wheel.add(new THREE.Mesh(wheelRim,material('#795939')));
 for(let i=0;i<8;i++){const g=new THREE.BoxGeometry(7,90,7);own.push(g);const spoke=new THREE.Mesh(g,material('#795939'));spoke.rotation.z=i*Math.PI/4;wheel.add(spoke);}
-const waterGlints=[];
-for(let i=0;i<14;i++){const m=mesh(new THREE.PlaneGeometry(15,2),rippleMat);m.visible=false;waterGlints.push(m);}
 const blockBox=boxes.find(b=>b.name===L.puzzle.block),blockObject=runtimeScene.getObjects(L.puzzle.block)[0];
 const blockAnchor=anchors.find(a=>a.kind==='block'),plateObject=runtimeScene.getObjects(L.puzzle.plate)[0];
 const pressureMat=plateObject.get3DRendererObject().material.clone();own.push(pressureMat);plateObject.get3DRendererObject().material=pressureMat;
@@ -193,14 +228,12 @@ function syncPuzzle(visual=true){
   gateObject.setZ(173+puzzle.flow*62);returnGateBox.z=20+puzzle.flow*150;returnGateObject.setZ(returnGateBox.z);
   plateMat.color.set(puzzle.solved?'#8bbd87':'#bc9555');
   pressureMat.color.set(puzzle.solved?'#bdd6a6':'#ffffff');laneMat.color.set(puzzle.solved?'#6b986b':'#a28b60');
-  for(let i=0;i<streams.length;i++)streams[i].visible=puzzle.flow>(i+0.15)/streams.length;
   // The first feed revives the tree partway; the sky feed supplies the payoff.
   const bloom=elevation.complete?P.clamp((journey.reveal-1)/4,0,1):0;
   const life=puzzle.flow*0.55+bloom*0.45;
   treeMat.color.setRGB(0.573+0.427*life,0.584+0.416*life,0.459+0.541*life);
   tree.scale.setScalar(1+0.1*bloom);tree.position.z=treeFoot+(treeBaseZ-treeFoot)*tree.scale.y;
   wheel.rotation.z=state.time*(puzzle.flow>0.5?0.45:0);
-  for(let i=0;i<waterGlints.length;i++){const m=waterGlints[i];m.visible=puzzle.flow>0.5;m.position.set(1190-((state.time*65+i*38)%490),311,153.3);}
 }
 syncPuzzle();
 const bridgeBox=boxes.find(b=>b.name==='CounterBridge'),bridgeObject=runtimeScene.getObjects('CounterBridge')[0];
@@ -208,7 +241,6 @@ const weightObject=runtimeScene.getObjects('HangingWeight')[0];
 const weightAnchor=anchors.find(a=>a.kind==='weight'),movingAnchor=anchors.find(a=>a.kind==='moving');
 const cableMat=material('#665e4d'),cables=[];
 for(const [x,y] of [[1490,-155],[1280,-470],[1440,-470]]){const cable=mesh(new THREE.CylinderGeometry(2,2,1,6),cableMat);cable.rotation.x=Math.PI/2;cables.push({mesh:cable,x,y});}
-const highStream=trim(624,400,145,10,16,315,[waterMat,waterMat,waterMat,waterMat,waterMat,waterMat]);highStream.visible=false;
 const seal=mesh(new THREE.RingGeometry(32,38,32),material('#bc9555'));seal.position.set(785,450,465);
 function syncElevation(visual=true){
  bridgeBox.z=E.bridgeTop(elevation)-24;
@@ -220,9 +252,7 @@ function syncElevation(visual=true){
  }
  const ends=[495-elevation.drop,E.bridgeTop(elevation),E.bridgeTop(elevation)];
  cables.forEach((c,i)=>{const top=i?560:560;c.mesh.position.set(c.x,c.y,(top+ends[i])/2);c.mesh.scale.y=top-ends[i];});
- seal.material.color.set(elevation.complete?'#8bbd87':'#bc9555');highStream.visible=elevation.complete;
- const feed=elevation.complete?P.clamp(journey.reveal/2,0.01,1):0;
- highStream.scale.z=feed;highStream.position.z=460-315*feed/2;
+ seal.material.color.set(elevation.complete?'#8bbd87':'#bc9555');
  seal.scale.setScalar(1+(journey.hold>0?journey.hold*0.2:0));
 }
 syncElevation();
@@ -310,7 +340,7 @@ function detach(reason){
   }else if(state.arrow)S.retract(state.arrow);
   state.drawing=false;state.draw=0;
 }
-function recover(){if(J.locked(journey))return;stopVoices();chainView.clear();A.reset(animation);firedThisFrame=false;B.reset(puzzle,L.puzzle);syncPuzzle();journey.hold=0;const spawn=elevation.complete?{x:785,y:450,z:460}:E.checkpoint(elevation)||(puzzle.solved?L.puzzle.checkpoint:state.checkpoint?L.checkpoint:L.spawn);Object.assign(p,spawn,{vx:0,vy:0,vz:0,grounded:false,coyote:0,jumpBuffer:0});state.tether=null;state.arrow=null;state.drawing=false;state.draw=0;state.acc=0;state.jump=false;state.resetCount++;state.keys.clear();facingX=0;facingY=-1;toast(elevation.complete?'Garden restored. Back at the overlook.':puzzle.solved?'Checkpoint recovered. Puzzle progress kept.':'Back on solid ground');}
+function recover(){if(J.locked(journey))return;stopVoices();chainView.clear();Object.assign(wetState,W.create());A.reset(animation);firedThisFrame=false;B.reset(puzzle,L.puzzle);syncPuzzle();journey.hold=0;const spawn=elevation.complete?{x:785,y:450,z:460}:E.checkpoint(elevation)||(puzzle.solved?L.puzzle.checkpoint:state.checkpoint?L.checkpoint:L.spawn);Object.assign(p,spawn,{vx:0,vy:0,vz:0,grounded:false,coyote:0,jumpBuffer:0});state.tether=null;state.arrow=null;state.drawing=false;state.draw=0;state.acc=0;state.jump=false;state.resetCount++;state.keys.clear();facingX=0;facingY=-1;toast(elevation.complete?'Garden restored. Back at the overlook.':puzzle.solved?'Checkpoint recovered. Puzzle progress kept.':'Back on solid ground');}
 let endingNote=-1;
 function beginRestoration(){
   stopVoices();state.tether=null;state.arrow=null;state.drawing=false;state.draw=0;state.drawTarget=null;state.keys.clear();state.jump=false;state.acc=0;
@@ -447,7 +477,7 @@ function targetUnderMouse(){
 }
 function setText(el,value){if(el.textContent!==value)el.textContent=value;}
 function render(){
-  syncPuzzle();syncElevation();
+  syncPuzzle();syncElevation();waterView.update(state.time,puzzle.flow,elevation.complete?P.clamp(journey.reveal/2,0,1):0);
   const paddle=E.obstacle(elevation);paddleObject.setX(paddle.x);paddleCord.position.set(paddle.x+35,-143,612.5);
   updateCamera();const cam=viewConfig(),angle=Math.atan2(-(cam.x-p.x),cam.y-p.y);
   // Close third-person framing: near-camera hardware must not fill the screen
@@ -503,8 +533,12 @@ courtyardGrass.update(state.time);
   else if(state.tether?.anchor.kind==='moving'){setText(title,'Ride the waterwheel carriage.');setText(detail,'Reel up with E. Ride west toward the high landing, then release. R returns to your latest terrace.');}
   else if(state.tether?.anchor.kind==='block'){setText(title,puzzle.solved?'The sluice is secured.':'Pull the sluice block.');setText(detail,puzzle.solved?'Water is on its way to the tree. Right mouse releases the chain.':state.tether.length<=90.5?'Step backward toward the brass standing mark, then keep holding E. The chain needs room to pull.':'Stand on the brass mark beyond the plate and hold E. The guide keeps the heavy block on course.');}
   else if(state.tether?.anchor.id==='ascent'){setText(title,'Climb on the chain.');setText(detail,'Hold E and move north. Release above the upper terrace; your momentum carries you onto it.');}
+  else if(state.tether?.anchor.id==='crossing'){setText(title,p.z<135?'Reel above the far stone ledge.':'Steer onto the landing, then release.');setText(detail,'Hold E and W until your feet clear the terrace. Right mouse releases; keep W held to land.');}
+  else if(state.tether?.anchor.id==='practice'){setText(title,'Safe practice: feel the reel lift you.');setText(detail,'E pulls you up · Q lowers you · Right mouse lets go. The next ring crosses the water.');}
+  else if(state.tether?.anchor.id==='wind'){setText(title,'Swing above the slow paddle.');setText(detail,'Hold E to lift above the wood, steer south with S, then release onto the high walk.');}
   else if(state.tether){setText(title,state.tether.length<=90.5?'Fully reeled in.':state.tether.length>=619.5?'Chain at full reach.':state.tether.taut?'Feel the chain take your weight.':'Attached. Move toward the watercourse.');setText(detail,'E shortens the chain · Q gives you room · Right mouse releases your momentum');}
   else if(state.target){setText(title,state.valid?'Hold, draw, release.':P.distance(P.reelPoint(p),state.target)>620?'Move closer to this anchor.':'Stone blocks the shot.');setText(detail,state.target.label+' · A gold reticle means a clear shot.');}
+  else if(wetState.wet){setText(title,'Shallow water slows your steps.');setText(detail,'Ripples follow your movement. The deep basins return you to your checkpoint.');}
   else if(elevation.complete){setText(title,'Level complete. The garden is yours.');setText(detail,'Both feeds are restored. Explore freely, or choose Restart courtyard in the pause menu to play again.');}
   else if(elevation.canopy){setText(title,elevation.wind&&p.y<-80?'The wind walk.':'Follow the high walk back to the tree.');setText(detail,elevation.wind&&p.y<-80?'Wait for the wooden paddle to sweep aside, or use the high ring to swing over it.':'Head south to the overlook. Stand on the brass seal to open the sky cistern.');}
   else if(elevation.tower){setText(title,'A path across the sky.');setText(detail,'Catch the moving ring. Reel upward, ride west, and release above the broad landing.');}
@@ -544,7 +578,10 @@ function tick(){
       let walked=0,landed=false;
       let steps=0;while(state.acc>=P.STEP&&steps++<8){
         if(state.arrow){
-          const shot=state.arrow,event=S.step(shot,P.STEP,P.reelPoint(p),boxes,anchors);
+          const shot=state.arrow,wasOutbound=shot.phase==='out',from={...shot.pos};
+          let event=S.step(shot,P.STEP,P.reelPoint(p),boxes,anchors);
+          const waterHit=wasOutbound?W.crossing(from,shot.pos,L.water,state.time):null;
+          if(waterHit){Object.assign(shot.pos,{x:waterHit.x,y:waterHit.y,z:waterHit.z});S.retract(shot);event={type:'water'};waterView.splash(waterHit.x,waterHit.y,waterHit.z,.65,waterHit.basin);sound('splash',.3);}
           if(event?.type==='anchor'){
             const a=event.anchor;
             if(P.distance(P.reelPoint(p),a)<=S.RANGE&&!P.blocked(P.reelPoint(p),a,boxes)){
@@ -563,15 +600,18 @@ function tick(){
         syncElevation(false);
         if(ridingBridge)p.z+=E.bridgeTop(elevation)-bridgeWas;
         if(locked){sound('plate');toast('Bridge locked. Climb the waterwheel tower.');}
-        const result=P.step(p,{x:fx*f-fy*r,y:fy*f+fx*r,jump:state.jump,reel:!pullingBlock&&k.has('KeyE'),payout:k.has('KeyQ')},boxes,state.tether);
+        const contactBefore=W.sample(p,L.water,state.time);
+        const result=P.step(p,{speedScale:contactBefore?(contactBefore.deep?0.4:0.72):1,x:fx*f-fy*r,y:fy*f+fx*r,jump:state.jump,reel:!pullingBlock&&k.has('KeyE'),payout:k.has('KeyQ')},boxes,state.tether);
         if(mechanism.completed){state.checkpoint=true;sound('plate');toast('Sluice secured. Water is returning.');}
         state.jump=false;state.acc-=P.STEP;
         if(wasGrounded&&p.grounded)walked+=Math.hypot(p.x-oldX,p.y-oldY);
         if(result.reason)detach('Chain released: the path is blocked');
-        const wet=L.boxes.some(water=>water.name.startsWith('Water')&&!water.name.endsWith('Bed')&&P.inWater(p,water));
-        if(result.invalid||wet||P.outside(p,L.bounds)){recover();sound('splash');break;}
+        const contact=W.sample(p,L.water,state.time),waterEvent=W.step(wetState,p,contact,Math.hypot(p.x-oldX,p.y-oldY),P.STEP);
+        if(waterEvent.ripple&&contact)waterView.splash(p.x,p.y,contact.z,waterEvent.splash?1:.35,contact.basin);
+        if(waterEvent.splash)sound('splash',contact.deep?0.7:0.25);
+        if(result.invalid||waterEvent.recover||P.outside(p,L.bounds)){recover();if(waterEvent.recover)toast('Deep water. Back at your checkpoint.');break;}
         if(elevation.canopy&&P.overlaps(p,E.obstacle(elevation))){recover();sound('land',0.3);toast('A soft bump. Wait for the paddle, or swing over it.');break;}
-        if(result.landed&&result.impact>100){landed=true;sound('land',Math.min(1,result.impact/500));}
+        if(result.landed&&result.impact>100){landed=true;if(!waterEvent.splash)sound(contact?'splash':'land',Math.min(1,result.impact/500));}
       }
       if(state.acc>P.STEP*8)state.acc=0;
       if(!state.checkpoint&&p.y<620&&p.z>=98&&p.grounded){state.checkpoint=true;checkpoint.material.color.set('#c9df91');toast('Checkpoint reached');sound('checkpoint');}
@@ -579,7 +619,7 @@ function tick(){
       if(p.grounded&&p.z>=458&&p.x<1020&&p.y<-650&&!elevation.canopy){elevation.canopy=true;toast('Canopy checkpoint. Follow the high walk back to the tree.');sound('checkpoint');}
       if(elevation.canopy&&!elevation.wind&&p.grounded&&p.z===460&&p.y>-430&&p.y<-270){elevation.wind=true;toast('Wind walk checkpoint. Watch the paddle or take the high ring.');sound('checkpoint');}
       const pose=A.update(animation,{grounded:p.grounded,vz:p.vz,distance:walked,drawing:state.drawing,draw:state.draw,fired:firedThisFrame,landed,attached:!!state.tether,reeling:(!!state.tether&&(k.has('KeyE')||k.has('KeyQ')))||state.arrow?.phase==='return'},elapsed);
-      firedThisFrame=false;if(pose.step)sound('step',0.35);
+      firedThisFrame=false;if(pose.step)sound(wetState.wet?'splash':'step',wetState.wet?0.13:0.35);
       const blockSlack=state.tether?.anchor.kind==='block'&&state.tether.length-P.distance(P.reelPoint(p),state.tether.anchor)>1;
       const motor=state.tether?.anchor.kind==='block'?Math.max(puzzle.speed,blockSlack&&k.has('KeyE')&&!puzzle.solved?135:0):state.tether?Math.abs(state.tether.lengthRate||0):state.arrow?180:0;
       if(state.time-lastMechanism>0.16&&(elevation.moved>0||puzzle.speed>2||(puzzle.solved&&puzzle.flow<1))){sound(puzzle.speed>2?'block':'sluice',0.6);lastMechanism=state.time;}
@@ -589,7 +629,7 @@ function tick(){
       // The single licensed flute track replaces the old repeated test tones.
       // Overlapping finite voices create a quiet bed; at most two water voices
       // coexist. They use the effects volume and stop with all other sounds.
-      if(state.time-lastWater>1.1){sound('water',P.clamp(1-Math.hypot(p.x-485,p.y-800)/1000,0.15,0.6));lastWater=state.time;}
+      if(state.time-lastWater>1.1){const near=Math.min(...L.water.map(b=>Math.hypot(p.x-P.clamp(p.x,b.x,b.x+b.w),p.y-P.clamp(p.y,b.y,b.y+b.h),(p.z-b.z)*.7)));sound('water',P.clamp(1-near/650,.03,.6));lastWater=state.time;}
     }
     const event=J.step(journey,puzzle,elevation,p,elapsed,false,{shots:state.shotCount,recoveries:state.resetCount});
     if(event==='restore')beginRestoration();
@@ -612,6 +652,7 @@ function tick(){
   diagnostics.textContent+=`\nDraw calls ${gpu?.calls??'—'} | triangles ${gpu?.triangles??'—'} | wind checkpoint ${elevation.wind}`;
   diagnostics.textContent+=`\nSluice block ${puzzle.y.toFixed(1)} | plate ${puzzle.solved?'latched':'waiting'} | water ${Math.round(puzzle.flow*100)}%`;
   diagnostics.textContent+=`\nJourney ${journey.phase} | seal ${journey.hold.toFixed(2)}s | reveal ${journey.reveal.toFixed(2)}s | route ${journey.seconds.toFixed(1)}s`;
+  diagnostics.textContent+=`\nWater ${wetState.wet?'wading':'dry'} | deep ${wetState.deepTime.toFixed(2)}s | ripples ${waterView.activeRipples}`;
 }
 function dispose(){flute.pause();flute.removeAttribute('src');flute.load();controls.abort();runtimeScene.getGame().setMaximumFps(60);root.remove();group.remove(world);for(const resource of own)resource.dispose?.();audio?.close();}
 runtimeScene.__courtyard={tick,dispose,state,player:p,boxes,anchors,recover};

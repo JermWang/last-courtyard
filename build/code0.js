@@ -17,8 +17,6 @@ gdjs.CourtyardCode.GDWaterObjects1= [];
 gdjs.CourtyardCode.GDWaterBedObjects1= [];
 gdjs.CourtyardCode.GDBasinLipWestObjects1= [];
 gdjs.CourtyardCode.GDBasinLipEastObjects1= [];
-gdjs.CourtyardCode.GDStepOneObjects1= [];
-gdjs.CourtyardCode.GDStepTwoObjects1= [];
 gdjs.CourtyardCode.GDEastGalleryObjects1= [];
 gdjs.CourtyardCode.GDSluiceCourtObjects1= [];
 gdjs.CourtyardCode.GDUpperGardenObjects1= [];
@@ -63,8 +61,6 @@ gdjs.CourtyardCode.GDPressurePlateObjects1= [];
 gdjs.CourtyardCode.GDGardenPillarWestObjects1= [];
 gdjs.CourtyardCode.GDGardenPillarEastObjects1= [];
 gdjs.CourtyardCode.GDGardenLintelObjects1= [];
-gdjs.CourtyardCode.GDEastAnchorMastObjects1= [];
-gdjs.CourtyardCode.GDEastAnchorBeamObjects1= [];
 gdjs.CourtyardCode.GDUpperRearWallEastObjects1= [];
 gdjs.CourtyardCode.GDCounterBridgeObjects1= [];
 gdjs.CourtyardCode.GDBridgeLandingObjects1= [];
@@ -72,7 +68,6 @@ gdjs.CourtyardCode.GDTowerCrownObjects1= [];
 gdjs.CourtyardCode.GDTowerEastColumnObjects1= [];
 gdjs.CourtyardCode.GDTowerWestColumnObjects1= [];
 gdjs.CourtyardCode.GDTowerBackParapetObjects1= [];
-gdjs.CourtyardCode.GDTowerUnderpassObjects1= [];
 gdjs.CourtyardCode.GDCanopyLandingObjects1= [];
 gdjs.CourtyardCode.GDCanopyWalkObjects1= [];
 gdjs.CourtyardCode.GDTreeOverlookObjects1= [];
@@ -101,6 +96,52 @@ gdjs.CourtyardCode.GDRailCanopyObjects1= [];
 gdjs.CourtyardCode.GDAscentBeamObjects1= [];
 gdjs.CourtyardCode.GDWindPaddleObjects1= [];
 gdjs.CourtyardCode.GDWindRailObjects1= [];
+gdjs.CourtyardCode.GDBasinNorthWallObjects1= [];
+gdjs.CourtyardCode.GDBasinSouthWallObjects1= [];
+gdjs.CourtyardCode.GDLowerBasinSouthObjects1= [];
+gdjs.CourtyardCode.GDLowerBasinWestObjects1= [];
+gdjs.CourtyardCode.GDReservoirBackObjects1= [];
+gdjs.CourtyardCode.GDSkyRimWestObjects1= [];
+gdjs.CourtyardCode.GDSkyRimEastObjects1= [];
+gdjs.CourtyardCode.GDSkyRimNorthObjects1= [];
+gdjs.CourtyardCode.GDSkyRimSouthObjects1= [];
+gdjs.CourtyardCode.GDSkyDrainCollarObjects1= [];
+gdjs.CourtyardCode.GDAqueductReceivingBedObjects1= [];
+gdjs.CourtyardCode.GDAqueductReceivingWestObjects1= [];
+gdjs.CourtyardCode.GDAqueductReceivingEastObjects1= [];
+gdjs.CourtyardCode.GDCrossingMastFootObjects1= [];
+gdjs.CourtyardCode.GDAscentPostObjects1= [];
+gdjs.CourtyardCode.GDWindPostWestObjects1= [];
+gdjs.CourtyardCode.GDWindPostEastObjects1= [];
+gdjs.CourtyardCode.GDWindAnchorBeamObjects1= [];
+gdjs.CourtyardCode.GDWeightFrameWestObjects1= [];
+gdjs.CourtyardCode.GDWeightCrossbeamObjects1= [];
+gdjs.CourtyardCode.GDCanopyFoundationObjects1= [];
+gdjs.CourtyardCode.GDWindFoundationObjects1= [];
+gdjs.CourtyardCode.GDOverlookFoundationObjects1= [];
+gdjs.CourtyardCode.GDTowerFoundationObjects1= [];
+gdjs.CourtyardCode.GDPracticeStepObjects1= [];
+gdjs.CourtyardCode.GDArrivalBenchSeatObjects1= [];
+gdjs.CourtyardCode.GDArrivalBenchFootAObjects1= [];
+gdjs.CourtyardCode.GDArrivalBenchFootBObjects1= [];
+gdjs.CourtyardCode.GDSluiceBenchSeatObjects1= [];
+gdjs.CourtyardCode.GDSluiceBenchFootAObjects1= [];
+gdjs.CourtyardCode.GDSluiceBenchFootBObjects1= [];
+gdjs.CourtyardCode.GDCanopyBenchSeatObjects1= [];
+gdjs.CourtyardCode.GDCanopyBenchFootAObjects1= [];
+gdjs.CourtyardCode.GDCanopyBenchFootBObjects1= [];
+gdjs.CourtyardCode.GDAqueductFoundationObjects1= [];
+gdjs.CourtyardCode.GDLandingRearFootingObjects1= [];
+gdjs.CourtyardCode.GDLandingWestFootingObjects1= [];
+gdjs.CourtyardCode.GDArrivalWestFootingObjects1= [];
+gdjs.CourtyardCode.GDArrivalBackFootingObjects1= [];
+gdjs.CourtyardCode.GDSluiceEastFootingObjects1= [];
+gdjs.CourtyardCode.GDSluiceRunnerLeftObjects1= [];
+gdjs.CourtyardCode.GDSluiceRunnerRightObjects1= [];
+gdjs.CourtyardCode.GDSluiceRunnerBeamObjects1= [];
+gdjs.CourtyardCode.GDWheelStandRearObjects1= [];
+gdjs.CourtyardCode.GDWheelStandFrontObjects1= [];
+gdjs.CourtyardCode.GDWheelAxleObjects1= [];
 gdjs.CourtyardCode.GDArt_9595adventurer_9595back_9595leftObjects1= [];
 gdjs.CourtyardCode.GDArt_9595adventurer_9595back_9595rightObjects1= [];
 gdjs.CourtyardCode.GDArt_9595adventurer_9595backObjects1= [];
@@ -143,7 +184,7 @@ gdjs.CourtyardCode.GDArt_9595stone_9595tileObjects1= [];
 gdjs.CourtyardCode.GDArt_9595wood_9595tileObjects1= [];
 
 
-gdjs.CourtyardCode.userFunc0xa323e8 = function GDJSInlineCode(runtimeScene) {
+gdjs.CourtyardCode.userFunc0xa555e8 = function GDJSInlineCode(runtimeScene) {
 "use strict";
 if (!runtimeScene.__courtyard) {
 /* Z-up, X/Y ground plane. Pure, fixed-step solver shared by GDevelop and tests.
@@ -230,7 +271,8 @@ if (!runtimeScene.__courtyard) {
     const n=Math.hypot(input.x,input.y),mx=n?input.x/Math.max(1,n):0,my=n?input.y/Math.max(1,n):0;
     if(wasGrounded){
       const blend=1-Math.exp(-(n?18:22)*dt);
-      p.vx+=(mx*220-p.vx)*blend;p.vy+=(my*220-p.vy)*blend;
+      const speed=220*clamp(input.speedScale??1,0.3,1);
+      p.vx+=(mx*speed-p.vx)*blend;p.vy+=(my*speed-p.vy)*blend;
     }else{
       p.vx+=mx*300*dt;p.vy+=my*300*dt;
       const speed=Math.hypot(p.vx,p.vy);
@@ -256,7 +298,7 @@ if (!runtimeScene.__courtyard) {
 })(typeof globalThis!=='undefined'?globalThis:this);
 
 
-const COURTYARD_LEVEL={"name":"The Last Courtyard","spawn":{"x":400,"y":1260,"z":0},"checkpoint":{"x":540,"y":510,"z":100},"camera":{"x":610,"y":2350,"z":710,"target":{"x":490,"y":1000,"z":150},"zoom":0.66},"boxes":[{"name":"Arrival","x":100,"y":900,"z":-120,"w":740,"h":550,"d":120,"color":"#d8ccb3","solid":true},{"name":"Landing","x":220,"y":250,"z":-120,"w":680,"h":490,"d":220,"color":"#d8ccb3","solid":true},{"name":"ArrivalBackWall","x":80,"y":1420,"z":0,"w":780,"h":35,"d":72,"color":"#c5bca8","solid":true},{"name":"ArrivalWestWall","x":65,"y":880,"z":-10,"w":35,"h":575,"d":100,"color":"#c5bca8","solid":true},{"name":"RearWall","x":200,"y":220,"z":100,"w":720,"h":30,"d":140,"color":"#c5bca8","solid":true},{"name":"LandingWestWall","x":190,"y":220,"z":100,"w":30,"h":350,"d":110,"color":"#c5bca8","solid":true},{"name":"PracticePlinth","x":245,"y":1135,"z":0,"w":70,"h":70,"d":36,"color":"#b4a482","solid":true},{"name":"PracticeMast","x":272,"y":1162,"z":36,"w":16,"h":16,"d":255,"color":"#65513f","solid":true},{"name":"AnchorMast","x":790,"y":750,"z":-100,"w":22,"h":22,"d":535,"color":"#65513f","solid":true},{"name":"AnchorBeam","x":490,"y":750,"z":435,"w":322,"h":22,"d":22,"color":"#65513f","solid":true},{"name":"TreePlanter","x":610,"y":330,"z":100,"w":175,"h":175,"d":34,"color":"#9eac91","solid":true},{"name":"TreeTrunk","x":683,"y":402,"z":134,"w":26,"h":26,"d":160,"color":"#65513f","solid":true},{"name":"Water","x":70,"y":700,"z":-35,"w":830,"h":200,"d":12,"color":"#286c8e","solid":false},{"name":"WaterBed","x":70,"y":700,"z":-140,"w":830,"h":200,"d":24,"color":"#315565","solid":false},{"name":"BasinLipWest","x":40,"y":680,"z":-120,"w":30,"h":240,"d":100,"color":"#b4a482","solid":true},{"name":"BasinLipEast","x":900,"y":680,"z":-120,"w":30,"h":240,"d":100,"color":"#b4a482","solid":true},{"name":"StepOne","x":670,"y":1180,"z":0,"w":130,"h":120,"d":22,"color":"#e3d9c3","solid":true},{"name":"StepTwo","x":710,"y":1180,"z":22,"w":90,"h":120,"d":22,"color":"#e3d9c3","solid":true},{"name":"EastGallery","x":880,"y":400,"z":-120,"w":230,"h":170,"d":220,"color":"#d8ccb3","solid":true},{"name":"SluiceCourt","x":1080,"y":180,"z":-120,"w":540,"h":780,"d":220,"color":"#d8ccb3","solid":true},{"name":"UpperGarden","x":1080,"y":-180,"z":-120,"w":540,"h":240,"d":340,"color":"#d8ccb3","solid":true},{"name":"GardenStair0","x":1450,"y":180,"z":100,"w":145,"h":24,"d":20,"color":"#d8ccb3","solid":true},{"name":"GardenStair1","x":1450,"y":156,"z":100,"w":145,"h":24,"d":40,"color":"#d8ccb3","solid":true},{"name":"GardenStair2","x":1450,"y":132,"z":100,"w":145,"h":24,"d":60,"color":"#d8ccb3","solid":true},{"name":"GardenStair3","x":1450,"y":108,"z":100,"w":145,"h":24,"d":80,"color":"#d8ccb3","solid":true},{"name":"GardenStair4","x":1450,"y":84,"z":100,"w":145,"h":24,"d":100,"color":"#d8ccb3","solid":true},{"name":"GardenStair5","x":1450,"y":60,"z":100,"w":145,"h":24,"d":120,"color":"#d8ccb3","solid":true},{"name":"UpperRearWall","x":1060,"y":-210,"z":220,"w":210,"h":30,"d":100,"color":"#c5bca8","solid":true},{"name":"SluiceEastWall","x":1620,"y":160,"z":100,"w":26,"h":800,"d":90,"color":"#c5bca8","solid":true},{"name":"UpperWestWall","x":1050,"y":-180,"z":180,"w":30,"h":240,"d":140,"color":"#c5bca8","solid":true},{"name":"LowerWalk","x":920,"y":636,"z":-120,"w":160,"h":470,"d":140,"color":"#d8ccb3","solid":true},{"name":"MaintenanceStair0","x":920,"y":540,"z":-120,"w":160,"h":24,"d":200,"color":"#d8ccb3","solid":true},{"name":"MaintenanceStair1","x":920,"y":564,"z":-120,"w":160,"h":24,"d":180,"color":"#d8ccb3","solid":true},{"name":"MaintenanceStair2","x":920,"y":588,"z":-120,"w":160,"h":24,"d":160,"color":"#d8ccb3","solid":true},{"name":"MaintenanceStair3","x":920,"y":612,"z":-120,"w":160,"h":24,"d":140,"color":"#d8ccb3","solid":true},{"name":"ArrivalEastPath","x":830,"y":1106,"z":-120,"w":250,"h":140,"d":120,"color":"#d8ccb3","solid":true},{"name":"LowerWalkRail","x":900,"y":690,"z":20,"w":20,"h":340,"d":54,"color":"#c5bca8","solid":true},{"name":"ReturnGate","x":920,"y":1035,"z":20,"w":160,"h":20,"d":100,"color":"#65513f","solid":true},{"name":"GatePostWest","x":902,"y":1028,"z":0,"w":18,"h":32,"d":285,"color":"#65513f","solid":true},{"name":"GatePostEast","x":1080,"y":1028,"z":0,"w":18,"h":32,"d":285,"color":"#65513f","solid":true},{"name":"GateLintel","x":900,"y":1028,"z":285,"w":200,"h":32,"d":18,"color":"#65513f","solid":true},{"name":"WaterLower","x":1080,"y":960,"z":-20,"w":540,"h":225,"d":12,"color":"#286c8e","solid":false},{"name":"LowerBasinBed","x":1080,"y":960,"z":-130,"w":540,"h":225,"d":20,"color":"#315565","solid":false},{"name":"LowerBasinRim","x":1600,"y":960,"z":-120,"w":22,"h":240,"d":120,"color":"#d8ccb3","solid":true},{"name":"ReservoirBase","x":1090,"y":40,"z":100,"w":230,"h":200,"d":76,"color":"#d8ccb3","solid":true},{"name":"WaterReservoir","x":1100,"y":50,"z":176,"w":210,"h":180,"d":7,"color":"#286c8e","solid":false},{"name":"ReservoirWest","x":1072,"y":28,"z":100,"w":28,"h":220,"d":102,"color":"#d8ccb3","solid":true},{"name":"ReservoirEast","x":1310,"y":28,"z":100,"w":28,"h":220,"d":102,"color":"#d8ccb3","solid":true},{"name":"ReservoirFrontWest","x":1090,"y":230,"z":100,"w":75,"h":25,"d":102,"color":"#d8ccb3","solid":true},{"name":"ReservoirFrontEast","x":1220,"y":230,"z":100,"w":100,"h":25,"d":102,"color":"#d8ccb3","solid":true},{"name":"SluiceGate","x":1165,"y":233,"z":173,"w":55,"h":18,"d":54,"color":"#65513f","solid":false},{"name":"Aqueduct","x":690,"y":294,"z":125,"w":510,"h":35,"d":23,"color":"#d8ccb3","solid":true},{"name":"AqueductLipNorth","x":685,"y":285,"z":148,"w":525,"h":9,"d":14,"color":"#d8ccb3","solid":true},{"name":"AqueductLipSouth","x":685,"y":329,"z":148,"w":525,"h":9,"d":14,"color":"#d8ccb3","solid":true},{"name":"AqueductLeg925","x":925,"y":294,"z":-50,"w":22,"h":35,"d":175,"color":"#d8ccb3","solid":true},{"name":"AqueductLeg1035","x":1035,"y":294,"z":-50,"w":22,"h":35,"d":175,"color":"#d8ccb3","solid":true},{"name":"AqueductLeg1160","x":1160,"y":294,"z":-50,"w":22,"h":35,"d":175,"color":"#d8ccb3","solid":true},{"name":"SluiceBlock","x":1243,"y":263,"z":100,"w":74,"h":74,"d":62,"color":"#65513f","solid":true},{"name":"PressurePlate","x":1224,"y":604,"z":100,"w":112,"h":112,"d":5,"color":"#b4a482","solid":false},{"name":"GardenPillarWest","x":1100,"y":-80,"z":220,"w":34,"h":34,"d":170,"color":"#d8ccb3","solid":true},{"name":"GardenPillarEast","x":1570,"y":-80,"z":220,"w":34,"h":34,"d":170,"color":"#d8ccb3","solid":true},{"name":"GardenLintel","x":1100,"y":-80,"z":390,"w":504,"h":34,"d":26,"color":"#d8ccb3","solid":true},{"name":"EastAnchorMast","x":1570,"y":420,"z":100,"w":22,"h":22,"d":350,"color":"#65513f","solid":true},{"name":"EastAnchorBeam","x":1435,"y":420,"z":450,"w":157,"h":22,"d":22,"color":"#65513f","solid":true},{"name":"UpperRearWallEast","x":1450,"y":-210,"z":220,"w":190,"h":30,"d":70,"color":"#c5bca8","solid":true},{"name":"CounterBridge","x":1270,"y":-500,"z":36,"w":180,"h":320,"d":24,"color":"#65513f","solid":true},{"name":"BridgeLanding","x":1100,"y":-790,"z":196,"w":510,"h":330,"d":24,"color":"#d8ccb3","solid":true},{"name":"TowerCrown","x":1110,"y":-970,"z":220,"w":500,"h":240,"d":180,"color":"#d8ccb3","solid":true},{"name":"TowerEastColumn","x":1590,"y":-970,"z":-120,"w":28,"h":470,"d":520,"color":"#d8ccb3","solid":true},{"name":"TowerWestColumn","x":1100,"y":-970,"z":-120,"w":28,"h":470,"d":340,"color":"#d8ccb3","solid":true},{"name":"TowerBackParapet","x":1100,"y":-990,"z":400,"w":530,"h":20,"d":65,"color":"#c5bca8","solid":true},{"name":"TowerUnderpass","x":1100,"y":-520,"z":100,"w":170,"h":20,"d":96,"color":"#d8ccb3","solid":false},{"name":"CanopyLanding","x":580,"y":-1080,"z":436,"w":420,"h":430,"d":24,"color":"#d8ccb3","solid":true},{"name":"CanopyWalk","x":700,"y":-650,"z":436,"w":190,"h":960,"d":24,"color":"#d8ccb3","solid":true},{"name":"TreeOverlook","x":580,"y":310,"z":436,"w":420,"h":230,"d":24,"color":"#d8ccb3","solid":true},{"name":"HighColumn580_-1060","x":580,"y":-1060,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn970_-1060","x":970,"y":-1060,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn580_-680","x":580,"y":-680,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn970_-680","x":970,"y":-680,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn700_-300","x":700,"y":-300,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn865_-300","x":865,"y":-300,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn580_510","x":580,"y":350,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn970_510","x":970,"y":350,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"CanopyRail680","x":680,"y":-630,"z":460,"w":16,"h":915,"d":48,"color":"#c5bca8","solid":true},{"name":"CanopyRail890","x":890,"y":-630,"z":460,"w":16,"h":915,"d":48,"color":"#c5bca8","solid":true},{"name":"CanopyWestParapet","x":560,"y":-1080,"z":460,"w":20,"h":450,"d":55,"color":"#c5bca8","solid":true},{"name":"CanopyRearParapet","x":560,"y":-1100,"z":460,"w":440,"h":20,"d":55,"color":"#c5bca8","solid":true},{"name":"OverlookFrontParapet","x":560,"y":540,"z":460,"w":460,"h":20,"d":55,"color":"#c5bca8","solid":true},{"name":"SkyCistern","x":590,"y":370,"z":460,"w":100,"h":100,"d":55,"color":"#d8ccb3","solid":true},{"name":"WaterSkyCistern","x":600,"y":380,"z":509,"w":80,"h":80,"d":5,"color":"#286c8e","solid":false},{"name":"CanopySeal","x":730,"y":400,"z":460,"w":110,"h":100,"d":4,"color":"#b4a482","solid":false},{"name":"HangingWeight","x":1475,"y":-175,"z":425,"w":50,"h":40,"d":70,"color":"#65513f","solid":false},{"name":"WeightFrame","x":1580,"y":-160,"z":220,"w":20,"h":20,"d":340,"color":"#65513f","solid":true},{"name":"WeightBeam","x":1470,"y":-160,"z":560,"w":130,"h":20,"d":18,"color":"#65513f","solid":false},{"name":"CarriageRail","x":880,"y":-800,"z":765,"w":510,"h":14,"d":14,"color":"#65513f","solid":false},{"name":"RailTower","x":1380,"y":-800,"z":400,"w":18,"h":18,"d":365,"color":"#65513f","solid":false},{"name":"RailCanopy","x":880,"y":-800,"z":460,"w":18,"h":18,"d":305,"color":"#65513f","solid":false},{"name":"AscentBeam","x":1490,"y":-865,"z":704,"w":20,"h":180,"d":18,"color":"#65513f","solid":false},{"name":"WindPaddle","x":755,"y":-155,"z":480,"w":70,"h":24,"d":75,"color":"#65513f","solid":false},{"name":"WindRail","x":590,"y":-155,"z":670,"w":400,"h":16,"d":16,"color":"#65513f","solid":false}],"anchors":[{"id":"practice","x":280,"y":1198,"z":312,"label":"Practice anchor"},{"id":"crossing","x":505,"y":770,"z":415,"label":"Crossing anchor"},{"id":"east","x":1450,"y":444,"z":430,"label":"Waterworks anchor"},{"id":"ascent","kind":"fixed","label":"Tower ring · reel up, steer north, release above the garden","x":1500,"y":-700,"z":680},{"id":"wind","kind":"fixed","label":"Wind walk · swing over the slow paddle or wait for the opening","x":790,"y":-150,"z":740}],"puzzle":{"block":"SluiceBlock","plate":"PressurePlate","gate":"SluiceGate","returnGate":"ReturnGate","startY":300,"endY":660,"laneX":1280,"floorZ":100,"checkpoint":{"x":1390,"y":780,"z":100}},"elevation":{"bridge":"CounterBridge","weight":"HangingWeight"},"bounds":{"minX":-140,"maxX":1900,"minY":-1350,"maxY":1660,"minZ":-180,"maxZ":1120},"grass":[{"x":110,"y":920,"z":0,"w":165,"h":475},{"x":620,"y":970,"z":0,"w":180,"h":405},{"x":235,"y":265,"z":100,"w":190,"h":190},{"x":715,"y":580,"z":100,"w":150,"h":135},{"x":1090,"y":740,"z":100,"w":125,"h":190},{"x":1455,"y":715,"z":100,"w":140,"h":215},{"x":1090,"y":-170,"z":220,"w":150,"h":210},{"x":1475,"y":-165,"z":220,"w":125,"h":150},{"x":1120,"y":-955,"z":400,"w":150,"h":190},{"x":585,"y":-1065,"z":460,"w":125,"h":385},{"x":885,"y":-1065,"z":460,"w":95,"h":370},{"x":590,"y":365,"z":460,"w":110,"h":155},{"x":875,"y":365,"z":460,"w":110,"h":155}]};
+const COURTYARD_LEVEL={"name":"The Last Courtyard","spawn":{"x":400,"y":1260,"z":0},"checkpoint":{"x":540,"y":510,"z":100},"camera":{"x":610,"y":2350,"z":710,"target":{"x":490,"y":1000,"z":150},"zoom":0.66},"boxes":[{"name":"Arrival","x":100,"y":900,"z":-120,"w":740,"h":550,"d":120,"color":"#d8ccb3","solid":true},{"name":"Landing","x":220,"y":250,"z":-120,"w":680,"h":490,"d":220,"color":"#d8ccb3","solid":true},{"name":"ArrivalBackWall","x":80,"y":1420,"z":0,"w":780,"h":35,"d":72,"color":"#c5bca8","solid":true},{"name":"ArrivalWestWall","x":65,"y":880,"z":-10,"w":35,"h":575,"d":100,"color":"#c5bca8","solid":true},{"name":"RearWall","x":200,"y":220,"z":100,"w":720,"h":30,"d":140,"color":"#c5bca8","solid":true},{"name":"LandingWestWall","x":190,"y":220,"z":100,"w":30,"h":350,"d":110,"color":"#c5bca8","solid":true},{"name":"PracticePlinth","x":245,"y":1135,"z":0,"w":70,"h":70,"d":36,"color":"#b4a482","solid":true},{"name":"PracticeMast","x":272,"y":1162,"z":36,"w":16,"h":16,"d":255,"color":"#65513f","solid":true},{"name":"AnchorMast","x":790,"y":750,"z":-100,"w":22,"h":22,"d":535,"color":"#65513f","solid":true},{"name":"AnchorBeam","x":490,"y":750,"z":435,"w":322,"h":22,"d":22,"color":"#65513f","solid":true},{"name":"TreePlanter","x":610,"y":330,"z":100,"w":175,"h":175,"d":34,"color":"#9eac91","solid":true},{"name":"TreeTrunk","x":683,"y":402,"z":134,"w":26,"h":26,"d":160,"color":"#65513f","solid":true},{"name":"Water","x":70,"y":700,"z":-35,"w":830,"h":200,"d":12,"color":"#286c8e","solid":false},{"name":"WaterBed","x":70,"y":700,"z":-140,"w":830,"h":200,"d":24,"color":"#315565","solid":true},{"name":"BasinLipWest","x":40,"y":680,"z":-120,"w":30,"h":240,"d":100,"color":"#b4a482","solid":true},{"name":"BasinLipEast","x":900,"y":680,"z":-120,"w":30,"h":240,"d":100,"color":"#b4a482","solid":true},{"name":"EastGallery","x":880,"y":400,"z":-120,"w":230,"h":170,"d":220,"color":"#d8ccb3","solid":true},{"name":"SluiceCourt","x":1080,"y":180,"z":-120,"w":540,"h":780,"d":220,"color":"#d8ccb3","solid":true},{"name":"UpperGarden","x":1080,"y":-180,"z":-120,"w":540,"h":240,"d":340,"color":"#d8ccb3","solid":true},{"name":"GardenStair0","x":1450,"y":180,"z":100,"w":145,"h":24,"d":20,"color":"#d8ccb3","solid":true},{"name":"GardenStair1","x":1450,"y":156,"z":100,"w":145,"h":24,"d":40,"color":"#d8ccb3","solid":true},{"name":"GardenStair2","x":1450,"y":132,"z":100,"w":145,"h":24,"d":60,"color":"#d8ccb3","solid":true},{"name":"GardenStair3","x":1450,"y":108,"z":100,"w":145,"h":24,"d":80,"color":"#d8ccb3","solid":true},{"name":"GardenStair4","x":1450,"y":84,"z":100,"w":145,"h":24,"d":100,"color":"#d8ccb3","solid":true},{"name":"GardenStair5","x":1450,"y":60,"z":100,"w":145,"h":24,"d":120,"color":"#d8ccb3","solid":true},{"name":"UpperRearWall","x":1080,"y":-180,"z":220,"w":190,"h":16,"d":100,"color":"#c5bca8","solid":true},{"name":"SluiceEastWall","x":1620,"y":160,"z":100,"w":26,"h":800,"d":90,"color":"#c5bca8","solid":true},{"name":"UpperWestWall","x":1080,"y":-180,"z":220,"w":30,"h":240,"d":100,"color":"#c5bca8","solid":true},{"name":"LowerWalk","x":920,"y":636,"z":-120,"w":160,"h":470,"d":140,"color":"#d8ccb3","solid":true},{"name":"MaintenanceStair0","x":920,"y":540,"z":-120,"w":160,"h":24,"d":200,"color":"#d8ccb3","solid":true},{"name":"MaintenanceStair1","x":920,"y":564,"z":-120,"w":160,"h":24,"d":180,"color":"#d8ccb3","solid":true},{"name":"MaintenanceStair2","x":920,"y":588,"z":-120,"w":160,"h":24,"d":160,"color":"#d8ccb3","solid":true},{"name":"MaintenanceStair3","x":920,"y":612,"z":-120,"w":160,"h":24,"d":140,"color":"#d8ccb3","solid":true},{"name":"ArrivalEastPath","x":830,"y":1106,"z":-120,"w":250,"h":140,"d":120,"color":"#d8ccb3","solid":true},{"name":"LowerWalkRail","x":900,"y":690,"z":20,"w":20,"h":340,"d":54,"color":"#c5bca8","solid":true},{"name":"ReturnGate","x":920,"y":1035,"z":20,"w":160,"h":20,"d":100,"color":"#65513f","solid":true},{"name":"GatePostWest","x":902,"y":1028,"z":0,"w":18,"h":32,"d":285,"color":"#65513f","solid":true},{"name":"GatePostEast","x":1080,"y":1028,"z":0,"w":18,"h":32,"d":285,"color":"#65513f","solid":true},{"name":"GateLintel","x":900,"y":1028,"z":285,"w":200,"h":32,"d":18,"color":"#65513f","solid":true},{"name":"WaterLower","x":1080,"y":960,"z":-20,"w":520,"h":225,"d":12,"color":"#286c8e","solid":false},{"name":"LowerBasinBed","x":1080,"y":960,"z":-130,"w":540,"h":225,"d":20,"color":"#315565","solid":true},{"name":"LowerBasinRim","x":1600,"y":960,"z":-120,"w":22,"h":240,"d":120,"color":"#d8ccb3","solid":true},{"name":"ReservoirBase","x":1090,"y":40,"z":100,"w":230,"h":200,"d":76,"color":"#d8ccb3","solid":true},{"name":"WaterReservoir","x":1100,"y":50,"z":176,"w":210,"h":180,"d":7,"color":"#286c8e","solid":false},{"name":"ReservoirWest","x":1072,"y":28,"z":100,"w":28,"h":220,"d":102,"color":"#d8ccb3","solid":true},{"name":"ReservoirEast","x":1310,"y":28,"z":100,"w":28,"h":220,"d":102,"color":"#d8ccb3","solid":true},{"name":"ReservoirFrontWest","x":1090,"y":230,"z":100,"w":75,"h":25,"d":102,"color":"#d8ccb3","solid":true},{"name":"ReservoirFrontEast","x":1220,"y":230,"z":100,"w":100,"h":25,"d":102,"color":"#d8ccb3","solid":true},{"name":"SluiceGate","x":1165,"y":233,"z":173,"w":55,"h":18,"d":54,"color":"#65513f","solid":false},{"name":"Aqueduct","x":685,"y":285,"z":125,"w":525,"h":53,"d":23,"color":"#d8ccb3","solid":true},{"name":"AqueductLipNorth","x":685,"y":285,"z":148,"w":525,"h":9,"d":14,"color":"#d8ccb3","solid":true},{"name":"AqueductLipSouth","x":685,"y":329,"z":148,"w":525,"h":9,"d":14,"color":"#d8ccb3","solid":true},{"name":"AqueductLeg925","x":925,"y":294,"z":-120,"w":22,"h":35,"d":245,"color":"#d8ccb3","solid":true},{"name":"AqueductLeg1035","x":1035,"y":294,"z":-120,"w":22,"h":35,"d":245,"color":"#d8ccb3","solid":true},{"name":"AqueductLeg1160","x":1160,"y":294,"z":-120,"w":22,"h":35,"d":245,"color":"#d8ccb3","solid":true},{"name":"SluiceBlock","x":1243,"y":263,"z":100,"w":74,"h":74,"d":62,"color":"#65513f","solid":true},{"name":"PressurePlate","x":1224,"y":604,"z":100,"w":112,"h":112,"d":5,"color":"#b4a482","solid":false},{"name":"GardenPillarWest","x":1100,"y":-80,"z":220,"w":34,"h":34,"d":170,"color":"#d8ccb3","solid":true},{"name":"GardenPillarEast","x":1570,"y":-80,"z":220,"w":34,"h":34,"d":170,"color":"#d8ccb3","solid":true},{"name":"GardenLintel","x":1100,"y":-80,"z":390,"w":504,"h":34,"d":26,"color":"#d8ccb3","solid":true},{"name":"UpperRearWallEast","x":1450,"y":-180,"z":220,"w":170,"h":16,"d":70,"color":"#c5bca8","solid":true},{"name":"CounterBridge","x":1270,"y":-500,"z":36,"w":180,"h":320,"d":24,"color":"#65513f","solid":true},{"name":"BridgeLanding","x":1100,"y":-790,"z":196,"w":510,"h":330,"d":24,"color":"#d8ccb3","solid":true},{"name":"TowerCrown","x":1110,"y":-970,"z":220,"w":500,"h":240,"d":180,"color":"#d8ccb3","solid":true},{"name":"TowerEastColumn","x":1590,"y":-970,"z":-120,"w":28,"h":470,"d":520,"color":"#d8ccb3","solid":true},{"name":"TowerWestColumn","x":1100,"y":-970,"z":-120,"w":28,"h":470,"d":340,"color":"#d8ccb3","solid":true},{"name":"TowerBackParapet","x":1110,"y":-970,"z":400,"w":500,"h":16,"d":65,"color":"#c5bca8","solid":true},{"name":"CanopyLanding","x":580,"y":-1080,"z":436,"w":420,"h":430,"d":24,"color":"#d8ccb3","solid":true},{"name":"CanopyWalk","x":700,"y":-650,"z":436,"w":190,"h":960,"d":24,"color":"#d8ccb3","solid":true},{"name":"TreeOverlook","x":580,"y":310,"z":436,"w":420,"h":230,"d":24,"color":"#d8ccb3","solid":true},{"name":"HighColumn580_-1060","x":580,"y":-1060,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn970_-1060","x":970,"y":-1060,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn580_-680","x":580,"y":-680,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn970_-680","x":970,"y":-680,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn700_-300","x":700,"y":-300,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn865_-300","x":865,"y":-300,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn580_510","x":580,"y":350,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"HighColumn970_510","x":970,"y":350,"z":-120,"w":22,"h":22,"d":556,"color":"#d8ccb3","solid":true},{"name":"CanopyRail680","x":700,"y":-630,"z":460,"w":10,"h":915,"d":48,"color":"#c5bca8","solid":true},{"name":"CanopyRail890","x":880,"y":-630,"z":460,"w":10,"h":915,"d":48,"color":"#c5bca8","solid":true},{"name":"CanopyWestParapet","x":580,"y":-1080,"z":460,"w":14,"h":430,"d":55,"color":"#c5bca8","solid":true},{"name":"CanopyRearParapet","x":580,"y":-1080,"z":460,"w":420,"h":14,"d":55,"color":"#c5bca8","solid":true},{"name":"OverlookFrontParapet","x":580,"y":526,"z":460,"w":420,"h":14,"d":55,"color":"#c5bca8","solid":true},{"name":"SkyCistern","x":590,"y":370,"z":460,"w":100,"h":100,"d":38,"color":"#d8ccb3","solid":true},{"name":"WaterSkyCistern","x":600,"y":380,"z":509,"w":80,"h":80,"d":5,"color":"#286c8e","solid":false},{"name":"CanopySeal","x":730,"y":400,"z":460,"w":110,"h":100,"d":4,"color":"#b4a482","solid":false},{"name":"HangingWeight","x":1475,"y":-175,"z":425,"w":50,"h":40,"d":70,"color":"#65513f","solid":false},{"name":"WeightFrame","x":1580,"y":-160,"z":220,"w":20,"h":20,"d":340,"color":"#65513f","solid":true},{"name":"WeightBeam","x":1470,"y":-160,"z":560,"w":130,"h":20,"d":18,"color":"#65513f","solid":false},{"name":"CarriageRail","x":880,"y":-800,"z":765,"w":510,"h":14,"d":14,"color":"#65513f","solid":false},{"name":"RailTower","x":1380,"y":-800,"z":400,"w":18,"h":18,"d":365,"color":"#65513f","solid":false},{"name":"RailCanopy","x":880,"y":-800,"z":460,"w":18,"h":18,"d":305,"color":"#65513f","solid":false},{"name":"AscentBeam","x":1490,"y":-865,"z":704,"w":20,"h":180,"d":18,"color":"#65513f","solid":false},{"name":"WindPaddle","x":755,"y":-155,"z":480,"w":70,"h":24,"d":75,"color":"#65513f","solid":false},{"name":"WindRail","x":590,"y":-155,"z":670,"w":400,"h":16,"d":16,"color":"#65513f","solid":false},{"name":"BasinNorthWall","x":40,"y":680,"z":-140,"w":890,"h":20,"d":120,"color":"#d8ccb3","solid":true},{"name":"BasinSouthWall","x":40,"y":900,"z":-140,"w":890,"h":20,"d":120,"color":"#d8ccb3","solid":true},{"name":"LowerBasinSouth","x":1080,"y":1185,"z":-130,"w":542,"h":20,"d":130,"color":"#d8ccb3","solid":true},{"name":"LowerBasinWest","x":1068,"y":960,"z":-130,"w":12,"h":225,"d":130,"color":"#d8ccb3","solid":true},{"name":"ReservoirBack","x":1090,"y":28,"z":176,"w":230,"h":22,"d":26,"color":"#d8ccb3","solid":true},{"name":"SkyRimWest","x":590,"y":370,"z":498,"w":10,"h":100,"d":26,"color":"#d8ccb3","solid":true},{"name":"SkyRimEast","x":680,"y":370,"z":498,"w":10,"h":100,"d":26,"color":"#d8ccb3","solid":true},{"name":"SkyRimNorth","x":600,"y":370,"z":498,"w":80,"h":10,"d":26,"color":"#d8ccb3","solid":true},{"name":"SkyRimSouth","x":600,"y":460,"z":498,"w":80,"h":10,"d":26,"color":"#d8ccb3","solid":true},{"name":"SkyDrainCollar","x":611,"y":387,"z":431,"w":26,"h":26,"d":5,"color":"#b39155","solid":false},{"name":"AqueductReceivingBed","x":1165,"y":248,"z":125,"w":55,"h":57,"d":20,"color":"#d8ccb3","solid":true},{"name":"AqueductReceivingWest","x":1165,"y":248,"z":145,"w":9,"h":57,"d":24,"color":"#d8ccb3","solid":true},{"name":"AqueductReceivingEast","x":1211,"y":248,"z":145,"w":9,"h":57,"d":24,"color":"#d8ccb3","solid":true},{"name":"CrossingMastFoot","x":779,"y":739,"z":-116,"w":44,"h":44,"d":20,"color":"#d8ccb3","solid":true},{"name":"AscentPost","x":1490,"y":-865,"z":400,"w":20,"h":20,"d":304,"color":"#65513f","solid":true},{"name":"WindPostWest","x":700,"y":-165,"z":460,"w":12,"h":20,"d":305,"color":"#65513f","solid":true},{"name":"WindPostEast","x":878,"y":-165,"z":460,"w":12,"h":20,"d":305,"color":"#65513f","solid":true},{"name":"WindAnchorBeam","x":700,"y":-165,"z":760,"w":190,"h":20,"d":12,"color":"#65513f","solid":false},{"name":"WeightFrameWest","x":1240,"y":-160,"z":220,"w":20,"h":20,"d":340,"color":"#65513f","solid":true},{"name":"WeightCrossbeam","x":1240,"y":-160,"z":560,"w":230,"h":20,"d":18,"color":"#65513f","solid":false},{"name":"CanopyFoundation","x":560,"y":-1100,"z":-144,"w":460,"h":470,"d":24,"color":"#d8ccb3","solid":true},{"name":"WindFoundation","x":680,"y":-330,"z":-144,"w":230,"h":70,"d":24,"color":"#d8ccb3","solid":true},{"name":"OverlookFoundation","x":560,"y":330,"z":-144,"w":460,"h":70,"d":24,"color":"#d8ccb3","solid":true},{"name":"TowerFoundation","x":1080,"y":-1000,"z":-144,"w":560,"h":520,"d":24,"color":"#d8ccb3","solid":true},{"name":"PracticeStep","x":245,"y":1205,"z":0,"w":70,"h":26,"d":18,"color":"#d8ccb3","solid":true},{"name":"ArrivalBenchSeat","x":640,"y":1330,"z":29,"w":125,"h":28,"d":9,"color":"#65513f","solid":true},{"name":"ArrivalBenchFootA","x":650,"y":1334,"z":0,"w":12,"h":20,"d":29,"color":"#d8ccb3","solid":true},{"name":"ArrivalBenchFootB","x":740,"y":1334,"z":0,"w":12,"h":20,"d":29,"color":"#d8ccb3","solid":true},{"name":"SluiceBenchSeat","x":1480,"y":850,"z":129,"w":105,"h":28,"d":9,"color":"#65513f","solid":true},{"name":"SluiceBenchFootA","x":1490,"y":854,"z":100,"w":12,"h":20,"d":29,"color":"#d8ccb3","solid":true},{"name":"SluiceBenchFootB","x":1560,"y":854,"z":100,"w":12,"h":20,"d":29,"color":"#d8ccb3","solid":true},{"name":"CanopyBenchSeat","x":902,"y":-1005,"z":489,"w":65,"h":25,"d":9,"color":"#65513f","solid":true},{"name":"CanopyBenchFootA","x":907,"y":-1002,"z":460,"w":10,"h":18,"d":29,"color":"#d8ccb3","solid":true},{"name":"CanopyBenchFootB","x":952,"y":-1002,"z":460,"w":10,"h":18,"d":29,"color":"#d8ccb3","solid":true},{"name":"AqueductFoundation","x":900,"y":275,"z":-144,"w":180,"h":70,"d":24,"color":"#d8ccb3","solid":true},{"name":"LandingRearFooting","x":190,"y":210,"z":-120,"w":750,"h":40,"d":220,"color":"#d8ccb3","solid":true},{"name":"LandingWestFooting","x":190,"y":250,"z":-120,"w":30,"h":320,"d":220,"color":"#d8ccb3","solid":true},{"name":"ArrivalWestFooting","x":65,"y":880,"z":-120,"w":35,"h":575,"d":110,"color":"#d8ccb3","solid":true},{"name":"ArrivalBackFooting","x":80,"y":1420,"z":-120,"w":780,"h":35,"d":120,"color":"#d8ccb3","solid":true},{"name":"SluiceEastFooting","x":1620,"y":160,"z":-120,"w":26,"h":800,"d":220,"color":"#d8ccb3","solid":true},{"name":"SluiceRunnerLeft","x":1157,"y":233,"z":176,"w":8,"h":18,"d":120,"color":"#65513f","solid":true},{"name":"SluiceRunnerRight","x":1220,"y":233,"z":176,"w":8,"h":18,"d":120,"color":"#65513f","solid":true},{"name":"SluiceRunnerBeam","x":1157,"y":233,"z":296,"w":71,"h":18,"d":10,"color":"#65513f","solid":false},{"name":"WheelStandRear","x":1140,"y":250,"z":100,"w":20,"h":16,"d":75,"color":"#d8ccb3","solid":true},{"name":"WheelStandFront","x":1140,"y":294,"z":100,"w":20,"h":16,"d":75,"color":"#d8ccb3","solid":true},{"name":"WheelAxle","x":1145,"y":258,"z":170,"w":10,"h":44,"d":10,"color":"#65513f","solid":false}],"anchors":[{"id":"practice","x":280,"y":1198,"z":312,"label":"Practice ring · learn reel and release safely here","purpose":"Safe first reel and release on broad ground"},{"id":"crossing","x":505,"y":770,"z":415,"label":"Crossing anchor","purpose":"Cross the arrival basin to the checkpoint"},{"id":"ascent","kind":"fixed","label":"Tower ring · reel up, steer north, release above the garden","x":1500,"y":-700,"z":680,"purpose":"Reach the tower; no stair route exists"},{"id":"wind","kind":"fixed","label":"Wind walk · swing over the slow paddle or wait for the opening","x":790,"y":-150,"z":740,"purpose":"Swing above the moving paddle"}],"puzzle":{"block":"SluiceBlock","plate":"PressurePlate","gate":"SluiceGate","returnGate":"ReturnGate","startY":300,"endY":660,"laneX":1280,"floorZ":100,"checkpoint":{"x":1390,"y":780,"z":100}},"elevation":{"bridge":"CounterBridge","weight":"HangingWeight"},"bounds":{"minX":-140,"maxX":1900,"minY":-1350,"maxY":1660,"minZ":-180,"maxZ":1120},"grass":[{"x":110,"y":920,"z":0,"w":165,"h":475},{"x":620,"y":970,"z":0,"w":180,"h":330},{"x":235,"y":265,"z":100,"w":190,"h":190},{"x":715,"y":580,"z":100,"w":150,"h":135},{"x":1090,"y":740,"z":100,"w":125,"h":190},{"x":1455,"y":715,"z":100,"w":140,"h":115},{"x":1090,"y":-170,"z":220,"w":150,"h":210},{"x":1475,"y":-165,"z":220,"w":125,"h":150},{"x":1120,"y":-955,"z":400,"w":150,"h":190},{"x":585,"y":-1065,"z":460,"w":125,"h":385},{"x":885,"y":-955,"z":460,"w":95,"h":260},{"x":590,"y":480,"z":460,"w":110,"h":38},{"x":875,"y":365,"z":460,"w":110,"h":155},{"x":1380,"y":280,"z":100,"w":210,"h":120},{"x":1380,"y":580,"z":100,"w":210,"h":100},{"x":1125,"y":-680,"z":220,"w":115,"h":120}],"water":[{"name":"Water","x":70,"y":700,"z":-23,"w":830,"h":200,"bottom":-116,"flowX":17,"flowY":0},{"name":"WaterLower","x":1080,"y":960,"z":-8,"w":520,"h":225,"bottom":-110,"flowX":12,"flowY":8},{"name":"WaterReservoir","x":1100,"y":50,"z":183,"w":210,"h":180,"bottom":176,"flowX":0,"flowY":10},{"name":"WaterSkyCistern","x":600,"y":380,"z":514,"w":80,"h":80,"bottom":498,"flowX":0,"flowY":8}]};
 /* Pure sprite state controller. Units match physics; walk phase follows ground
  * distance, never wall-clock time. Frozen pauses/stalls cannot skip action poses.
  * Atlas: 0–7 walk, 8–10 draw, 11 release, 12 rise, 13 fall, 14 swing, 15 land.
@@ -431,6 +473,100 @@ const COURTYARD_LEVEL={"name":"The Last Courtyard","spawn":{"x":400,"y":1260,"z"
   root.CourtyardJourney=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 
+/* Bounded water interaction in engine X/Y ground, Z height. Basins have real
+ * bottoms; water is never an infinite trigger column. This is a surface/current
+ * model, not a volumetric fluid simulation. Deep water remains a forgiving fall. */
+(function(root){
+  function surface(b,time){return b.z+Math.sin(time*1.15+b.x*.013)*.55;}
+  function sample(p,basins,time){
+    for(const b of basins){const z=surface(b,time);
+      if(p.x>b.x&&p.x<b.x+b.w&&p.y>b.y&&p.y<b.y+b.h&&p.z>=b.bottom-2&&p.z<z+1)
+        return {basin:b,z,depth:Math.max(0,z-p.z),deep:z-b.bottom>40};
+    }return null;
+  }
+  function crossing(a,b,basins,time){
+    let first=null;
+    for(const basin of basins){const z=surface(basin,time);if(a.z<=z||b.z>z)continue;
+      const t=(a.z-z)/(a.z-b.z),x=a.x+(b.x-a.x)*t,y=a.y+(b.y-a.y)*t;
+      if(x>basin.x&&x<basin.x+basin.w&&y>basin.y&&y<basin.y+basin.h&&(!first||t<first.t))first={t,x,y,z,basin};
+    }return first;
+  }
+  function create(){return {wet:false,deepTime:0,distance:0};}
+  function step(s,p,contact,travel,dt){
+    if(!(dt>0)||dt>0.15)return {splash:false,ripple:false,recover:false};
+    const splash=!!contact&&!s.wet;s.wet=!!contact;
+    s.deepTime=contact?.deep?s.deepTime+dt:0;
+    s.distance=contact?s.distance+travel:0;
+    const ripple=splash||s.distance>32;if(ripple)s.distance=0;
+    if(contact){const damping=Math.exp(-(contact.deep?5:2)*dt);p.vx*=damping;p.vy*=damping;
+      if(contact.deep)p.vz=Math.max(-95,p.vz*Math.exp(-6*dt));
+    }
+    return {splash,ripple,recover:s.deepTime>=0.38};
+  }
+  const api={surface,sample,crossing,create,step};root.CourtyardWater=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(globalThis);
+
+/* Small opaque water surfaces on the existing GDevelop renderer. Shared shader
+ * uses three color bands, edge foam and travelling highlights, without screen
+ * reflections or post processing. Fixed-size ripple pool cannot accumulate. */
+(function(root){
+  function create(THREE,world,own,basins){
+    const W=root.CourtyardWater,surfaces=[],falls=[],rings=[];
+    const vertex=`uniform float time;uniform vec2 size;uniform float vertical;varying vec2 point;
+      void main(){vec3 p=position;point=uv*size;
+        float edge=min(min(uv.x,1.-uv.x)*size.x,min(uv.y,1.-uv.y)*size.y);
+        if(vertical<.5)p.z+=sin(p.x*.035+time*1.7)*cos(p.y*.04-time*.9)*.7*clamp(edge/12.,0.,1.);
+        gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`;
+    const fragment=`uniform float time;uniform vec2 size;uniform vec2 flow;uniform float vertical;varying vec2 point;
+      void main(){vec2 q=point-flow*time;
+        float bands=sin(q.x*.06+sin(q.y*.035))*cos(q.y*.065+sin(q.x*.04));
+        float edge=min(min(point.x,size.x-point.x),min(point.y,size.y-point.y));
+        vec3 col=bands>.58?vec3(.19,.47,.58):bands<-.48?vec3(.08,.29,.40):vec3(.12,.38,.50);
+        float glint=step(.94,sin(q.x*.045+q.y*.11))*step(.3,cos(q.y*.035-q.x*.09));
+        float foam=(1.-step(2.+sin(time*1.2+point.x*.08)*.6,edge))*step(-.2,sin(point.x*.13+point.y*.16-time));
+        if(vertical>.5){glint=step(.83,sin(q.y*.16+sin(q.x*.2)))*.55;foam=0.;}
+        col=mix(col,vec3(.64,.81,.77),max(foam*.65,glint*.5));gl_FragColor=vec4(col,1.);
+        #include <colorspace_fragment>
+      }`;
+    function plane(x,y,z,w,h,flowX=9,flowY=3,vertical=false){
+      const mat=new THREE.ShaderMaterial({side:THREE.DoubleSide,uniforms:{time:{value:0},size:{value:new THREE.Vector2(w,h)},flow:{value:new THREE.Vector2(flowX,flowY)},vertical:{value:vertical?1:0}},vertexShader:vertex,fragmentShader:fragment});
+      const geo=new THREE.PlaneGeometry(w,h,Math.min(24,Math.ceil(w/35)),Math.min(24,Math.ceil(h/35)));
+      own.push(mat,geo);const mesh=new THREE.Mesh(geo,mat);mesh.position.set(x+w/2,y+h/2,z);world.add(mesh);
+      const item={mesh,mat,x,y,z,w,h};surfaces.push(item);return item;
+    }
+    for(const b of basins){const item=plane(b.x,b.y,b.z,b.w,b.h,b.flowX||9,b.flowY||3);item.basin=b;}
+    // Gate -> stepped receiving trough -> downhill aqueduct -> root bed.
+    const lower=[plane(1174,248,183,37,57,0,55),plane(695,299,153,505,25,-65,0),plane(694,323,151,28,35,0,40),plane(690,350,145,40,70,0,25)];
+    lower[0].mesh.rotation.x=-Math.atan2(30,57);lower[0].mesh.position.z=168;
+    function fall(x,y,top,bottom,width){const item=plane(x-width/2,y,top,width,top-bottom,0,-130,true);item.mesh.rotation.x=Math.PI/2;item.mesh.position.set(x,y,(top+bottom)/2);item.top=top;item.bottom=bottom;falls.push(item);return item;}
+    const sky=fall(624,400,498,145,14);
+    const outlet=plane(615,385,498,18,23,0,55);outlet.mesh.visible=false;
+    const pool=plane(613,391,143,38,37,0,18);
+    const ringGeo=new THREE.RingGeometry(.82,1,24);own.push(ringGeo);
+    for(let i=0;i<20;i++){const mat=new THREE.MeshBasicMaterial({color:'#b3d6cb',transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide}),mesh=new THREE.Mesh(ringGeo,mat);own.push(mat);mesh.visible=false;world.add(mesh);rings.push({mesh,age:9,strength:1,basin:null});}
+    let cursor=0,lastFoam=-1;
+    function splash(x,y,z,strength=1,basin=null){const r=rings[cursor++%rings.length];r.age=0;r.strength=Math.min(1.6,strength);r.basin=basin;r.mesh.position.set(x,y,z+1.4);r.mesh.visible=true;}
+    let previous=0;
+    function update(time,lowerFlow,skyFlow){
+      const dt=Math.max(0,Math.min(.15,time-previous));previous=time;
+      for(const item of surfaces){item.mat.uniforms.time.value=time;if(item.basin)item.mesh.position.z=W.surface(item.basin,time);}
+      for(let i=0;i<lower.length;i++){const f=Math.max(0,Math.min(1,lowerFlow*4-i));lower[i].mesh.visible=f>0;const item=lower[i];
+        if(i===1){item.mesh.scale.x=Math.max(.001,f);item.mesh.position.x=item.x+item.w-item.w*f/2;}
+        else{item.mesh.scale.y=Math.max(.001,f);item.mesh.position.y=item.y+item.h*f/2;}
+      }
+      sky.mesh.visible=skyFlow>0;sky.mesh.scale.y=Math.max(.001,skyFlow);sky.mesh.position.z=sky.top-(sky.top-sky.bottom)*skyFlow/2;
+      outlet.mesh.visible=skyFlow>0;pool.mesh.visible=skyFlow>.98;
+      if(time-lastFoam>.32){if(skyFlow>.98)splash(624,406,144,.45);if(lowerFlow>.98)splash(710,395,146,.25);lastFoam=time;}
+      for(const r of rings){r.age+=dt;r.mesh.visible=r.age<1.2;if(!r.mesh.visible)continue;
+        const radius=5+r.age*28*r.strength;r.mesh.scale.set(radius,radius,1);r.mesh.material.opacity=(1-r.age/1.2)*.55;
+        if(r.basin){r.mesh.position.z=W.surface(r.basin,time)+1.4;const b=r.basin;const edge=Math.min(r.mesh.position.x-b.x,b.x+b.w-r.mesh.position.x,r.mesh.position.y-b.y,b.y+b.h-r.mesh.position.y);if(radius>edge)r.mesh.visible=false;}
+      }
+    }
+    return {update,splash,clear(){for(const r of rings){r.age=9;r.mesh.visible=false;}},get activeRipples(){return rings.filter(r=>r.mesh.visible).length;},count:surfaces.length};
+  }
+  root.createCourtyardWaterView=create;
+})(globalThis);
+
 /* Lightweight mixed-media equipment in GDevelop's existing Three group.
  * One instanced link mesh, one reusable arrow and a small reusable impact cue.
  * Links are visual only; physics.js owns the single distance constraint. */
@@ -566,6 +702,7 @@ const P=globalThis.CourtyardPhysics, A=globalThis.CourtyardAnimation, S=globalTh
 const B=globalThis.CourtyardPuzzle,puzzle=B.create(L.puzzle);
 const E=globalThis.CourtyardElevation,elevation=E.create();
 const J=globalThis.CourtyardJourney,journey=J.create();
+const W=globalThis.CourtyardWater,wetState=W.create();
 const animation=A.create();let firedThisFrame=false,lastTickClock=performance.now(),previousActive=false;
 const layer=runtimeScene.getLayer(''),renderer=layer.getRenderer();
 const group=renderer.getThreeGroup(),camera=renderer.getThreeCamera();
@@ -576,6 +713,7 @@ const state={time:0,acc:0,tether:null,arrow:null,draw:0,drawing:false,checkpoint
 const fixture=new URLSearchParams(location.search).has('debug')?new URLSearchParams(location.search).get('stage'):null;
 if(fixture==='tower'){puzzle.solved=true;puzzle.flow=1;puzzle.plate=1;puzzle.y=L.puzzle.endY;elevation.locked=true;elevation.drop=160;elevation.tower=true;state.checkpoint=true;Object.assign(p,{x:1300,y:-820,z:400});}
 if(fixture==='ending'){Object.assign(puzzle,{solved:true,flow:1,plate:1,y:L.puzzle.endY});Object.assign(elevation,{locked:true,drop:160,tower:true,canopy:true,wind:true});state.checkpoint=true;Object.assign(p,{x:785,y:350,z:460});}
+if(fixture==='water'){Object.assign(puzzle,{solved:true,flow:1,plate:1,y:L.puzzle.endY});state.checkpoint=true;Object.assign(p,{x:1200,y:150,z:176});}
 const timing={activeSeconds:0,stalls:0,longest:0,p95:0};
 // Native GDevelop frame limiting keeps a paused preview from competing with
 // active play. DOM controls remain immediately responsive between game frames.
@@ -602,7 +740,7 @@ function foregroundFade(object,position,bounds=null){
 // Three deliberate face tones: no dynamic lighting or smooth tonal gradients.
 for(const b of L.boxes){
   const obj=runtimeScene.getObjects(b.name)[0],m=obj.get3DRendererObject();
-  const water=b.name.startsWith('Water'),wood=b.color==='#65513f';
+  const water=L.water.some(w=>w.name===b.name),wood=b.color==='#65513f';
   m.material=water?flatFaces:wood?woodSurface:stoneSurface;
   const tones=water?['#2585a4','#246a86','#234a65']:['#ffffff','#eeebe4','#a0a8ba'];
   const tint=new THREE.Color(b.name==='SluiceCourt'||b.name==='BridgeLanding'?'#c5d2cb':'#ffffff');
@@ -626,7 +764,8 @@ for(const b of L.boxes){
     const edges=new THREE.EdgesGeometry(m.geometry,35),ink=new THREE.LineBasicMaterial({color:b.color==='#65513f'?'#45362f':'#897969',transparent:true,opacity:0.6});
     const outline=new THREE.LineSegments(edges,ink);m.add(outline);own.push(edges,ink);
   }
-  if((b.d<=32&&b.z>150)||['PracticeMast','AnchorMast','AnchorBeam','EastAnchorMast','EastAnchorBeam','WeightFrame','WeightBeam','CarriageRail','RailTower','RailCanopy','AscentBeam','WindRail'].includes(b.name))foregroundFade(m,{x:b.x+b.w/2,y:b.y+b.h/2,z:b.z+b.d/2},b);
+  if(L.water.some(w=>w.name===b.name))obj.hide();
+  if((b.d<=32&&b.z>150)||['PracticeMast','AnchorMast','AnchorBeam','EastAnchorMast','EastAnchorBeam','WeightFrame','WeightBeam','CarriageRail','RailTower','RailCanopy','AscentBeam','WindRail','WindAnchorBeam','WindPostWest','WindPostEast'].includes(b.name))foregroundFade(m,{x:b.x+b.w/2,y:b.y+b.h/2,z:b.z+b.d/2},b);
 }
 const targetDefinitions=[...L.anchors,B.anchor(puzzle,L.puzzle),E.weight(elevation),E.carriage(elevation)];
 const anchorMats=targetDefinitions.map(()=>material('#bc9148'));
@@ -658,7 +797,7 @@ for(const [x,y,z,w] of [[145,1020,0,115],[145,1310,0,100],[277,292,100,135],[815
   const h=w*216/384,mat=new THREE.MeshBasicMaterial({map:imageManager.getThreeTexture('courtyard-shrub'),transparent:true,alphaTest:0.25,side:THREE.DoubleSide,depthWrite:true});own.push(mat);
   const shrub=mesh(new THREE.PlaneGeometry(w,h,4,5),mat);shrub.position.set(x,y,z+h/2-h*6/216);shrubs.push(shrub);
 }
-for(const [x,y,z,w] of [[1110,860,100,100],[1550,860,100,110],[1550,280,100,85],[1125,-115,220,125],[1510,-130,220,120],[965,980,20,65],[875,1190,0,80]]){
+for(const [x,y,z,w] of [[1110,860,100,100],[1550,775,100,110],[1550,280,100,85],[1125,-115,220,125],[1510,-130,220,120],[965,980,20,65],[875,1190,0,80]]){
   const h=w*216/384,mat=new THREE.MeshBasicMaterial({map:imageManager.getThreeTexture('courtyard-shrub'),transparent:true,alphaTest:0.25,side:THREE.DoubleSide,depthWrite:true});own.push(mat);
   const plant=mesh(new THREE.PlaneGeometry(w,h,4,5),mat);plant.position.set(x,y,z+h/2-h*6/216);shrubs.push(plant);
 }
@@ -671,7 +810,7 @@ const treeBaseZ=tree.position.z,treeFoot=142;
 treeMat.color.set('#929575');
 // Wind bends the generated cutouts above rooted feet; it never rotates their
 // vertical billboard axes toward the camera. Shared phases make gusts coherent.
-for(const [x,y,z,w] of [[1160,-610,220,95],[1530,-900,400,95],[630,-920,460,110],[960,-1000,460,85],[755,-350,460,65],[630,485,460,85],[940,470,460,100]]){
+for(const [x,y,z,w] of [[1160,-610,220,95],[1530,-900,400,95],[630,-920,460,110],[950,-890,460,85],[755,-350,460,65],[630,485,460,70],[940,470,460,100],[1480,335,100,130],[1530,620,100,110],[1140,800,100,90],[680,1060,0,110]]){
  const h=w*216/384,mat=treeMat.clone();mat.map=imageManager.getThreeTexture('courtyard-shrub');mat.color.set('#ffffff');own.push(mat);
  const plant=mesh(new THREE.PlaneGeometry(w,h,4,5),mat);plant.position.set(x,y,z+h/2-h*6/216);shrubs.push(plant);
 }
@@ -705,6 +844,45 @@ const stoneTones=['#8b8d9b','#dcc7a6','#dcc7a6','#8b8d9b','#f4e1c1','#8b8d9b'].m
 const brassTones=['#8a6939','#b38b45','#b38b45','#795a36','#ddbb73','#795a36'].map(material);
 for(const m of brassTones){m.map=brassMap;m.color.set('#ffffff');}
 function trim(x,y,z,w,h,d,mats){const t=mesh(new THREE.BoxGeometry(w,h,d),mats);t.position.set(x+w/2,y+h/2,z+d/2);return t;}
+// Finished floating foundations: broad beveled undersides instead of abruptly
+// cut piers. Decorative support geometry stays below the playable collision.
+for(const name of ['Arrival','Landing','SluiceCourt','UpperGarden','CanopyFoundation','WindFoundation','OverlookFoundation','TowerFoundation','AqueductFoundation']){
+ const b=L.boxes.find(b=>b.name===name),inset=Math.min(45,b.w*.15,b.h*.15),drop=Math.min(75,b.h*.35);
+ const points=[[b.x,b.y,b.z],[b.x+b.w,b.y,b.z],[b.x+b.w,b.y+b.h,b.z],[b.x,b.y+b.h,b.z],
+  [b.x+inset,b.y+inset,b.z-drop],[b.x+b.w-inset,b.y+inset,b.z-drop],[b.x+b.w-inset,b.y+b.h-inset,b.z-drop],[b.x+inset,b.y+b.h-inset,b.z-drop]];
+ const positions=[],colors=[],tones=['#859585','#6b7c78','#566977'];
+ for(const [face,indices] of [[0,[0,4,5,0,5,1]],[1,[1,5,6,1,6,2]],[2,[2,6,7,2,7,3]],[1,[3,7,4,3,4,0]],[2,[4,7,6,4,6,5]]]){
+  const color=new THREE.Color(tones[face]);for(const i of indices){positions.push(...points[i]);colors.push(color.r,color.g,color.b);}
+ }
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));mesh(geo,flatFaces);
+}
+// One instanced draw frames every garden bed without adding dozens of materials.
+const curbGeo=new THREE.BoxGeometry(1,1,1),curbColors=[];
+for(let i=0;i<curbGeo.attributes.position.count;i++){const n=curbGeo.attributes.normal,color=new THREE.Color(n.getZ(i)>.5?'#e4d3b1':n.getX(i)>.5?'#a4a393':'#c1b89f');curbColors.push(color.r,color.g,color.b);}
+curbGeo.setAttribute('color',new THREE.Float32BufferAttribute(curbColors,3));own.push(curbGeo);
+const curbs=new THREE.InstancedMesh(curbGeo,flatFaces,L.grass.length*4),curbTransform=new THREE.Object3D();let curbIndex=0;
+for(const lawn of L.grass)for(const [x,y,w,h] of [[lawn.x,lawn.y,lawn.w,4],[lawn.x,lawn.y+lawn.h-4,lawn.w,4],[lawn.x,lawn.y,4,lawn.h],[lawn.x+lawn.w-4,lawn.y,4,lawn.h]]){
+ curbTransform.position.set(x+w/2,y+h/2,lawn.z+1.7);curbTransform.scale.set(w,h,3);curbTransform.updateMatrix();curbs.setMatrixAt(curbIndex++,curbTransform.matrix);
+}
+curbs.instanceMatrix.needsUpdate=true;curbs.computeBoundingSphere();world.add(curbs);own.push(curbs);
+function supportBeam(from,to,width){
+ const a=new THREE.Vector3(...from),b=new THREE.Vector3(...to),direction=b.clone().sub(a);
+ const beam=mesh(new THREE.BoxGeometry(width,width,direction.length()),woodSurface);beam.position.copy(a).add(b).multiplyScalar(.5);beam.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),direction.normalize());
+ // The textured shared material expects vertex colors, including on these props.
+ const attr=beam.geometry.attributes.position,colors=[];for(let i=0;i<attr.count;i++)colors.push(.85,.85,.85);beam.geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+ foregroundFade(beam,{x:beam.position.x,y:beam.position.y,z:beam.position.z});
+}
+supportBeam([1250,-150,480],[1280,-470,560],12);supportBeam([1590,-150,480],[1440,-470,560],12);
+supportBeam([1280,-470,560],[1440,-470,560],12);
+for(const a of L.anchors.filter(a=>['ascent','wind'].includes(a.id))){
+ trim(a.x-3,a.y-3,a.z+18,6,6,a.id==='wind'?24:10,brassTones);
+}
+// Raised landing mark and a separate practice pad communicate intent without
+// adding another collectible, route or misleading grapple target.
+const practicePad=mesh(new THREE.RingGeometry(40,44,32),material('#9f8c5f'));practicePad.position.set(400,1220,.7);
+for(const [x,y,z] of [[505,940,0],[540,510,100],[1450,-810,400],[780,-800,460]]){
+ const mark=mesh(new THREE.RingGeometry(26,29,24),material('#9f8c5f'));mark.position.set(x,y,z+.7);
+}
 for(const name of ['RearWall','LandingWestWall','ArrivalWestWall','TreePlanter']){
   const b=L.boxes.find(b=>b.name===name);
   const cap={name:name+'Cap',x:b.x-3,y:b.y-3,z:b.z+b.d,w:b.w+6,h:b.h+6,d:8,solid:true};
@@ -718,26 +896,19 @@ for(const [x,y,z,w,h,d] of [[197,217,100,44,42,148],[880,217,100,40,42,148],[63,
 for(const [x,y,z,w,h,d] of [[488,747,433,31,28,27],[786,747,420,30,28,40],[268,1158,266,24,24,14],[272,1170,291,16,28,10]]){
   const mount=trim(x,y,z,w,h,d,brassTones);foregroundFade(mount,{x:x+w/2,y:y+h/2,z:z+d/2});
 } // ring stands forward of the post so reeling cannot snag its own mount
-const rippleMat=material('#4ca8bb');
-for(const [x,y,w] of [[150,755,58],[360,817,42],[568,748,65],[730,830,55]]){const r=mesh(new THREE.PlaneGeometry(w,3),rippleMat);r.position.set(x,y,-22.6);}
+const waterView=globalThis.createCourtyardWaterView(THREE,world,own,L.water);
 // Waterworks: broad lane guides, a matching plate mark, and an actual elevated
 // aqueduct deliver water downhill into the tree bed. All streams are cheap boxes.
-const laneMat=material('#a28b60'),plateMat=material('#bc9555'),waterMat=material('#318eaa');
+const laneMat=material('#a28b60'),plateMat=material('#bc9555');
 for(const x of [1236,1320])trim(x,260,101,4,455,3,[laneMat,laneMat,laneMat,laneMat,laneMat,laneMat]);
 const plateMark=mesh(new THREE.RingGeometry(28,34,24),plateMat);plateMark.position.set(1280,660,106);
 const blockMark=mesh(new THREE.RingGeometry(20,24,24),plateMat);blockMark.position.set(1280,300,163);
 // Visible brass signal line connects the plate to the sluice along the deck.
 trim(1150,674,101,76,4,2,[laneMat,laneMat,laneMat,laneMat,laneMat,laneMat]);
 trim(1150,265,101,4,413,2,[laneMat,laneMat,laneMat,laneMat,laneMat,laneMat]);
-const streams=[];
-for(const [x,y,z,w,h,d] of [[1174,248,150,37,57,33],[695,299,149,505,25,4],[694,323,142,28,35,9],[690,350,142,40,70,3]]){
-  const m=trim(x,y,z,w,h,d,[waterMat,waterMat,waterMat,waterMat,waterMat,waterMat]);m.visible=false;streams.push(m);
-}
-const wheel=new THREE.Group();world.add(wheel);wheel.position.set(1350,235,175);wheel.rotation.x=Math.PI/2;
+const wheel=new THREE.Group();world.add(wheel);wheel.position.set(1150,278,175);wheel.rotation.x=Math.PI/2;
 const wheelRim=new THREE.TorusGeometry(48,5,6,20);own.push(wheelRim);wheel.add(new THREE.Mesh(wheelRim,material('#795939')));
 for(let i=0;i<8;i++){const g=new THREE.BoxGeometry(7,90,7);own.push(g);const spoke=new THREE.Mesh(g,material('#795939'));spoke.rotation.z=i*Math.PI/4;wheel.add(spoke);}
-const waterGlints=[];
-for(let i=0;i<14;i++){const m=mesh(new THREE.PlaneGeometry(15,2),rippleMat);m.visible=false;waterGlints.push(m);}
 const blockBox=boxes.find(b=>b.name===L.puzzle.block),blockObject=runtimeScene.getObjects(L.puzzle.block)[0];
 const blockAnchor=anchors.find(a=>a.kind==='block'),plateObject=runtimeScene.getObjects(L.puzzle.plate)[0];
 const pressureMat=plateObject.get3DRendererObject().material.clone();own.push(pressureMat);plateObject.get3DRendererObject().material=pressureMat;
@@ -752,14 +923,12 @@ function syncPuzzle(visual=true){
   gateObject.setZ(173+puzzle.flow*62);returnGateBox.z=20+puzzle.flow*150;returnGateObject.setZ(returnGateBox.z);
   plateMat.color.set(puzzle.solved?'#8bbd87':'#bc9555');
   pressureMat.color.set(puzzle.solved?'#bdd6a6':'#ffffff');laneMat.color.set(puzzle.solved?'#6b986b':'#a28b60');
-  for(let i=0;i<streams.length;i++)streams[i].visible=puzzle.flow>(i+0.15)/streams.length;
   // The first feed revives the tree partway; the sky feed supplies the payoff.
   const bloom=elevation.complete?P.clamp((journey.reveal-1)/4,0,1):0;
   const life=puzzle.flow*0.55+bloom*0.45;
   treeMat.color.setRGB(0.573+0.427*life,0.584+0.416*life,0.459+0.541*life);
   tree.scale.setScalar(1+0.1*bloom);tree.position.z=treeFoot+(treeBaseZ-treeFoot)*tree.scale.y;
   wheel.rotation.z=state.time*(puzzle.flow>0.5?0.45:0);
-  for(let i=0;i<waterGlints.length;i++){const m=waterGlints[i];m.visible=puzzle.flow>0.5;m.position.set(1190-((state.time*65+i*38)%490),311,153.3);}
 }
 syncPuzzle();
 const bridgeBox=boxes.find(b=>b.name==='CounterBridge'),bridgeObject=runtimeScene.getObjects('CounterBridge')[0];
@@ -767,7 +936,6 @@ const weightObject=runtimeScene.getObjects('HangingWeight')[0];
 const weightAnchor=anchors.find(a=>a.kind==='weight'),movingAnchor=anchors.find(a=>a.kind==='moving');
 const cableMat=material('#665e4d'),cables=[];
 for(const [x,y] of [[1490,-155],[1280,-470],[1440,-470]]){const cable=mesh(new THREE.CylinderGeometry(2,2,1,6),cableMat);cable.rotation.x=Math.PI/2;cables.push({mesh:cable,x,y});}
-const highStream=trim(624,400,145,10,16,315,[waterMat,waterMat,waterMat,waterMat,waterMat,waterMat]);highStream.visible=false;
 const seal=mesh(new THREE.RingGeometry(32,38,32),material('#bc9555'));seal.position.set(785,450,465);
 function syncElevation(visual=true){
  bridgeBox.z=E.bridgeTop(elevation)-24;
@@ -779,9 +947,7 @@ function syncElevation(visual=true){
  }
  const ends=[495-elevation.drop,E.bridgeTop(elevation),E.bridgeTop(elevation)];
  cables.forEach((c,i)=>{const top=i?560:560;c.mesh.position.set(c.x,c.y,(top+ends[i])/2);c.mesh.scale.y=top-ends[i];});
- seal.material.color.set(elevation.complete?'#8bbd87':'#bc9555');highStream.visible=elevation.complete;
- const feed=elevation.complete?P.clamp(journey.reveal/2,0.01,1):0;
- highStream.scale.z=feed;highStream.position.z=460-315*feed/2;
+ seal.material.color.set(elevation.complete?'#8bbd87':'#bc9555');
  seal.scale.setScalar(1+(journey.hold>0?journey.hold*0.2:0));
 }
 syncElevation();
@@ -869,7 +1035,7 @@ function detach(reason){
   }else if(state.arrow)S.retract(state.arrow);
   state.drawing=false;state.draw=0;
 }
-function recover(){if(J.locked(journey))return;stopVoices();chainView.clear();A.reset(animation);firedThisFrame=false;B.reset(puzzle,L.puzzle);syncPuzzle();journey.hold=0;const spawn=elevation.complete?{x:785,y:450,z:460}:E.checkpoint(elevation)||(puzzle.solved?L.puzzle.checkpoint:state.checkpoint?L.checkpoint:L.spawn);Object.assign(p,spawn,{vx:0,vy:0,vz:0,grounded:false,coyote:0,jumpBuffer:0});state.tether=null;state.arrow=null;state.drawing=false;state.draw=0;state.acc=0;state.jump=false;state.resetCount++;state.keys.clear();facingX=0;facingY=-1;toast(elevation.complete?'Garden restored. Back at the overlook.':puzzle.solved?'Checkpoint recovered. Puzzle progress kept.':'Back on solid ground');}
+function recover(){if(J.locked(journey))return;stopVoices();chainView.clear();Object.assign(wetState,W.create());A.reset(animation);firedThisFrame=false;B.reset(puzzle,L.puzzle);syncPuzzle();journey.hold=0;const spawn=elevation.complete?{x:785,y:450,z:460}:E.checkpoint(elevation)||(puzzle.solved?L.puzzle.checkpoint:state.checkpoint?L.checkpoint:L.spawn);Object.assign(p,spawn,{vx:0,vy:0,vz:0,grounded:false,coyote:0,jumpBuffer:0});state.tether=null;state.arrow=null;state.drawing=false;state.draw=0;state.acc=0;state.jump=false;state.resetCount++;state.keys.clear();facingX=0;facingY=-1;toast(elevation.complete?'Garden restored. Back at the overlook.':puzzle.solved?'Checkpoint recovered. Puzzle progress kept.':'Back on solid ground');}
 let endingNote=-1;
 function beginRestoration(){
   stopVoices();state.tether=null;state.arrow=null;state.drawing=false;state.draw=0;state.drawTarget=null;state.keys.clear();state.jump=false;state.acc=0;
@@ -1006,7 +1172,7 @@ function targetUnderMouse(){
 }
 function setText(el,value){if(el.textContent!==value)el.textContent=value;}
 function render(){
-  syncPuzzle();syncElevation();
+  syncPuzzle();syncElevation();waterView.update(state.time,puzzle.flow,elevation.complete?P.clamp(journey.reveal/2,0,1):0);
   const paddle=E.obstacle(elevation);paddleObject.setX(paddle.x);paddleCord.position.set(paddle.x+35,-143,612.5);
   updateCamera();const cam=viewConfig(),angle=Math.atan2(-(cam.x-p.x),cam.y-p.y);
   // Close third-person framing: near-camera hardware must not fill the screen
@@ -1062,8 +1228,12 @@ courtyardGrass.update(state.time);
   else if(state.tether?.anchor.kind==='moving'){setText(title,'Ride the waterwheel carriage.');setText(detail,'Reel up with E. Ride west toward the high landing, then release. R returns to your latest terrace.');}
   else if(state.tether?.anchor.kind==='block'){setText(title,puzzle.solved?'The sluice is secured.':'Pull the sluice block.');setText(detail,puzzle.solved?'Water is on its way to the tree. Right mouse releases the chain.':state.tether.length<=90.5?'Step backward toward the brass standing mark, then keep holding E. The chain needs room to pull.':'Stand on the brass mark beyond the plate and hold E. The guide keeps the heavy block on course.');}
   else if(state.tether?.anchor.id==='ascent'){setText(title,'Climb on the chain.');setText(detail,'Hold E and move north. Release above the upper terrace; your momentum carries you onto it.');}
+  else if(state.tether?.anchor.id==='crossing'){setText(title,p.z<135?'Reel above the far stone ledge.':'Steer onto the landing, then release.');setText(detail,'Hold E and W until your feet clear the terrace. Right mouse releases; keep W held to land.');}
+  else if(state.tether?.anchor.id==='practice'){setText(title,'Safe practice: feel the reel lift you.');setText(detail,'E pulls you up · Q lowers you · Right mouse lets go. The next ring crosses the water.');}
+  else if(state.tether?.anchor.id==='wind'){setText(title,'Swing above the slow paddle.');setText(detail,'Hold E to lift above the wood, steer south with S, then release onto the high walk.');}
   else if(state.tether){setText(title,state.tether.length<=90.5?'Fully reeled in.':state.tether.length>=619.5?'Chain at full reach.':state.tether.taut?'Feel the chain take your weight.':'Attached. Move toward the watercourse.');setText(detail,'E shortens the chain · Q gives you room · Right mouse releases your momentum');}
   else if(state.target){setText(title,state.valid?'Hold, draw, release.':P.distance(P.reelPoint(p),state.target)>620?'Move closer to this anchor.':'Stone blocks the shot.');setText(detail,state.target.label+' · A gold reticle means a clear shot.');}
+  else if(wetState.wet){setText(title,'Shallow water slows your steps.');setText(detail,'Ripples follow your movement. The deep basins return you to your checkpoint.');}
   else if(elevation.complete){setText(title,'Level complete. The garden is yours.');setText(detail,'Both feeds are restored. Explore freely, or choose Restart courtyard in the pause menu to play again.');}
   else if(elevation.canopy){setText(title,elevation.wind&&p.y<-80?'The wind walk.':'Follow the high walk back to the tree.');setText(detail,elevation.wind&&p.y<-80?'Wait for the wooden paddle to sweep aside, or use the high ring to swing over it.':'Head south to the overlook. Stand on the brass seal to open the sky cistern.');}
   else if(elevation.tower){setText(title,'A path across the sky.');setText(detail,'Catch the moving ring. Reel upward, ride west, and release above the broad landing.');}
@@ -1103,7 +1273,10 @@ function tick(){
       let walked=0,landed=false;
       let steps=0;while(state.acc>=P.STEP&&steps++<8){
         if(state.arrow){
-          const shot=state.arrow,event=S.step(shot,P.STEP,P.reelPoint(p),boxes,anchors);
+          const shot=state.arrow,wasOutbound=shot.phase==='out',from={...shot.pos};
+          let event=S.step(shot,P.STEP,P.reelPoint(p),boxes,anchors);
+          const waterHit=wasOutbound?W.crossing(from,shot.pos,L.water,state.time):null;
+          if(waterHit){Object.assign(shot.pos,{x:waterHit.x,y:waterHit.y,z:waterHit.z});S.retract(shot);event={type:'water'};waterView.splash(waterHit.x,waterHit.y,waterHit.z,.65,waterHit.basin);sound('splash',.3);}
           if(event?.type==='anchor'){
             const a=event.anchor;
             if(P.distance(P.reelPoint(p),a)<=S.RANGE&&!P.blocked(P.reelPoint(p),a,boxes)){
@@ -1122,15 +1295,18 @@ function tick(){
         syncElevation(false);
         if(ridingBridge)p.z+=E.bridgeTop(elevation)-bridgeWas;
         if(locked){sound('plate');toast('Bridge locked. Climb the waterwheel tower.');}
-        const result=P.step(p,{x:fx*f-fy*r,y:fy*f+fx*r,jump:state.jump,reel:!pullingBlock&&k.has('KeyE'),payout:k.has('KeyQ')},boxes,state.tether);
+        const contactBefore=W.sample(p,L.water,state.time);
+        const result=P.step(p,{speedScale:contactBefore?(contactBefore.deep?0.4:0.72):1,x:fx*f-fy*r,y:fy*f+fx*r,jump:state.jump,reel:!pullingBlock&&k.has('KeyE'),payout:k.has('KeyQ')},boxes,state.tether);
         if(mechanism.completed){state.checkpoint=true;sound('plate');toast('Sluice secured. Water is returning.');}
         state.jump=false;state.acc-=P.STEP;
         if(wasGrounded&&p.grounded)walked+=Math.hypot(p.x-oldX,p.y-oldY);
         if(result.reason)detach('Chain released: the path is blocked');
-        const wet=L.boxes.some(water=>water.name.startsWith('Water')&&!water.name.endsWith('Bed')&&P.inWater(p,water));
-        if(result.invalid||wet||P.outside(p,L.bounds)){recover();sound('splash');break;}
+        const contact=W.sample(p,L.water,state.time),waterEvent=W.step(wetState,p,contact,Math.hypot(p.x-oldX,p.y-oldY),P.STEP);
+        if(waterEvent.ripple&&contact)waterView.splash(p.x,p.y,contact.z,waterEvent.splash?1:.35,contact.basin);
+        if(waterEvent.splash)sound('splash',contact.deep?0.7:0.25);
+        if(result.invalid||waterEvent.recover||P.outside(p,L.bounds)){recover();if(waterEvent.recover)toast('Deep water. Back at your checkpoint.');break;}
         if(elevation.canopy&&P.overlaps(p,E.obstacle(elevation))){recover();sound('land',0.3);toast('A soft bump. Wait for the paddle, or swing over it.');break;}
-        if(result.landed&&result.impact>100){landed=true;sound('land',Math.min(1,result.impact/500));}
+        if(result.landed&&result.impact>100){landed=true;if(!waterEvent.splash)sound(contact?'splash':'land',Math.min(1,result.impact/500));}
       }
       if(state.acc>P.STEP*8)state.acc=0;
       if(!state.checkpoint&&p.y<620&&p.z>=98&&p.grounded){state.checkpoint=true;checkpoint.material.color.set('#c9df91');toast('Checkpoint reached');sound('checkpoint');}
@@ -1138,7 +1314,7 @@ function tick(){
       if(p.grounded&&p.z>=458&&p.x<1020&&p.y<-650&&!elevation.canopy){elevation.canopy=true;toast('Canopy checkpoint. Follow the high walk back to the tree.');sound('checkpoint');}
       if(elevation.canopy&&!elevation.wind&&p.grounded&&p.z===460&&p.y>-430&&p.y<-270){elevation.wind=true;toast('Wind walk checkpoint. Watch the paddle or take the high ring.');sound('checkpoint');}
       const pose=A.update(animation,{grounded:p.grounded,vz:p.vz,distance:walked,drawing:state.drawing,draw:state.draw,fired:firedThisFrame,landed,attached:!!state.tether,reeling:(!!state.tether&&(k.has('KeyE')||k.has('KeyQ')))||state.arrow?.phase==='return'},elapsed);
-      firedThisFrame=false;if(pose.step)sound('step',0.35);
+      firedThisFrame=false;if(pose.step)sound(wetState.wet?'splash':'step',wetState.wet?0.13:0.35);
       const blockSlack=state.tether?.anchor.kind==='block'&&state.tether.length-P.distance(P.reelPoint(p),state.tether.anchor)>1;
       const motor=state.tether?.anchor.kind==='block'?Math.max(puzzle.speed,blockSlack&&k.has('KeyE')&&!puzzle.solved?135:0):state.tether?Math.abs(state.tether.lengthRate||0):state.arrow?180:0;
       if(state.time-lastMechanism>0.16&&(elevation.moved>0||puzzle.speed>2||(puzzle.solved&&puzzle.flow<1))){sound(puzzle.speed>2?'block':'sluice',0.6);lastMechanism=state.time;}
@@ -1148,7 +1324,7 @@ function tick(){
       // The single licensed flute track replaces the old repeated test tones.
       // Overlapping finite voices create a quiet bed; at most two water voices
       // coexist. They use the effects volume and stop with all other sounds.
-      if(state.time-lastWater>1.1){sound('water',P.clamp(1-Math.hypot(p.x-485,p.y-800)/1000,0.15,0.6));lastWater=state.time;}
+      if(state.time-lastWater>1.1){const near=Math.min(...L.water.map(b=>Math.hypot(p.x-P.clamp(p.x,b.x,b.x+b.w),p.y-P.clamp(p.y,b.y,b.y+b.h),(p.z-b.z)*.7)));sound('water',P.clamp(1-near/650,.03,.6));lastWater=state.time;}
     }
     const event=J.step(journey,puzzle,elevation,p,elapsed,false,{shots:state.shotCount,recoveries:state.resetCount});
     if(event==='restore')beginRestoration();
@@ -1171,6 +1347,7 @@ function tick(){
   diagnostics.textContent+=`\nDraw calls ${gpu?.calls??'—'} | triangles ${gpu?.triangles??'—'} | wind checkpoint ${elevation.wind}`;
   diagnostics.textContent+=`\nSluice block ${puzzle.y.toFixed(1)} | plate ${puzzle.solved?'latched':'waiting'} | water ${Math.round(puzzle.flow*100)}%`;
   diagnostics.textContent+=`\nJourney ${journey.phase} | seal ${journey.hold.toFixed(2)}s | reveal ${journey.reveal.toFixed(2)}s | route ${journey.seconds.toFixed(1)}s`;
+  diagnostics.textContent+=`\nWater ${wetState.wet?'wading':'dry'} | deep ${wetState.deepTime.toFixed(2)}s | ripples ${waterView.activeRipples}`;
 }
 function dispose(){flute.pause();flute.removeAttribute('src');flute.load();controls.abort();runtimeScene.getGame().setMaximumFps(60);root.remove();group.remove(world);for(const resource of own)resource.dispose?.();audio?.close();}
 runtimeScene.__courtyard={tick,dispose,state,player:p,boxes,anchors,recover};
@@ -1187,7 +1364,7 @@ gdjs.CourtyardCode.eventsList0 = function(runtimeScene) {
 {
 
 
-gdjs.CourtyardCode.userFunc0xa323e8(runtimeScene);
+gdjs.CourtyardCode.userFunc0xa555e8(runtimeScene);
 
 }
 
@@ -1213,8 +1390,6 @@ gdjs.CourtyardCode.GDWaterObjects1.length = 0;
 gdjs.CourtyardCode.GDWaterBedObjects1.length = 0;
 gdjs.CourtyardCode.GDBasinLipWestObjects1.length = 0;
 gdjs.CourtyardCode.GDBasinLipEastObjects1.length = 0;
-gdjs.CourtyardCode.GDStepOneObjects1.length = 0;
-gdjs.CourtyardCode.GDStepTwoObjects1.length = 0;
 gdjs.CourtyardCode.GDEastGalleryObjects1.length = 0;
 gdjs.CourtyardCode.GDSluiceCourtObjects1.length = 0;
 gdjs.CourtyardCode.GDUpperGardenObjects1.length = 0;
@@ -1259,8 +1434,6 @@ gdjs.CourtyardCode.GDPressurePlateObjects1.length = 0;
 gdjs.CourtyardCode.GDGardenPillarWestObjects1.length = 0;
 gdjs.CourtyardCode.GDGardenPillarEastObjects1.length = 0;
 gdjs.CourtyardCode.GDGardenLintelObjects1.length = 0;
-gdjs.CourtyardCode.GDEastAnchorMastObjects1.length = 0;
-gdjs.CourtyardCode.GDEastAnchorBeamObjects1.length = 0;
 gdjs.CourtyardCode.GDUpperRearWallEastObjects1.length = 0;
 gdjs.CourtyardCode.GDCounterBridgeObjects1.length = 0;
 gdjs.CourtyardCode.GDBridgeLandingObjects1.length = 0;
@@ -1268,7 +1441,6 @@ gdjs.CourtyardCode.GDTowerCrownObjects1.length = 0;
 gdjs.CourtyardCode.GDTowerEastColumnObjects1.length = 0;
 gdjs.CourtyardCode.GDTowerWestColumnObjects1.length = 0;
 gdjs.CourtyardCode.GDTowerBackParapetObjects1.length = 0;
-gdjs.CourtyardCode.GDTowerUnderpassObjects1.length = 0;
 gdjs.CourtyardCode.GDCanopyLandingObjects1.length = 0;
 gdjs.CourtyardCode.GDCanopyWalkObjects1.length = 0;
 gdjs.CourtyardCode.GDTreeOverlookObjects1.length = 0;
@@ -1297,6 +1469,52 @@ gdjs.CourtyardCode.GDRailCanopyObjects1.length = 0;
 gdjs.CourtyardCode.GDAscentBeamObjects1.length = 0;
 gdjs.CourtyardCode.GDWindPaddleObjects1.length = 0;
 gdjs.CourtyardCode.GDWindRailObjects1.length = 0;
+gdjs.CourtyardCode.GDBasinNorthWallObjects1.length = 0;
+gdjs.CourtyardCode.GDBasinSouthWallObjects1.length = 0;
+gdjs.CourtyardCode.GDLowerBasinSouthObjects1.length = 0;
+gdjs.CourtyardCode.GDLowerBasinWestObjects1.length = 0;
+gdjs.CourtyardCode.GDReservoirBackObjects1.length = 0;
+gdjs.CourtyardCode.GDSkyRimWestObjects1.length = 0;
+gdjs.CourtyardCode.GDSkyRimEastObjects1.length = 0;
+gdjs.CourtyardCode.GDSkyRimNorthObjects1.length = 0;
+gdjs.CourtyardCode.GDSkyRimSouthObjects1.length = 0;
+gdjs.CourtyardCode.GDSkyDrainCollarObjects1.length = 0;
+gdjs.CourtyardCode.GDAqueductReceivingBedObjects1.length = 0;
+gdjs.CourtyardCode.GDAqueductReceivingWestObjects1.length = 0;
+gdjs.CourtyardCode.GDAqueductReceivingEastObjects1.length = 0;
+gdjs.CourtyardCode.GDCrossingMastFootObjects1.length = 0;
+gdjs.CourtyardCode.GDAscentPostObjects1.length = 0;
+gdjs.CourtyardCode.GDWindPostWestObjects1.length = 0;
+gdjs.CourtyardCode.GDWindPostEastObjects1.length = 0;
+gdjs.CourtyardCode.GDWindAnchorBeamObjects1.length = 0;
+gdjs.CourtyardCode.GDWeightFrameWestObjects1.length = 0;
+gdjs.CourtyardCode.GDWeightCrossbeamObjects1.length = 0;
+gdjs.CourtyardCode.GDCanopyFoundationObjects1.length = 0;
+gdjs.CourtyardCode.GDWindFoundationObjects1.length = 0;
+gdjs.CourtyardCode.GDOverlookFoundationObjects1.length = 0;
+gdjs.CourtyardCode.GDTowerFoundationObjects1.length = 0;
+gdjs.CourtyardCode.GDPracticeStepObjects1.length = 0;
+gdjs.CourtyardCode.GDArrivalBenchSeatObjects1.length = 0;
+gdjs.CourtyardCode.GDArrivalBenchFootAObjects1.length = 0;
+gdjs.CourtyardCode.GDArrivalBenchFootBObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceBenchSeatObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceBenchFootAObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceBenchFootBObjects1.length = 0;
+gdjs.CourtyardCode.GDCanopyBenchSeatObjects1.length = 0;
+gdjs.CourtyardCode.GDCanopyBenchFootAObjects1.length = 0;
+gdjs.CourtyardCode.GDCanopyBenchFootBObjects1.length = 0;
+gdjs.CourtyardCode.GDAqueductFoundationObjects1.length = 0;
+gdjs.CourtyardCode.GDLandingRearFootingObjects1.length = 0;
+gdjs.CourtyardCode.GDLandingWestFootingObjects1.length = 0;
+gdjs.CourtyardCode.GDArrivalWestFootingObjects1.length = 0;
+gdjs.CourtyardCode.GDArrivalBackFootingObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceEastFootingObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceRunnerLeftObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceRunnerRightObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceRunnerBeamObjects1.length = 0;
+gdjs.CourtyardCode.GDWheelStandRearObjects1.length = 0;
+gdjs.CourtyardCode.GDWheelStandFrontObjects1.length = 0;
+gdjs.CourtyardCode.GDWheelAxleObjects1.length = 0;
 gdjs.CourtyardCode.GDArt_9595adventurer_9595back_9595leftObjects1.length = 0;
 gdjs.CourtyardCode.GDArt_9595adventurer_9595back_9595rightObjects1.length = 0;
 gdjs.CourtyardCode.GDArt_9595adventurer_9595backObjects1.length = 0;
@@ -1355,8 +1573,6 @@ gdjs.CourtyardCode.GDWaterObjects1.length = 0;
 gdjs.CourtyardCode.GDWaterBedObjects1.length = 0;
 gdjs.CourtyardCode.GDBasinLipWestObjects1.length = 0;
 gdjs.CourtyardCode.GDBasinLipEastObjects1.length = 0;
-gdjs.CourtyardCode.GDStepOneObjects1.length = 0;
-gdjs.CourtyardCode.GDStepTwoObjects1.length = 0;
 gdjs.CourtyardCode.GDEastGalleryObjects1.length = 0;
 gdjs.CourtyardCode.GDSluiceCourtObjects1.length = 0;
 gdjs.CourtyardCode.GDUpperGardenObjects1.length = 0;
@@ -1401,8 +1617,6 @@ gdjs.CourtyardCode.GDPressurePlateObjects1.length = 0;
 gdjs.CourtyardCode.GDGardenPillarWestObjects1.length = 0;
 gdjs.CourtyardCode.GDGardenPillarEastObjects1.length = 0;
 gdjs.CourtyardCode.GDGardenLintelObjects1.length = 0;
-gdjs.CourtyardCode.GDEastAnchorMastObjects1.length = 0;
-gdjs.CourtyardCode.GDEastAnchorBeamObjects1.length = 0;
 gdjs.CourtyardCode.GDUpperRearWallEastObjects1.length = 0;
 gdjs.CourtyardCode.GDCounterBridgeObjects1.length = 0;
 gdjs.CourtyardCode.GDBridgeLandingObjects1.length = 0;
@@ -1410,7 +1624,6 @@ gdjs.CourtyardCode.GDTowerCrownObjects1.length = 0;
 gdjs.CourtyardCode.GDTowerEastColumnObjects1.length = 0;
 gdjs.CourtyardCode.GDTowerWestColumnObjects1.length = 0;
 gdjs.CourtyardCode.GDTowerBackParapetObjects1.length = 0;
-gdjs.CourtyardCode.GDTowerUnderpassObjects1.length = 0;
 gdjs.CourtyardCode.GDCanopyLandingObjects1.length = 0;
 gdjs.CourtyardCode.GDCanopyWalkObjects1.length = 0;
 gdjs.CourtyardCode.GDTreeOverlookObjects1.length = 0;
@@ -1439,6 +1652,52 @@ gdjs.CourtyardCode.GDRailCanopyObjects1.length = 0;
 gdjs.CourtyardCode.GDAscentBeamObjects1.length = 0;
 gdjs.CourtyardCode.GDWindPaddleObjects1.length = 0;
 gdjs.CourtyardCode.GDWindRailObjects1.length = 0;
+gdjs.CourtyardCode.GDBasinNorthWallObjects1.length = 0;
+gdjs.CourtyardCode.GDBasinSouthWallObjects1.length = 0;
+gdjs.CourtyardCode.GDLowerBasinSouthObjects1.length = 0;
+gdjs.CourtyardCode.GDLowerBasinWestObjects1.length = 0;
+gdjs.CourtyardCode.GDReservoirBackObjects1.length = 0;
+gdjs.CourtyardCode.GDSkyRimWestObjects1.length = 0;
+gdjs.CourtyardCode.GDSkyRimEastObjects1.length = 0;
+gdjs.CourtyardCode.GDSkyRimNorthObjects1.length = 0;
+gdjs.CourtyardCode.GDSkyRimSouthObjects1.length = 0;
+gdjs.CourtyardCode.GDSkyDrainCollarObjects1.length = 0;
+gdjs.CourtyardCode.GDAqueductReceivingBedObjects1.length = 0;
+gdjs.CourtyardCode.GDAqueductReceivingWestObjects1.length = 0;
+gdjs.CourtyardCode.GDAqueductReceivingEastObjects1.length = 0;
+gdjs.CourtyardCode.GDCrossingMastFootObjects1.length = 0;
+gdjs.CourtyardCode.GDAscentPostObjects1.length = 0;
+gdjs.CourtyardCode.GDWindPostWestObjects1.length = 0;
+gdjs.CourtyardCode.GDWindPostEastObjects1.length = 0;
+gdjs.CourtyardCode.GDWindAnchorBeamObjects1.length = 0;
+gdjs.CourtyardCode.GDWeightFrameWestObjects1.length = 0;
+gdjs.CourtyardCode.GDWeightCrossbeamObjects1.length = 0;
+gdjs.CourtyardCode.GDCanopyFoundationObjects1.length = 0;
+gdjs.CourtyardCode.GDWindFoundationObjects1.length = 0;
+gdjs.CourtyardCode.GDOverlookFoundationObjects1.length = 0;
+gdjs.CourtyardCode.GDTowerFoundationObjects1.length = 0;
+gdjs.CourtyardCode.GDPracticeStepObjects1.length = 0;
+gdjs.CourtyardCode.GDArrivalBenchSeatObjects1.length = 0;
+gdjs.CourtyardCode.GDArrivalBenchFootAObjects1.length = 0;
+gdjs.CourtyardCode.GDArrivalBenchFootBObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceBenchSeatObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceBenchFootAObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceBenchFootBObjects1.length = 0;
+gdjs.CourtyardCode.GDCanopyBenchSeatObjects1.length = 0;
+gdjs.CourtyardCode.GDCanopyBenchFootAObjects1.length = 0;
+gdjs.CourtyardCode.GDCanopyBenchFootBObjects1.length = 0;
+gdjs.CourtyardCode.GDAqueductFoundationObjects1.length = 0;
+gdjs.CourtyardCode.GDLandingRearFootingObjects1.length = 0;
+gdjs.CourtyardCode.GDLandingWestFootingObjects1.length = 0;
+gdjs.CourtyardCode.GDArrivalWestFootingObjects1.length = 0;
+gdjs.CourtyardCode.GDArrivalBackFootingObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceEastFootingObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceRunnerLeftObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceRunnerRightObjects1.length = 0;
+gdjs.CourtyardCode.GDSluiceRunnerBeamObjects1.length = 0;
+gdjs.CourtyardCode.GDWheelStandRearObjects1.length = 0;
+gdjs.CourtyardCode.GDWheelStandFrontObjects1.length = 0;
+gdjs.CourtyardCode.GDWheelAxleObjects1.length = 0;
 gdjs.CourtyardCode.GDArt_9595adventurer_9595back_9595leftObjects1.length = 0;
 gdjs.CourtyardCode.GDArt_9595adventurer_9595back_9595rightObjects1.length = 0;
 gdjs.CourtyardCode.GDArt_9595adventurer_9595backObjects1.length = 0;

@@ -1,6 +1,6 @@
 {
-  "status": "First-level ending exported; focused ending/replay browser checks passed; previous full-route evidence retained",
-  "export_uncompressed_bytes": 13855257,
+  "status": "Water and structural finish exported; focused normal-arrival and seeded waterworks/ending browser checks passed; previous full-route evidence retained",
+  "export_uncompressed_bytes": 13939287,
   "export_files": 131,
   "observed_fps_recent_windows": [
     54,
@@ -10,8 +10,12 @@
   "full_route_stalls": 7,
   "maximum_stall_ms": 2276,
   "browser_console_errors": 0,
-  "source_zip_bytes": 78496617,
-  "web_zip_bytes": 11955996,
+  "source_zip_bytes": 78513786,
+  "web_zip_bytes": 11963762,
   "y3k_grass_observed_fps": 21.8,
-  "y3k_grass_visible_fps": 50.2
+  "y3k_grass_visible_fps": 50.2,
+  "water_pass_observed_fps": [
+    43.6,
+    59.9
+  ]
 }
