@@ -20,8 +20,11 @@ async function check(){
     return {
       socket,
       send:data=>socket.send(JSON.stringify(data)),
-      async take(match){
-        for(let attempt=0;attempt<250;attempt++){
+      async take(match,timeoutMs=5000){
+        // A 2.2 s test round may expire up to 750 ms later on the server's
+        // sweep. Count elapsed time, not OS-dependent 10 ms timer ticks.
+        const deadline=Date.now()+timeoutMs;
+        while(Date.now()<deadline){
           const index=messages.findIndex(match);
           if(index>=0)return messages.splice(0,index+1).pop();
           await delay(10);
