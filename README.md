@@ -4,6 +4,8 @@ Editable **GDevelop 5.6.287** browser adventure for BIG Game Jam #10, theme **Ke
 
 ## Play and edit
 
+The newer **Downhill Bike — Ridge Run** demo is available at [Play Downhill Bike](https://jermwang.github.io/last-courtyard/downhill-bike/). Its editable GDevelop project, assets, source and server are in [demos/downhill-bike](demos/downhill-bike/README.md). GitHub Pages hosts the solo build; crew multiplayer requires the included Node server. The courtyard remains at the original URL below.
+
 Browser play link: https://jermwang.github.io/last-courtyard/ . Desktop keyboard and mouse recommended. The public build is served from the committed `build` folder by `.github/workflows/pages.yml`; changes to `main` run the gameplay checks and verify export freshness before deployment.
 
 Run `python tools/serve.py` and open http://localhost:8174. The loopback server serves `build` without caching; stop it with Ctrl+C. Serve a downloaded HTML5 export over HTTP rather than opening `index.html` directly.

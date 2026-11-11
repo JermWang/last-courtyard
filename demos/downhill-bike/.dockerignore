@@ -1,0 +1,12 @@
+**
+!Dockerfile
+!package.json
+!package-lock.json
+!build
+!build/**
+!tools
+!tools/crew-server.cjs
+!src
+!src/track.js
+!src/expedition.js
+!src/landscape.js

@@ -1,4 +1,4 @@
-name: Test and publish courtyard
+name: Test and publish games
 
 on:
   push:
@@ -17,6 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: demos/downhill-bike/package-lock.json
       - name: Check the committed GDevelop export
         run: node tools/verify-export.cjs
       - name: Check gameplay
@@ -29,10 +34,21 @@ jobs:
           node tests/journey.test.cjs
           node tests/water.test.cjs
           node tests/grapple-input.test.cjs
+      - name: Check the downhill source and export
+        run: node demos/downhill-bike/tools/verify-export.cjs
+      - name: Install downhill server test dependency
+        run: npm ci --prefix demos/downhill-bike --ignore-scripts
+      - name: Check downhill gameplay and multiplayer
+        run: npm test --prefix demos/downhill-bike
+      - name: Assemble both playable games
+        run: |
+          mkdir -p site/downhill-bike
+          cp -R build/. site/
+          cp -R demos/downhill-bike/build/. site/downhill-bike/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: build
+          path: site
 
   deploy:
     needs: validate

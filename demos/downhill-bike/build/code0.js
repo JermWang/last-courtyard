@@ -1,0 +1,3458 @@
+gdjs.RidgeRunCode = {};
+gdjs.RidgeRunCode.localVariables = [];
+gdjs.RidgeRunCode.idToCallbackMap = new Map();
+gdjs.RidgeRunCode.GDRidgeReferenceObjects1= [];
+gdjs.RidgeRunCode.GDValleyReferenceObjects1= [];
+gdjs.RidgeRunCode.GDSurface_9595park_9595dirtObjects1= [];
+gdjs.RidgeRunCode.GDSurface_9595gravel_9595floor_959504Objects1= [];
+gdjs.RidgeRunCode.GDSurface_9595forest_9595floorObjects1= [];
+gdjs.RidgeRunCode.GDSurface_9595mountain_9545skyObjects1= [];
+
+
+gdjs.RidgeRunCode.userFunc0x83e3c8 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+if (!runtimeScene.__downhillBike) {
+/* Metres, Z up, positive Y down the mountain. Seeded descents reuse a tested
+ * ridge silhouette and vary the turn lines, grades and obstacle positions. */
+const BikeTrack = (() => {
+  const lowerStart = 218;
+  const finish = lowerStart + 362;
+  const bounds = { left: -116, right: 126, top: -28, bottom: finish + 34 };
+  const summitLine = [[-28,-2],[0,0],[25,0],[45,1.5],[70,5],[95,13],[119,12],
+    [141,1],[164,-9],[182,-8],[200,-3]];
+  // Height in metres above the saddle where the lower mountain starts.
+  const summitElevation = [[-28,180],[0,165],[23,154],[48,143],[77,127],[105,105],
+    [135,78],[161,52],[184,30],[202,13]];
+  const roadSource = [[-30,0],[0,0],[28,1],[53,8],[81,24],[115,36],[141,30],
+    [164,12],[189,0],[217,-8],[249,-23],[275,-24],[306,-9],[332,1],[362,4],[398,4]];
+  const chuteSource = [[46,5.7],[55,6.9],[66,6],[87,-2],[118,-7],[146,-2],[168,6.2],[180,4.4],[190,-.35]];
+  const elevationSource = [[-30,91],[0,85],[29,77.8],[54,72],[87,64],[117,57],
+    [147,49.4],[180,42],[218,34.5],[250,27.2],[276,21],[310,13.6],
+    [342,7.4],[362,5.2],[398,5]];
+  const rocksSource = [
+    [-4,95,.69],[-8.8,113,.72],[-3,134,.64],[2.7,152,.73],
+    [-16,120,1.8],[47,114,2.4],[40,172,2.1],[-36,257,2.6],[-16,284,1.35],
+    [14,318,1.8],[-31,202,2.15],[18,208,2.3]
+  ];
+  // Shared biome weights drive materials and ambience, without marking routes.
+  function region(y){
+    const blend=(a,b)=>{const t=Math.max(0,Math.min(1,(y-a)/(b-a)));return t*t*(3-2*t);};
+    const forest=blend(174,248),valley=blend(424,510);
+    return {alpine:1-forest,forest:forest*(1-valley),valley,
+      name:y<218?'Exposed summit':y<462?'Pine gorge':'Fern valley'};
+  }
+  const surfaces = {
+    dirt:{name:'Packed dirt',grip:1.04,drag:.06},
+    gravel:{name:'Loose rock',grip:.68,drag:.10},
+    grass:{name:'Grass',grip:.72,drag:.26}
+  };
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const smooth = (a,b,value) => {
+    const t=clamp((value-a)/(b-a),0,1);
+    return t*t*(3-2*t);
+  };
+  const ramp=(y,a,b,h0,h1,s0,s1)=>{
+    const d=b-a,t=clamp((y-a)/d,0,1),q=t*t,c=q*t;
+    return (2*c-3*q+1)*h0+(c-2*q+t)*d*s0+(-2*c+3*q)*h1+(c-q)*d*s1;
+  };
+  function spline(knots,y){
+    const n=knots.length-1;
+    if (y<=knots[0][0]) return knots[0][1];
+    if (y>=knots[n][0]) return knots[n][1];
+    let i=0;
+    while(y>knots[i+1][0]) i++;
+    const [a,x]=knots[i],[b,v]=knots[i+1];
+    const [before,u]=knots[Math.max(0,i-1)],[after,w]=knots[Math.min(n,i+2)];
+    const t=(y-a)/(b-a), t2=t*t, t3=t2*t;
+    return (2*t3-3*t2+1)*x+(t3-2*t2+t)*(b-a)*(v-u)/(b-before)
+      +(-2*t3+3*t2)*v+(t3-t2)*(b-a)*(w-x)/(after-a);
+  }
+  function makeTrack(seed=0,stage=1,layout={}){
+    const value=seed>>>0,tier=clamp(Math.floor(stage)-1,0,4);
+    const hash=Math.imul((value^Math.imul(stage,1640531527))>>>0,2246822519)>>>0;
+    const authored=stage===1&&value===0;
+    const mirrored=authored?1:hash&1?-1:1;
+    const phase=(hash>>>8)*.000031;
+    const widthFactor=authored?1:.96+tier*.039+((hash>>>5)&31)*.003;
+    const grade=1.79+tier*.065+(authored?0:((hash>>>2)&15)*.004);
+    const drift=y=>authored?0:Math.sin(y*.022+phase)*Math.min(5,1.8+tier*.65)*smooth(18,80,y);
+    const offsetX=(x,y)=>{
+      // Mirror the summit as a whole. Apply seeded lateral variation after
+      // the long gaps, where the routes have room to shift without twisting the catches.
+      const variation=smooth(200,260,y);
+      return mirrored*x*(1+(widthFactor-1)*variation)+drift(y)*variation;
+    };
+    const flankX=(x,y)=>mirrored*x*(1+(widthFactor-1)*.48)+drift(y)*.52;
+    const lowerKnots=knots=>knots.filter(([y])=>y>=0).map(([y,z])=>[y+lowerStart,z]);
+    const road=summitLine.concat(lowerKnots(roadSource)).map(([y,x])=>{
+      const low=y-lowerStart;
+      const sweep=tier*Math.sin(low*.042+phase)*smooth(181,212,low)*(1-smooth(301,340,low));
+      return [y,offsetX(x,y)+sweep];
+    });
+    const chute=lowerKnots(chuteSource).map(([y,x])=>[y,offsetX(x,y)]);
+    const chuteStart=chute[0][0],chuteEnd=chute.at(-1)[0];
+    const saddleZ=-36+80*grade;
+    const elevation=summitElevation.map(([y,z])=>[y,saddleZ+z])
+      .concat(lowerKnots(elevationSource).map(([y,z])=>[y,-36+(z-5)*grade]));
+    const title=stage===1?'Ridge Run':['Timber Cut','Pine Divide','Scree Pass','The Last Drop'][(stage-2)%4];
+    const chuteHalf=2.08-tier*.055;
+    const rollers=tier?[226+(hash>>>16)%12,278+(hash>>>23)%15].slice(0,tier===1?1:2).map(y=>y+lowerStart):[];
+    function rollerHeight(y){
+      let z=0;
+      for(const middle of rollers){
+        const u=(y-middle)/5.8;
+        if(Math.abs(u)<1)z+=(.28+tier*.071)*(1-u*u)**2;
+      }
+      return z;
+    }
+    const safeX = y => spline(road,y);
+    const chuteX = y => spline(chute,y);
+    const baseZ = y => spline(elevation,y)-(layout.freeride?.28*Math.max(0,y-510)*smooth(500,540,y):0);
+    const chuteActive = y => y>=chuteStart && y<=chuteEnd;
+    const mainWidth = y => y<12 ? 4.5 : y>finish-20 ? 5.1 : 4.05-tier*.085;
+    const baseSlope=y=>(baseZ(y+.2)-baseZ(y-.2))/.4;
+    const valleyZ=baseZ(finish);
+    // The broad mountain needs traversable shoulders, not the short demo's
+    // deep edge chutes. Construct jumps against this same grading.
+    const shoulderDrop=x=>(layout.gentleFlanks?10:25)*smooth(39,77,Math.abs(x))+
+      (layout.gentleFlanks?10:26)*smooth(100,126,Math.abs(x));
+    const valleyFloor=x=>valleyZ-shoulderDrop(x);
+    // Broad resting shelves and diagonal erosion cuts create spatial choices.
+    // Their mouths taper into open hillside, so no crossing is compulsory.
+    const shelves=[
+      {x:0,y:15,rx:28,ry:12,grade:-.09},
+      {x:3,y:252,rx:48,ry:22,grade:-.12},
+      {x:-9,y:373,rx:62,ry:25,grade:-.10}
+    ];
+    const cuts=[
+      {x:0,y:293,span:68,half:18,skew:.24,depth:7.2,saddles:[-23,29]},
+      {x:-5,y:414,span:77,half:17,skew:-.22,depth:6.4,saddles:[-33,24]}
+    ];
+    const ravines=[
+      {from:91,to:187,x:-55,bend:-9,width:11,depth:9},
+      {from:129,to:244,x:61,bend:12,width:13,depth:11},
+      {from:259,to:365,x:-80,bend:9,width:15,depth:8},
+      {from:341,to:448,x:59,bend:-9,width:10,depth:7},
+      {from:432,to:531,x:-54,bend:-12,width:13,depth:10}
+    ];
+    const jumps=[
+      // Long catches accept the ballistic arc at normal downhill speeds.
+      // A low lip and gradual runout also tolerate an early bunny hop.
+      {name:'Knife Edge',lip:64,gap:10.8+tier*.18,side:-mirrored,min:43,max:85,branch:12,landingGuide:true,
+        drop:11.5,lift:-.60,lipRise:.6,catchSlope:-.75,catchLength:42,runoutLength:22,pitDepth:19,catchWidth:5.25},
+      {name:'Skyfall',lip:169,gap:15.3+tier*.22,side:mirrored,min:51,max:85,branch:15,landingGuide:true,
+        drop:17,lift:-.70,lipRise:4.1,catchSlope:-.85,catchLength:35,runoutLength:13,pitDepth:28,catchWidth:5.10},
+      {name:'Timber Gap',lip:lowerStart+222+(authored?0:(hash>>>12)%5),gap:5.6+tier*.28,side:mirrored,min:39,max:57,
+        lift:.10,drop:1.05,catchSlope:-.46,catchLength:23,runoutLength:12,catchWidth:4.9},
+      {name:'Quarry Drop',lip:lowerStart+306+(authored?0:(hash>>>18)%4),gap:7.6+tier*.34,side:-mirrored,min:46,max:62,
+        lift:.12,catchSlope:-.48,catchLength:layout.freeride?28:21,runoutLength:layout.freeride?18:9,catchWidth:layout.freeride?8:4.65},
+      {name:'Split Shale',flank:-52,lip:250,gap:4.5+tier*.15,min:37,max:50,
+        lift:.10,drop:.9,catchSlope:-.43,catchLength:17,runoutLength:14,pitDepth:9,catchWidth:4.1},
+      {name:'Pine Fault',flank:82,lip:358,gap:6.1+tier*.18,min:43,max:57,
+        lift:.10,drop:1.55,catchSlope:-.54,catchLength:18,runoutLength:16,pitDepth:12,catchWidth:4.4},
+      {name:'Slate Split',flank:-83,lip:459,gap:5.1+tier*.16,min:39,max:54,
+        lift:.12,drop:1.05,catchSlope:-.46,catchLength:18,runoutLength:15,pitDepth:10,catchWidth:4.15}
+    ].map(j=>{
+      if(layout.freeride&&!j.landingGuide)j={...j,lift:-.24,drop:Math.max(j.drop||0,j.gap*.27+.7),catchWidth:Math.max(j.catchWidth||0,6.5)};
+      const {lip,side,gap,branch=10.4,drop=gap*.12,lift=.16,lipRise=.55,catchSlope=-.50,catchLength=19,
+        runoutLength=6,pitDepth=7.5,catchWidth=4.65}=j;
+      const start=lip-(j.flank?26:37),land=lip+gap,catchEnd=land+catchLength;
+      const runout=catchEnd+runoutLength,end=Math.min((layout.freeride?620:finish)-8,runout+15);
+      const approach=j.flank?y=>flankX(j.flank+(y-lip)*.08,y):safeX;
+      const startX=approach(start),lipX=j.flank?approach(lip):safeX(lip)+side*branch,endX=approach(end);
+      const dx=clamp((lipX-startX)/(lip-start),-.38,.38)*(j.landingGuide?.52:1);
+      const slope=y=>(approach(y+.2)-approach(y-.2))/.4;
+      const line=y=>lipX+dx*(y-lip);
+      const entry=lip-9,exit=j.landingGuide||layout.freeride&&j.name==='Quarry Drop'?catchEnd:land+14,entryX=line(entry),exitX=line(exit);
+      const startSlope=slope(start),endSlope=slope(end);
+      const center=y=>{
+        if(y<=start||y>=end)return approach(y);
+        if(y<entry)return ramp(y,start,entry,startX,entryX,startSlope,dx);
+        if(y>exit)return ramp(y,exit,end,exitX,endX,dx,endSlope);
+        return line(y);
+      };
+      const referenceHeight=j.flank?y=>naturalGround(center(y),y).z:baseZ;
+      const referenceSlope=j.flank?y=>(referenceHeight(y+.2)-referenceHeight(y-.2))/.4:baseSlope;
+      const takeoff=referenceHeight(lip)+lipRise,landing=takeoff-drop;
+      const catchHeight=landing+catchSlope*catchLength;
+      const width=y=>2.65+(catchWidth-2.65)*smooth(land-1,land+4,y);
+      function height(y){
+        if(y<lip-12)return referenceHeight(y);
+        if(y<lip)return ramp(y,lip-12,lip,takeoffFrom,takeoff,fromSlope,lift);
+        if(y<land)return Math.min(landing,referenceHeight(y))-pitDepth;
+        if(y<catchEnd)return landing+catchSlope*(y-land);
+        if(y<runout)return ramp(y,catchEnd,runout,catchHeight,runoutZ,catchSlope,toSlope);
+        return referenceHeight(y);
+      }
+      const takeoffFrom=referenceHeight(lip-12),fromSlope=referenceSlope(lip-12);
+      const runoutZ=referenceHeight(runout),toSlope=referenceSlope(runout);
+      return {...j,start,land,catchEnd,runout,end,center,width,height,takeoff,lift,landing,catchSlope};
+    });
+    const slopeRocks=Array.from({length:15},(_,i)=>{
+      const y=lowerStart+33+i*20.5;
+      const wave=Math.sin(i*2.39+phase);
+      const x=safeX(y)+mirrored*(i%2?1:-1)*(13+wave*4.4);
+      return [x,y,.9+Math.abs(wave)*1.15];
+    }).filter(([x,y,r])=>!chuteActive(y)||Math.abs(x-chuteX(y))>chuteHalf+r+2);
+    const summitRocks=[[14,29,1.3],[-16,42,2.2],[26,64,3.4],[27,83,1.5],[-14,108,2.5],
+      [-7,128,1.4],[24,151,2.7],[-19,166,2.4],[13,192,1.6],[-13,206,2.9]];
+    const flankRocks=[[-46,92,2.1],[52,111,2.8],[-76,156,3.1],[75,178,3.6],[-87,220,2.9],
+      [68,251,3.3],[-63,289,2.5],[97,315,4.1],[-101,357,3.9],[61,389,2.7],[-72,419,2.3],
+      [92,445,3.4],[-53,501,3.1],[68,518,2.6]];
+    const rocks=summitRocks.concat(rocksSource.map(([x,y,r])=>[x,y+lowerStart,r]))
+      .map(([x,y,r])=>[offsetX(x,y),y,r]).concat(flankRocks.map(([x,y,r])=>[flankX(x,y),y,r]),slopeRocks)
+      .filter(([x,y,r])=>
+      !jumps.some(j=>y>=j.start&&y<=j.end&&Math.abs(x-j.center(y))<j.width(y)+r+1));
+    // These are visible islands to ride around, not invisible route gates.
+    for(const [x,y,r] of [[0,34,3.7],[1.7,37,2.5],[7,269,4.7],[-7,395,5.1]]){
+      rocks.push([flankX(x,y),y,r]);
+    }
+    function offset(x,y,center){
+      const dx=(center(y+.4)-center(y-.4))/.8;
+      return (x-center(y))/Math.hypot(1,dx);
+    }
+    function naturalGround(x,y){
+      const safeOffset=offset(x,y,safeX);
+      const cutOffset=chuteActive(y)?offset(x,y,chuteX):Infinity;
+      const mainHalf=mainWidth(y);
+      const cutHalf=chuteHalf;
+      const mainShoulder=1-smooth(mainHalf,mainHalf+4,Math.abs(safeOffset));
+      const ridgeShoulder=1-smooth(mainHalf+5,mainHalf+17,Math.abs(safeOffset));
+      const cutShoulder=1-smooth(cutHalf,cutHalf+2.2,Math.abs(cutOffset));
+      const low=y-lowerStart;
+      const envelope=smooth(54,96,low)*(1-smooth(152,190,low));
+      const cutDepth=envelope*(2.3+tier*.21+.68*Math.sin((low-61)*.14)+.21*Math.sin(low*.62));
+      const exposure=clamp(.48+.24*Math.sin(x*.32+y*.042)+.20*Math.sin(x*.13-y*.168)
+        +.10*Math.sin(x*.51+y*.27),0,1);
+      const edge=Math.abs(x),outer=smooth(42,78,edge);
+      const flankRelief=outer*(3.4*Math.sin(x*.095+y*.034)+2.3*Math.cos(x*.046-y*.062));
+      const mountain=(1.95*Math.sin(x*.18+y*.028)+1.65*Math.sin(x*.055-y*.04))+
+        .28*Math.sin(x*.51+y*.33)+flankRelief-shoulderDrop(x);
+      // Broad ridge support, without the old perfectly smooth narrow strip.
+      const routeInfluence=Math.max(ridgeShoulder*.70,cutShoulder*.65);
+      let z=baseZ(y)+mountain*(1-routeInfluence);
+      const northShelf=smooth(99,114,low)*(1-smooth(146,163,low))*smooth(7.5,13.5,mirrored*safeOffset);
+      const southShelf=smooth(226,241,low)*(1-smooth(261,276,low))*smooth(8,15,-mirrored*safeOffset);
+      const accessStart=mirrored*safeOffset>0?39:75;
+      const access=smooth(accessStart,accessStart+43,y);
+      const summitExposure=(1-smooth(145,lowerStart,y))*smooth(15+5*access,31+25*access,Math.abs(safeOffset))*(1-.47*access);
+      const summitRock=summitExposure*(.86+.14*Math.cos(x*.34-y*.076));
+      let ravine=0;
+      if(edge>32){
+        for(const {from,to,x:mouth,bend,width,depth} of ravines){
+          if(y<=from||y>=to)continue;
+          const t=(y-from)/(to-from);
+          const center=flankX(mouth+bend*Math.sin(Math.PI*t),y);
+          const channel=smooth(0,.23,t)*(1-smooth(.70,1,t))*(1-smooth(width*.19,width,Math.abs(x-center)));
+          z-=depth*channel;
+          ravine=Math.max(ravine,channel);
+        }
+      }
+      let ledge=Math.max(northShelf,southShelf,summitRock,ravine);
+      z-=Math.max(northShelf,southShelf)*5.7+summitRock*(layout.gentleFlanks?18:52);
+      const cutMix=cutShoulder*(1-mainShoulder);
+      z-=cutDepth*cutMix;
+      z+=mainShoulder*rollerHeight(y);
+      z+=cutMix*Math.min(Math.abs(cutOffset),cutHalf)**2*.042;
+      let shelf=0,erosion=0;
+      for(const s of shelves){
+        if(Math.abs(y-s.y)>=s.ry)continue;
+        const center=flankX(s.x,s.y),radius=Math.hypot((x-center)/s.rx,(y-s.y)/s.ry);
+        const blend=1-smooth(.42,1,radius);
+        const height=baseZ(s.y)-shoulderDrop(center)+(y-s.y)*s.grade;
+        z+=(height-z)*blend;shelf=Math.max(shelf,blend);
+      }
+      for(const cut of cuts){
+        const across=mirrored*x-cut.x;
+        const along=y-cut.y-cut.skew*across;
+        if(Math.abs(along)>=cut.half||Math.abs(across)>=cut.span)continue;
+        const bank=1-smooth(.16,1,Math.abs(along)/cut.half);
+        const mouth=1-smooth(cut.span*.73,cut.span,Math.abs(across));
+        const saddle=Math.max(1-smooth(5,15,Math.abs(across-cut.saddles[0])),
+          1-smooth(5,15,Math.abs(across-cut.saddles[1])));
+        const hollow=bank*mouth*(1-.88*saddle);
+        z-=cut.depth*hollow;erosion=Math.max(erosion,hollow);
+      }
+      ledge=Math.max(ledge,erosion*.85);
+      const kind=erosion>.35||ravine>.48||Math.abs(cutOffset)<=cutHalf&&Math.abs(safeOffset)>mainHalf?'gravel':
+        exposure>.48?'dirt':'grass';
+      return {z,kind,safeOffset,cutOffset,exposure,ledge,shelf,erosion};
+    }
+    function sample(x,y){
+      const ground=naturalGround(x,y);
+      let {z,kind}=ground;
+      let jump=null,jumpOffset=Infinity,gap=false,landing=false;
+      for(const j of jumps){
+        if(y<=j.start||y>=j.end)continue;
+        const distance=Math.abs(x-j.center(y));
+        const width=j.width(y);
+        const blend=smooth(j.start,j.start+6,y)*(1-smooth(j.end-6,j.end,y));
+        const apron=j.landingGuide||j.flank?2.6*smooth(j.land,j.land+4,y):0;
+        const influence=(1-smooth(width,width+2.4+apron,distance))*blend;
+        if(influence<=0)continue;
+        // A shallow bowl helps the tires settle on the shoulder of a catch.
+        const bank=j.landingGuide?.32*Math.min(1,distance/width)**4*
+          smooth(j.land,j.land+3,y)*(1-smooth(j.catchEnd-4,j.catchEnd,y)):0;
+        z+=(j.height(y)+bank-z)*influence;
+        jumpOffset=distance-width;
+        if(distance<=width+.35){
+          jump=j;gap=y>=j.lip&&y<j.land;landing=y>=j.land&&y<j.runout;
+          if(distance<=width)kind='dirt';
+        }
+      }
+      const valley=smooth(finish-36,finish-5,y);
+      z+=(baseZ(y)-shoulderDrop(x)-z)*valley;
+      if(valley>.85)kind='grass';
+      return {...ground,z,kind,jump,jumpOffset,gap,landing,valley};
+    }
+    function inside(x,y){
+      return x>bounds.left+2&&x<bounds.right-2&&y>bounds.top+2&&y<bounds.bottom-2;
+    }
+    function reachedValley(x,y,z){
+      const floor=valleyFloor(x);
+      return inside(x,y)&&y>=finish&&z>=floor-1&&z<=floor+2.2;
+    }
+    const summitDrop=Math.round(sample(safeX(0),0).z-sample(safeX(finish),finish).z);
+    return {finish,valleyZ,valleyFloor,reachedValley,bounds,rocks,surfaces,clamp,safeX,chuteX,chuteActive,mainWidth,sample,inside,
+      seed:value,stage,tier,mirrored,title,lowerStart,chuteStart,chuteEnd,chuteHalf,rollers,jumps,summitDrop,shelves,cuts,region};
+  }
+  return Object.assign(makeTrack(),{makeTrack});
+})();
+if(typeof module!=='undefined'&&module.exports)module.exports=BikeTrack;
+
+
+/* One continuous mountain: the calibrated summit joins a longer forest,
+ * rock gorge and valley. Render and tire contacts sample the same terrain. */
+const BikeExpedition=(()=>{
+  const baseTrack=typeof module!=='undefined'&&module.exports?require('./track.js'):BikeTrack;
+  const clamp=baseTrack.clamp;
+  const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
+  const hermite=(a,b,h0,h1,s0,s1,y)=>{
+    const t=clamp((y-a)/(b-a),0,1),t2=t*t,t3=t2*t,d=b-a;
+    return (2*t3-3*t2+1)*h0+(t3-2*t2+t)*d*s0+(-2*t3+3*t2)*h1+(t3-t2)*d*s1;
+  };
+  function makeTrack(seed=0,stage=1,layout={}){
+    const base=baseTrack.makeTrack(seed,stage,layout),finish=2640,seam=620;
+    const bounds={...base.bounds,bottom:finish+34};
+    const mirror=base.mirrored;
+    function region(y){
+      const forest=smooth(500,720,y),gorge=smooth(1290,1450,y),valley=smooth(2010,2190,y);
+      return {alpine:1-forest,forest:forest*(1-gorge),gorge:gorge*(1-valley),valley,
+        name:y<620?'Open summit':y<1380?'Old-growth forest':y<2100?'Waterfall gorge':'Shelter valley'};
+    }
+    const knots=layout.freeride?[[620,0],[760,60],[920,150],[1080,238],[1240,325],[1380,408],
+      [1550,515],[1740,630],[1920,735],[2100,835],[2300,940],[2460,1020],[2640,1090],[2700,1104]]:
+      [[620,0],[760,22],[920,75],[1080,115],[1240,160],[1380,205],
+      [1550,265],[1740,330],[1920,380],[2100,420],[2300,464],[2460,494],[2640,512],[2700,512]];
+    function drop(y){
+      if(y<=seam)return 0;if(y>=2700)return knots.at(-1)[1];
+      const i=knots.findIndex(([n])=>n>y)-1,[a,h0]=knots[i],[b,h1]=knots[i+1];
+      const before=knots[Math.max(0,i-1)],after=knots[Math.min(knots.length-1,i+2)];
+      const s0=i===0?(layout.freeride?.28:0):(h1-before[1])/(b-before[0]),s1=i+1===knots.length-1?0:(after[1]-h0)/(after[0]-a);
+      return hermite(a,b,h0,h1,s0,s1,y);
+    }
+    const floorOffset=base.sample(0,seam).z-base.valleyFloor(0);
+    const baseFloor=x=>base.valleyFloor(x)+floorOffset;
+    const ridge=y=>mirror*(22*Math.sin((y-seam)*.005)+9*Math.sin((y-seam)*.012));
+    const rests=[760,1080,1380,1740,2100,2410].map((y,i)=>({
+      x:(layout.freeride?[-67,64,-72,68,-64,72]:[-4,8,-8,5,-7,0])[i],y,
+      rx:layout.freeride?28:55,ry:layout.freeride?16:27,grade:-.055}));
+    const cuts=[
+      {x:0,y:868,half:28,depth:4.5,skew:.23,saddles:[-40,22,64]},
+      {x:0,y:1180,half:35,depth:6,skew:-.28,saddles:[-61,-17,43]},
+      {x:0,y:1510,half:35,depth:11,skew:.32,saddles:[-46,16,65]},
+      {x:0,y:1838,half:40,depth:13,skew:-.30,saddles:[-65,-21,44]},
+      {x:0,y:2250,half:32,depth:4.5,skew:.17,saddles:[-44,18,63]}
+    ];
+    const roots=Array.from({length:28},(_,i)=>({x:mirror*((i%3-1)*33+9*Math.sin(i*2.8)),
+      y:700+i*22,span:7+i%4,skew:(i%2?1:-1)*.25,height:.075+(i%3)*.018}));
+    function natural(x,y){
+      const w=smooth(seam,seam+65,y),r=region(y),cx=x-ridge(y);
+      const relief=1.9*Math.sin(x*.068+y*.021)+1.4*Math.sin(x*.125-y*.032);
+      // Broad banks and erosion, with room to traverse between choices.
+      let z=baseFloor(x)-drop(y)+w*relief,shelf=0,erosion=0,root=0;
+      for(const c of cuts){
+        const across=mirror*x,along=y-c.y-c.skew*across;
+        if(Math.abs(along)>c.half)continue;
+        const saddle=Math.max(...c.saddles.map(s=>1-smooth(5,15,Math.abs(across-s))));
+        const hollow=(1-smooth(.12,1,Math.abs(along)/c.half))*(1-smooth(90,115,Math.abs(x)))*(1-.92*saddle);
+        z-=c.depth*hollow;erosion=Math.max(erosion,hollow);
+      }
+      for(const s of rests){
+        if(Math.abs(y-s.y)>s.ry)continue;
+        const f=1-smooth(.40,1,Math.hypot((x-mirror*s.x)/s.rx,(y-s.y)/s.ry));
+        const plane=baseFloor(mirror*s.x)-drop(s.y)+(y-s.y)*s.grade;
+        z+=(plane-z)*f;shelf=Math.max(shelf,f);
+      }
+      if(y>670&&y<1340&&shelf<.25)for(const q of roots){
+        const across=x-q.x,along=y-q.y-q.skew*across;
+        if(Math.abs(along)>1.3||Math.abs(across)>q.span)continue;
+        const f=Math.exp(-Math.pow(along/.36,2))*(1-smooth(q.span-1.8,q.span,Math.abs(across)));
+        z+=f*q.height;root=Math.max(root,f);
+      }
+      const exposure=clamp(.50+.30*Math.sin(x*.078+y*.037)+.18*Math.sin(x*.19-y*.015),0,1);
+      const kind=root>.10?'roots':erosion>.28||r.gorge>.5&&exposure>.76?'gravel':
+        layout.freeride&&exposure>(r.forest>.5?.44:.28)?'stone':exposure>.45?'dirt':'grass';
+      return {z,kind,exposure,shelf,erosion,ledge:erosion*.65,safeOffset:cx,cutOffset:Infinity,root};
+    }
+    const extraJumps=[[-43,970,'Root Divide',5.8],[44,1270,'Timber Shelf',6.2],[-50,1615,'Gorge Leap',7.0],[38,1960,'Last Ledge',6.4]].map(([x,lip,name,gap])=>{
+      gap*=layout.gapScale?layout.gapScale(lip):1;
+      x*=mirror;
+      const start=lip-26,land=lip+gap,catchEnd=land+27,runout=catchEnd+17,end=runout+8;
+      const lift=layout.freeride?-.34:.10,catchSlope=layout.freeride?-.60:-.47,drop=layout.freeride?3.6:1.3,
+        center=()=>x,width=y=>2.8+2*smooth(land-1,land+5,y);
+      const h=y=>natural(x,y).z,s=y=>(h(y+.3)-h(y-.3))/.6;
+      const takeoff=h(lip)+.45,landing=takeoff-drop,from=h(lip-12),fromSlope=s(lip-12),out=h(runout),outSlope=s(runout);
+      const height=y=>y<lip-12?h(y):y<lip?hermite(lip-12,lip,from,takeoff,fromSlope,lift,y):
+        y<land?Math.min(landing,h(y))-12:y<catchEnd?landing+catchSlope*(y-land):
+        y<runout?hermite(catchEnd,runout,landing+catchSlope*27,out,catchSlope,outSlope,y):h(y);
+      return {name,flank:x,lip,gap,start,land,catchEnd,runout,end,center,width,height,takeoff,landing,lift,catchSlope,min:40,max:65};
+    });
+    function sample(x,y){
+      if(y<=seam)return base.sample(x,y);
+      const ground=natural(x,y);let {z,kind}=ground,jump=null,jumpOffset=Infinity,gap=false,landing=false;
+      for(const j of extraJumps){
+        if(y<=j.start||y>=j.end)continue;
+        const distance=Math.abs(x-j.center(y)),width=j.width(y);
+        const influence=(1-smooth(width,width+3,distance))*smooth(j.start,j.start+5,y)*(1-smooth(j.end-5,j.end,y));
+        if(!influence)continue;
+        z+=(j.height(y)-z)*influence;jumpOffset=distance-width;
+        if(distance<width+.35){jump=j;gap=y>=j.lip&&y<j.land;landing=y>=j.land&&y<j.runout;kind='dirt';}
+      }
+      const valley=smooth(finish-85,finish-10,y);
+      z+=(baseFloor(x)-drop(y)-z)*valley;
+      if(valley>.7)kind='grass';
+      return {...ground,z,kind,jump,jumpOffset,gap,landing,valley};
+    }
+    let state=(seed^Math.imul(stage,1664525)^937155)>>>0;
+    const random=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};
+    const clear=(x,y,r)=>rests.some(s=>Math.hypot((x-mirror*s.x)/s.rx,(y-s.y)/s.ry)<.65)||
+      extraJumps.some(j=>y>j.start-5&&y<j.end+5&&Math.abs(x-j.center(y))<j.width(y)+r+4);
+    const rocks=[...base.rocks];
+    for(let i=0;i<61;i++){
+      const y=690+i*30,x=mirror*(Math.sin(i*2.33)*66),r=1.4+(i%5)*.5;
+      if(!clear(x,y,r))rocks.push([x,y,r]);
+    }
+    // Real collision islands offer left, right and traverse options.
+    for(const [x,y,r] of [[0,808,5.5],[-6,1134,6],[5,1460,7],[-4,1784,6.5],[8,2183,4.5]])rocks.push([x*mirror,y,r]);
+    const trees=[];
+    for(let i=0;i<3600&&trees.length<(layout.freeride?650:850);i++){
+      const x=bounds.left+12+random()*(bounds.right-bounds.left-24),y=670+random()*(finish-760),r=region(y),p=sample(x,y);
+      if(random()>.16+r.forest*.78||p.gap||p.kind==='stone'||p.erosion>.4||clear(x,y,1.5))continue;
+      if(rocks.some(([rx,ry,radius])=>Math.hypot(x-rx,y-ry)<radius+2.1))continue;
+      const h=5+random()*6+r.forest*3,w=.7+random()*.35;
+      trees.push({x,y,z:p.z,h,w});rocks.push([x,y,.24,'tree']);
+    }
+    const buckets=new Map();
+    for(const rock of rocks){
+      const [x,y,r]=rock;
+      for(let k=Math.floor((y-r-1)/20);k<=Math.floor((y+r+1)/20);k++){
+        if(!buckets.has(k))buckets.set(k,[]);buckets.get(k).push(rock);
+      }
+    }
+    const inside=(x,y)=>x>bounds.left+2&&x<bounds.right-2&&y>bounds.top+2&&y<bounds.bottom-2;
+    const valleyFloor=x=>baseFloor(x)-drop(finish);
+    return {...base,finish,bounds,sample,inside,region,trees,roots,rocks,extraJumps,expedition:true,
+      obstaclesAt:y=>buckets.get(Math.floor(y/20))||[],
+      surfaces:{...base.surfaces,roots:{name:'Exposed roots',grip:.86,drag:.15},stone:{name:'Firm bedrock',grip:.96,drag:.075}},
+      shelves:[...base.shelves,...rests],cuts:[...base.cuts,...cuts],jumps:[...base.jumps,...extraJumps],
+      safeX:y=>y<=seam?base.safeX(y):ridge(y),valleyFloor,valleyZ:valleyFloor(0),
+      reachedValley:(x,y,z)=>inside(x,y)&&y>=finish&&Math.abs(z-valleyFloor(x))<2.2,
+      summitDrop:Math.round(base.sample(0,0).z-valleyFloor(0)),waterfallY:1660};
+  }
+  return Object.assign(makeTrack(),{makeTrack});
+})();
+if(typeof module!=='undefined'&&module.exports)module.exports=BikeExpedition;
+
+
+/* A broad, winding mountain around the calibrated expedition. Z remains up.
+ * Sampling, obstacles and jump centers share the same horizontal transform;
+ * this is actual rideable terrain, not a painted panorama or steering rail. */
+const BikeLandscape=(()=>{
+  const expedition=typeof module!=='undefined'&&module.exports?require('./expedition.js'):BikeExpedition;
+  const clamp=expedition.clamp;
+  const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
+  function makeTrack(seed=0,stage=1){
+    const spineKnots=[[0,0],[220,0],[620,-90],[1000,130],[1420,-130],[1820,170],[2200,20],[2640,0]];
+    function spineShape(y){
+      if(y<=220)return 0;if(y>=2640)return 0;
+      const i=spineKnots.findIndex(p=>p[0]>y)-1,[a,h0]=spineKnots[i],[b,h1]=spineKnots[i+1];
+      const before=spineKnots[Math.max(0,i-1)],after=spineKnots[Math.min(spineKnots.length-1,i+2)];
+      const s0=i===1?0:(h1-before[1])/(b-before[0]),s1=i+1===spineKnots.length-1?0:(after[1]-h0)/(after[0]-a);
+      const t=(y-a)/(b-a),t2=t*t,t3=t2*t;
+      return (2*t3-3*t2+1)*h0+(t3-2*t2+t)*(b-a)*s0+(-2*t3+3*t2)*h1+(t3-t2)*(b-a)*s1;
+    }
+    // Keep physical gap length consistent after bending the mountain. A gap
+    // measured only along Y otherwise becomes much longer on a diagonal.
+    const source=expedition.makeTrack(seed,stage,{gentleFlanks:true,freeride:true,gapScale:y=>1/Math.hypot(1,(spineShape(y+.1)-spineShape(y-.1))/.2)});
+    const mirror=source.mirrored,spine=y=>mirror*spineShape(y);
+    const bounds={left:-820,right:820,top:-160,bottom:source.finish+110};
+    const hills=[[-235,590,100,170,58],[240,910,115,190,72],[-270,1280,125,180,86],
+      [245,1600,120,190,95],[-230,1940,135,160,62],[260,2270,145,180,45]];
+    // Short erosion pockets, not continuous barriers across the hillside.
+    // Each has two low saddles plus open terrain around both tapered ends.
+    const flankCuts=[
+      [-210,405,50,10,1.8,.20], [210,530,55,10,2.0,-.18],
+      [-235,810,66,10,2.8,.22], [235,850,63,11,3.0,-.20],
+      [-310,1110,72,12,3.6,-.20], [190,1190,62,10,2.5,.24],
+      [-215,1390,70,12,4.1,.25], [310,1440,68,11,3.8,-.24],
+      [-300,1690,72,12,4.3,-.22], [215,1810,75,12,4.1,.20],
+      [-250,2040,65,11,3.2,.18], [300,2110,70,12,3.4,-.18],
+      [-170,2340,57,10,2.0,-.20], [180,2390,60,10,2.2,.20]
+    ].map(([x,y,span,half,depth,skew])=>({x,y,span,half,depth,skew,saddles:[-span*.43,span*.40]}));
+    const berms=[[-190,535,16,20,.65],[220,590,18,22,.75],[-185,925,16,20,.85],[310,990,18,22,1.1],[-340,1240,18,24,1.25],
+      [230,1340,16,19,.9],[-180,1530,17,21,1.05],[345,1640,20,24,1.15],
+      [-320,1880,17,22,1.0],[170,1970,18,21,.85],[-230,2220,18,24,.8],[315,2310,17,22,.75]];
+    let flankShelves=[];
+    // Broad exposed slab faces add optional steep commits. Their long
+    // runouts rejoin the falling grade without an uphill exit or a gate.
+    const slabs=[[-185,825,130,24,5.5,.16],[220,1040,145,30,6.5,-.20],[-230,1250,145,28,6,.18],
+      [190,1480,155,30,7,-.22],[-240,1770,145,28,6.5,.16],[230,1980,140,28,6,-.18],[-180,2200,130,30,5,.15]];
+    // Long rock spurs divide the face into traversable bowls. Their rounded
+    // crests and open saddles are tire terrain, not decorative cliff meshes.
+    const ridges=[[-360,650,205,420,100,.14],[380,930,210,450,115,-.16],
+      [-290,1330,180,440,86,-.10],[355,1590,205,460,112,.14],
+      [-390,1910,215,450,106,.10],[310,2200,190,380,68,-.16],
+      [-590,1160,210,590,170,.08],[580,1850,220,610,190,-.10]];
+    const bowls=[[-195,1010,115,220,20],[205,1360,120,230,24],
+      [-200,1650,115,230,22],[200,2010,130,220,19]];
+    function mountainShape(u,y){
+      let height=0,ridge=0,bowl=0;
+      for(const [cx,cy,width,length,rise,skew] of ridges){
+        const along=(y-cy)/length,across=mirror*u-cx-skew*(y-cy);
+        if(Math.abs(along)>=1||Math.abs(across)>=width)continue;
+        const edge=Math.max(0,1-(Math.hypot(across,8)-8)/(width-8));
+        const f=Math.pow(edge,1.45)*(1-smooth(.10,1,Math.abs(along)));
+        height+=rise*f;ridge=Math.max(ridge,f);
+      }
+      for(const [cx,cy,rx,ry,depth] of bowls){
+        const d=Math.hypot((mirror*u-cx)/rx,(y-cy)/ry);
+        if(d>=1)continue;
+        const f=(1-d*d)**2;height-=depth*f;bowl=Math.max(bowl,f);
+      }
+      const blend=smooth(100,185,Math.abs(u));
+      return {height:height*blend,ridge:ridge*blend,bowl:bowl*blend};
+    }
+    function flankHeight(u,y){
+      const outside=smooth(85,180,Math.abs(u));
+      if(!outside)return 0;
+      let h=5*Math.sin(u*.015+y*.008)+4*Math.sin(u*.027-y*.009);
+      for(const [x,cy,rx,ry,rise] of hills){
+        const d=((u-mirror*x)/(rx*1.25))**2+((y-cy)/(ry*1.10))**2;
+        if(d<10)h+=rise*.30*Math.exp(-d*1.5);
+      }
+      // Irregular outer watersheds obscure the finite safety bounds. Their
+      // rock faces are ordinary collision terrain, with no invisible walls.
+      const edge=Math.abs(u)-(25*Math.sin(y*.007)+32*Math.sin(y*.0023));
+      h+=smooth(480,920,edge)*(165+30*Math.sin(y*.005+u*.004));
+      h-=smooth(950,1300,edge)*55;
+      return outside*h;
+    }
+    const jumpMap=new Map(source.jumps.map(j=>[j,{...j,center:y=>j.center(y)+spine(y)}]));
+    function baseSample(x,y){
+      const u=x-spine(y),p=source.sample(u,y),outside=smooth(85,180,Math.abs(u));
+      const outerBase=outside?source.sample(Math.sign(u)*126,y).z:p.z,mountain=mountainShape(u,y);
+      let z=p.z+(outerBase-p.z)*smooth(115,210,Math.abs(u))+flankHeight(u,y)+mountain.height+
+        10*smooth(100,126,Math.abs(u))*smooth(560,650,y)+
+        10*smooth(39,77,Math.abs(u))*smooth(2050,2440,y),kind=p.kind;
+      // An uphill back ridge closes the summit view, far behind the start.
+      if(y< -18)z+=Math.pow((-18-y)/18,1.35)*7;
+      let exposure=p.exposure;
+      if(outside>.5){
+        exposure=clamp(.45+.30*Math.sin(u*.024+y*.026)+.20*Math.sin(u*.057-y*.017),0,1);
+        kind=Math.abs(u)>500?'gravel':exposure>.30?'stone':exposure>.18?'dirt':'grass';
+      }
+      let erosion=0,shelf=p.shelf,berm=0,slab=0;
+      for(const [cx,cy,span,run,depth,skew] of slabs){
+        const across=mirror*u-cx,along=y-cy-skew*across;
+        if(Math.abs(across)>span||along<0||along>run+110)continue;
+        const f=(1-smooth(span*.5,span,Math.abs(across)))*smooth(0,run,along)*(1-smooth(run,run+110,along));
+        z-=depth*f;slab=Math.max(slab,f);
+      }
+      for(const c of flankCuts){
+        const across=mirror*u-c.x,along=y-c.y-c.skew*across;
+        if(Math.abs(across)>c.span||Math.abs(along)>c.half)continue;
+        const saddle=Math.max(...c.saddles.map(s=>1-smooth(5,13,Math.abs(across-s))));
+        const hollow=(1-smooth(.08,1,Math.abs(along)/c.half))*(1-smooth(c.span*.65,c.span,Math.abs(across)))*(1-.88*saddle);
+        z-=c.depth*hollow;erosion=Math.max(erosion,hollow);
+      }
+      for(const [cx,cy,rx,ry,h] of berms){
+        const d=((mirror*u-cx)/rx)**2+((y-cy)/ry)**2;
+        if(d>=1)continue;
+        const rise=h*(1-d)**3;z+=rise;berm=Math.max(berm,rise);
+      }
+      for(const s of flankShelves){
+        if(Math.abs(y-s.y)>s.ry||Math.abs(x-s.worldX)>s.rx)continue;
+        const f=1-smooth(.42,1,Math.hypot((x-s.worldX)/s.rx,(y-s.y)/s.ry));
+        z+=(s.z+(y-s.y)*s.grade-z)*f;shelf=Math.max(shelf,f);
+      }
+      if(erosion>.20)kind='gravel';else if(slab>.15||mountain.ridge>.12)kind='stone';else if(berm>.12)kind='dirt';
+      return {...p,z,kind,exposure,shelf,erosion:Math.max(p.erosion||0,erosion),berm,slab,ridge:mountain.ridge,bowl:mountain.bowl,jump:p.jump?jumpMap.get(p.jump):null,
+        safeOffset:u-source.safeX(y),ledge:outside>.5?erosion*.45:p.ledge};
+    }
+    flankShelves=[[-260,1030],[260,1080],[-280,1570],[290,1730],[-260,2160],[250,2270]].map(([u,y])=>{
+      const worldX=mirror*u+spine(y);
+      return {x:worldX/mirror,worldX,y,z:baseSample(worldX,y).z,rx:32,ry:22,grade:-.065};
+    });
+    const blendHeight=(a,b,h0,h1,s0,s1,y)=>{
+      const t=clamp((y-a)/(b-a),0,1),t2=t*t,t3=t2*t;
+      return (2*t3-3*t2+1)*h0+(t3-2*t2+t)*(b-a)*s0+(-2*t3+3*t2)*h1+(t3-t2)*(b-a)*s1;
+    };
+    const flankJumps=[[-275,890,'Fern Notch'],[275,950,'Pine Step'],[-220,1300,'Root Shelf'],[330,1320,'Stone Skim'],
+      [-340,1510,'Scree Notch'],[185,1680,'Birch Hollow'],[-190,1980,'Meadow Step'],[280,2300,'Valley Notch']].map(([u,lip,name],i)=>{
+      const rawCenter=y=>mirror*u+spine(y),tangent=(rawCenter(lip+.1)-rawCenter(lip-.1))/.2,metric=Math.hypot(1,tangent);
+      const longCatch=name==='Pine Step'||name==='Scree Notch';
+      const gap=(1.8+(i%3)*.3)/metric,start=lip-20,land=lip+gap,
+        catchEnd=land+(longCatch?30:22),runout=catchEnd+(longCatch?28:18),end=runout+10;
+      // The fast catch follows the launch tangent. Bend back into the
+      // mountain only after touchdown, rather than underneath a flying bike.
+      const center=y=>!longCatch||y<=lip||y>=end?rawCenter(y):y<=catchEnd?rawCenter(lip)+tangent*(y-lip):
+        blendHeight(catchEnd,end,rawCenter(lip)+tangent*(catchEnd-lip),rawCenter(end),tangent,
+          (rawCenter(end+.1)-rawCenter(end-.1))/.2,y);
+      const h=y=>baseSample(center(y),y).z,s=y=>(h(y+.3)-h(y-.3))/.6;
+      const takeoff=h(lip)+.18,landing=takeoff-1.35,lift=-.34*metric,catchSlope=(longCatch?-.40:-.44)*metric;
+      const approach=h(lip-11),approachSlope=s(lip-11),out=h(runout),outSlope=s(runout);
+      const width=y=>3+(longCatch?6:2)*smooth(land,land+5,y);
+      const height=y=>y<lip-11?h(y):y<lip?blendHeight(lip-11,lip,approach,takeoff,approachSlope,lift,y):
+        y<land?Math.min(landing,h(y))-2.2:y<catchEnd?landing+catchSlope*(y-land):
+        y<runout?blendHeight(catchEnd,runout,landing+catchSlope*(catchEnd-land),out,catchSlope,outSlope,y):h(y);
+      return {name,flank:u,small:true,start,lip,gap,land,catchEnd,runout,end,center,width,height,takeoff,landing,lift,catchSlope,min:25,max:80};
+    });
+    function sample(x,y){
+      const p=baseSample(x,y);
+      for(const j of flankJumps){
+        if(y<=j.start||y>=j.end)continue;
+        const distance=Math.abs(x-j.center(y)),width=j.width(y);
+        const f=(1-smooth(width,width+5,distance))*smooth(j.start,j.start+5,y)*(1-smooth(j.end-6,j.end,y));
+        if(!f)continue;
+        p.z+=(j.height(y)-p.z)*f;
+        if(distance<width+.35)Object.assign(p,{jump:j,jumpOffset:distance-width,gap:y>=j.lip&&y<j.land,
+          landing:y>=j.land&&y<j.runout,kind:'dirt'});
+      }
+      return p;
+    }
+    const clear=(x,y,r)=>source.shelves.some(s=>Math.hypot((x-spine(y)-mirror*s.x)/s.rx,(y-s.y)/s.ry)<.7)||
+      source.jumps.some(j=>y>j.start-6&&y<j.end+6&&Math.abs(x-spine(y)-j.center(y))<j.width(y)+r+4)||
+      flankShelves.some(s=>Math.hypot((x-s.worldX)/s.rx,(y-s.y)/s.ry)<.75)||
+      flankJumps.some(j=>y>j.start-7&&y<j.end+7&&Math.abs(x-j.center(y))<j.width(y)+r+6);
+    const rocks=source.rocks.map(([x,y,r,kind])=>[x+spine(y),y,r,kind]);
+    // Broken rock crowns give the spurs a recognisable silhouette. These
+    // use the same convex tire/impact surfaces as every other boulder.
+    for(const [i,[cx,cy,width,length,,skew]] of ridges.entries())for(let n=0;n<5;n++){
+      const y=cy+(n-2)*length*.16,u=cx+skew*(y-cy)+Math.sin(n*2.7+i)*width*.10;
+      const x=mirror*u+spine(y),r=5+(i+n*3)%6;
+      if(!insideRidgeBounds(x,y)||clear(x,y,r))continue;
+      rocks.push([x,y,r]);
+    }
+    function insideRidgeBounds(x,y){return x>bounds.left+24&&x<bounds.right-24&&y>260&&y<source.finish-90;}
+    const trees=source.trees.map(t=>({...t,x:t.x+spine(t.y),z:sample(t.x+spine(t.y),t.y).z}));
+    let state=(seed^Math.imul(stage,2531011)^73023)>>>0;
+    const random=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};
+    for(let i=0;i<1900;i++){
+      const u=(random()<.5?-1:1)*(145+random()*300),y=230+random()*2330,x=u+spine(y),region=source.region(y);
+      if(clear(x,y,3))continue;
+      const p=sample(x,y);
+      if(i%9===0){rocks.push([x,y,1.8+random()*3.2]);continue;}
+      if(random()>.13+.78*region.forest||p.kind==='gravel'||p.kind==='stone')continue;
+      if(rocks.some(([rx,ry,r])=>Math.abs(ry-y)<r+2&&Math.hypot(rx-x,ry-y)<r+2))continue;
+      trees.push({x,y,z:p.z,h:5+random()*7,w:.7+random()*.4});rocks.push([x,y,.24,'tree']);
+    }
+    // Groups anchor the erosion pockets visually, leaving the saddles and
+    // jump runouts open. Every visible boulder and new trunk shares collision.
+    for(const [index,c] of flankCuts.entries()){
+      for(let n=0;n<6;n++){
+        const a=n*2.4+index,u=c.x+Math.cos(a)*(c.span*.72+random()*12),y=c.y+Math.sin(a)*19;
+        const x=mirror*u+spine(y),r=.85+random()*1.7;
+        if(clear(x,y,r)||rocks.some(([rx,ry,rr])=>Math.hypot(x-rx,y-ry)<r+rr+1.2))continue;
+        rocks.push([x,y,r]);
+      }
+      const u=c.x+(index%2?1:-1)*(c.span+16),cy=c.y+38;
+      for(let n=0;n<22;n++){
+        const a=random()*Math.PI*2,d=6+random()*21,y=cy+Math.sin(a)*d,x=mirror*(u+Math.cos(a)*d)+spine(y);
+        const p=sample(x,y);
+        if(clear(x,y,2)||p.gap||p.erosion>.25||Math.abs(x-spine(y))>430||
+          rocks.some(([rx,ry,r])=>Math.abs(ry-y)<r+3&&Math.hypot(x-rx,y-ry)<r+3))continue;
+        trees.push({x,y,z:p.z,h:4+random()*6,w:.65+random()*.35});rocks.push([x,y,.24,'tree']);
+      }
+    }
+    const buckets=new Map();
+    for(const rock of rocks)for(let k=Math.floor((rock[1]-rock[2]-1)/20);k<=Math.floor((rock[1]+rock[2]+1)/20);k++){
+      if(!buckets.has(k))buckets.set(k,[]);buckets.get(k).push(rock);
+    }
+    const inside=(x,y)=>x>bounds.left+2&&x<bounds.right-2&&y>bounds.top+2&&y<bounds.bottom-2;
+    const valleyFloor=x=>sample(x,source.finish).z;
+    return {...source,bounds,spine,spineKnots,sample,inside,rocks,trees,landscape:true,freeride:true,slabs,ridges,bowls,flankCuts,flankJumps,flankShelves,berms,
+      obstaclesAt:y=>buckets.get(Math.floor(y/20))||[],valleyFloor,valleyZ:valleyFloor(0),
+      safeX:y=>source.safeX(y)+spine(y),chuteX:y=>source.chuteX(y)+spine(y),
+      shelves:source.shelves.map(s=>({...s,x:s.x+spine(s.y)/mirror})).concat(flankShelves),
+      roots:source.roots.map(r=>{const factor=1+r.skew*(spine(r.y+.1)-spine(r.y-.1))/.2;
+        return {...r,x:r.x+spine(r.y),span:r.span*factor,skew:r.skew/factor};}),
+      jumps:[...jumpMap.values(),...flankJumps],extraJumps:source.extraJumps.map(j=>jumpMap.get(j)),
+      reachedValley:(x,y,z)=>inside(x,y)&&y>=source.finish&&Math.abs(x)<600&&Math.abs(z-sample(x,y).z)<2.2,
+      waterfallX:bounds.left-7,waterfallY:source.waterfallY};
+  }
+  return Object.assign(makeTrack(),{makeTrack});
+})();
+if(typeof module!=='undefined'&&module.exports)module.exports=BikeLandscape;
+
+
+/* Shared convex boulders: the renderer, tires and ragdoll use these faces.
+ * World metres, Z up. No Three dependency in the fixed-step collision code. */
+const BikeSolids=(()=>{
+  const phi=(1+Math.sqrt(5))/2,vertices=[],faces=[],cache=new WeakMap();
+  const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+  const sub=(a,b)=>a.map((v,i)=>v-b[i]);
+  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+  const unit=a=>{const n=Math.hypot(...a);return a.map(v=>v/n);};
+  for(const x of [-1,1])for(const y of [-1,1])for(const z of [-1,1])vertices.push([x,y,z]);
+  for(const a of [-1,1])for(const b of [-1,1])vertices.push([0,a/phi,b*phi],[a/phi,b*phi,0],[a*phi,0,b/phi]);
+  for(const v of vertices)for(let i=0;i<3;i++)v[i]/=Math.sqrt(3);
+  // Extract the twelve pentagonal faces once, without a rendering library.
+  for(let a=0;a<20;a++)for(let b=a+1;b<20;b++)for(let c=b+1;c<20;c++){
+    let n=cross(sub(vertices[b],vertices[a]),sub(vertices[c],vertices[a]));
+    if(Math.hypot(...n)<1e-6)continue;n=unit(n);let d=dot(n,vertices[a]);
+    if(d<0){n=n.map(v=>-v);d=-d;}
+    if(vertices.some(v=>dot(n,v)>d+1e-6)||faces.some(f=>dot(f.normal,n)>.99999))continue;
+    const ids=vertices.map((v,i)=>Math.abs(dot(n,v)-d)<1e-6?i:-1).filter(i=>i>=0);
+    const center=n.map(v=>v*d),u=unit(sub(vertices[ids[0]],center)),v=cross(n,u);
+    ids.sort((a,b)=>Math.atan2(dot(sub(vertices[a],center),v),dot(sub(vertices[a],center),u))-
+      Math.atan2(dot(sub(vertices[b],center),v),dot(sub(vertices[b],center),u)));
+    faces.push({ids,normal:n});
+  }
+  function rotate(v,yaw){
+    const cz=Math.cos(yaw),sz=Math.sin(yaw),cy=Math.cos(.28),sy=Math.sin(.28),cx=Math.cos(.2),sx=Math.sin(.2);
+    const x=v[0]*cz-v[1]*sz,y=v[0]*sz+v[1]*cz,z=v[2],xx=x*cy+z*sy,zz=-x*sy+z*cy;
+    return [xx,y*cx-zz*sx,y*sx+zz*cx];
+  }
+  function get(T){
+    if(cache.has(T))return cache.get(T);
+    const rocks=[],buckets=new Map(),trees=new Map((T.trees||[]).map(t=>[t.x+','+t.y,t]));
+    for(const [index,entry] of T.rocks.entries()){
+      const [x,y,r,kind]=entry;
+      const yaw=((Math.imul(index+1,2654435761)^(T.seed||0))>>>0)/4294967296*Math.PI;
+      const z=T.sample(x,y).z+(kind==='tree'?0:r*.26);
+      let points,planes,extent=r;
+      if(kind==='tree'){
+        const tree=trees.get(x+','+y),h=tree?.h||11.1,w=tree?.w||r/.22;
+        extent=.22*w;points=[];
+        for(const [radius,height] of [[.22*w,-.01*h],[.15*w,.63*h]])for(let k=0;k<5;k++){
+          const a=k/5*Math.PI*2;points.push([x+Math.sin(a)*radius,y-Math.cos(a)*radius,z+height]);
+        }
+        planes=[{n:[0,0,1],d:z+.63*h},{n:[0,0,-1],d:-z+.01*h}];
+        for(let k=0;k<5;k++){
+          const a=points[k],b=points[(k+1)%5],c=points[k+5];let n=unit(cross(sub(b,a),sub(c,a)));
+          if(dot(n,sub(a,[x,y,z+h*.3]))<0)n=n.map(v=>-v);
+          planes.push({n,d:dot(n,a)});
+        }
+      }else{
+        points=vertices.map(v=>rotate([v[0]*r,v[1]*r*.86,v[2]*r*.73],yaw).map((v,i)=>v+[x,y,z][i]));
+        planes=faces.map(f=>{const [a,b,c]=f.ids.map(i=>points[i]);const n=unit(cross(sub(b,a),sub(c,a)));return {n,d:dot(n,a)};});
+      }
+      const rock={x,y,z,r:extent,yaw,points,planes,index,kind:kind==='tree'?'tree':'rock'};
+      if(kind!=='tree')rocks.push(rock);
+      for(let k=Math.floor((y-r-1)/20);k<=Math.floor((y+r+1)/20);k++){
+        if(!buckets.has(k))buckets.set(k,[]);buckets.get(k).push(rock);
+      }
+    }
+    const value={rocks,near:y=>buckets.get(Math.floor(y/20))||[]};cache.set(T,value);return value;
+  }
+  function top(s,x,y){
+    if(Math.abs(x-s.x)>s.r||Math.abs(y-s.y)>s.r)return null;
+    let hi=Infinity,lo=-Infinity,normal;
+    for(const {n,d} of s.planes){
+      const h=d-n[0]*x-n[1]*y;
+      if(Math.abs(n[2])<1e-8){if(h<0)return null;continue;}
+      const z=h/n[2];
+      if(n[2]>0&&z<hi){hi=z;normal=n;}else if(n[2]<0)lo=Math.max(lo,z);
+    }
+    return hi>=lo?{z:hi,normal}:null;
+  }
+  function sample(T,x,y,ceiling=Infinity){
+    let p=T.sample(x,y);
+    for(const s of get(T).near(y)){
+      const hit=top(s,x,y);
+      if(hit&&hit.z>p.z&&hit.z<=ceiling+.18)p={...p,...hit,solid:s,kind:'gravel',gap:false,landing:false,jump:null,jumpOffset:Infinity};
+    }
+    return p;
+  }
+  function sweep(s,a,b,radius=0){
+    let enter=0,exit=1,face=null,nearest=-Infinity,insideFace=null;
+    for(const {n,d} of s.planes){
+      const da=dot(n,a)-d-radius,db=dot(n,b)-d-radius;
+      if(da>0&&db>0)return null;
+      if(da>nearest){nearest=da;insideFace=n;}
+      if(da>db){const t=da/(da-db);if(t>enter){enter=t;face=n;}}
+      else if(db>da)exit=Math.min(exit,da/(da-db));
+      if(enter>exit)return null;
+    }
+    if(exit<0||enter>1)return null;
+    return {t:Math.max(0,enter),normal:face||insideFace,depth:face?0:Math.max(0,-nearest)};
+  }
+  function collision(T,a,b,radius=.26,supported=[]){
+    let best=null;
+    const nearby=new Set([...get(T).near(a[1]),...get(T).near(b[1])]);
+    for(const s of nearby){
+      if(Math.min(a[0],b[0])>s.x+s.r+radius||Math.max(a[0],b[0])<s.x-s.r-radius)continue;
+      const hit=sweep(s,a,b,radius);
+      // Skip an upper face only when the tire solver can actually support
+      // this bike above it. Hitting the same face from below is still solid.
+      if(hit&&!(hit.normal[2]>=.40&&supported.includes(s.index))&&(!best||hit.t<best.t))best={...hit,solid:s};
+    }
+    return best;
+  }
+  return {vertices,faces,get,top,sample,sweep,collision};
+})();
+if(typeof module!=='undefined'&&module.exports)module.exports=BikeSolids;
+
+
+/* Two tire contacts support a damped chassis. The race solver runs at 120 Hz
+ * inside a GDevelop scene event. */
+const BikeMotion = (() => {
+  const defaultTrack=typeof module!=='undefined'&&module.exports?require('./track.js'):BikeTrack;
+  const solids=typeof module!=='undefined'&&module.exports?require('./solids.js'):BikeSolids;
+  const {clamp}=defaultTrack;
+  const follow=(value,target,rate)=>target+(value-target)*Math.exp(-rate*dt);
+  const dt=1/120;
+  const gravity=9.81;
+  const clearance=.38;
+  const hopWindup=.075,hopRecovery=.78,hopPop=2.72;
+  function create(track=defaultTrack,y=0){
+    const x=track.safeX(y),yaw=y===0?0:Math.atan2(track.safeX(y+1)-track.safeX(y-1),2);
+    return {x,y,z:track.sample(x,y).z+clearance,vx:0,vy:0,vz:0,speed:0,yaw,
+      lean:0,pitch:0,turn:0,shift:0,spin:0,rearSpin:0,crank:0,brake:0,drive:0,rearSkid:0,
+      grip:1,slip:0,slipSide:0,grounded:true,compression:0,airTime:0,frontTravel:0,rearTravel:0,
+      forkLoad:.042,shockLoad:.057,forkRate:0,shockRate:0,
+      phase:'ready',time:0,peak:0,surface:'dirt',looseTime:0,reason:'',impact:0,
+      crashInfo:null,flight:null,landingTime:0,hopAge:0,roughTime:0,airTrim:0,
+      airPitchError:0,airRollError:0,kickSide:0,kickAge:0,kickCooldown:0,shove:0,
+      recovery:0,recoveryLean:0,recoveryPending:false,saves:0,cleanLandings:0,lastSave:-10};
+  }
+  function axleContacts(track,x,y,yaw,center,ceiling=Infinity){
+    const dx=Math.sin(yaw)*.64,dy=Math.cos(yaw)*.64;
+    const contact=(ax,ay)=>{
+      // A tire can overhang a face by part of its wheelbase. Use the face's
+      // plane while the chassis remains supported, then leave it naturally.
+      if(center.solid){const n=center.normal;return center.z-(n[0]*(ax-x)+n[1]*(ay-y))/n[2];}
+      const tire=solids.sample(track,ax,ay,ceiling),j=center.jump;
+      if(!center.gap&&tire.gap&&j===tire.jump){
+        if(y<j.lip)return j.takeoff+j.lift*(ay-j.lip);
+        if(y>=j.land)return j.landing+j.catchSlope*(ay-j.land);
+      }
+      return tire.z;
+    };
+    return [contact(x+dx,y+dy),contact(x-dx,y-dy)];
+  }
+  function suspension(rider,frontRise,rearRise,landing){
+    const braking=rider.brake;
+    const forkRest=rider.grounded?clamp(.042+braking*.065+frontRise*.042,0,.18):0;
+    const shockRest=rider.grounded?clamp(.057-braking*.024+rearRise*.050,0,.20):0;
+    const frontShare=clamp(.5-rider.pitch*.35,.27,.74);
+    rider.forkRate+=landing*frontShare*.57;
+    rider.shockRate+=landing*(1-frontShare)*.62;
+    // Let the shock take an impact quickly, then slow the rebound so it
+    // settles instead of throwing the rider back up off the trail.
+    const forkDamping=rider.forkRate>=0?18:24;
+    const shockDamping=rider.shockRate>=0?16:22;
+    rider.forkRate+=((forkRest-rider.forkLoad)*245-rider.forkRate*forkDamping)*dt;
+    rider.shockRate+=((shockRest-rider.shockLoad)*190-rider.shockRate*shockDamping)*dt;
+    const forkNext=rider.forkLoad+rider.forkRate*dt;
+    const shockNext=rider.shockLoad+rider.shockRate*dt;
+    rider.forkLoad=clamp(forkNext,0,.20);
+    rider.shockLoad=clamp(shockNext,0,.22);
+    if(forkNext!==rider.forkLoad)rider.forkRate=0;
+    if(shockNext!==rider.shockLoad)rider.shockRate=0;
+    rider.compression=(rider.forkLoad+rider.shockLoad)*.5;
+  }
+  const kmh=speed=>Math.round(speed*3.6)+' km/h';
+  const degrees=radians=>Math.round(Math.abs(radians)*180/Math.PI)+'°';
+  function crash(rider,code,title,detail,metrics=''){
+    rider.phase='crashed';
+    rider.crashInfo={code,title,detail,metrics};
+    rider.reason=title+'. '+detail;
+  }
+  function unsettle(rider,strength,side){
+    // Contact determines the disturbance. No random impulse or steering snap.
+    rider.recovery=Math.max(rider.recovery,clamp(strength,.20,1));
+    rider.recoveryLean=clamp(side,-.34,.34);
+    rider.recoveryPending=true;
+  }
+  function shortJump(rider,j,z){
+    const speed=kmh(rider.flight?.speed??rider.speed);
+    const below=Math.max(0,j.landing+clearance-z);
+    crash(rider,'short-gap','Short of '+j.name,
+      (rider.y<j.land?'You dropped into the gap before the landing.':'The bike hit the far bank below the landing.')+
+      ' Carry more speed to the lip or go around on the hillside.',
+      'Takeoff '+speed+' · Target '+j.min+'–'+j.max+' km/h'+(rider.y>=j.land&&below>.15?' · '+below.toFixed(1)+' m below the catch':''));
+  }
+  function failedLanding(rider,next,normalSpeed,limit,pitchError,rollError,sideways){
+    const j=next.solid?null:rider.flight?.jump;
+    const impact='Impact '+normalSpeed.toFixed(1)+' m/s';
+    const takeoff=j?' · Takeoff '+kmh(rider.flight.speed):'';
+    if(Math.abs(sideways)>5&&normalSpeed<limit){
+      crash(rider,'sideways','Landed sideways',
+        'The wheels were turned away from your direction of travel. Straighten the bike in the air.',
+        'Sideways speed '+kmh(Math.abs(sideways))+' · '+impact);return;
+    }
+    if(Math.abs(rollError)>.50&&Math.abs(rollError)>Math.abs(pitchError)&&normalSpeed<limit){
+      crash(rider,'off-balance','Landed off balance',
+        'The bike leaned too far for the bank. Use A or D to match the slope before touchdown.',
+        degrees(rollError)+' off the bank · '+impact);return;
+    }
+    if(Math.abs(pitchError)>.56&&normalSpeed<limit){
+      crash(rider,pitchError<0?'nose-down':'nose-high',pitchError<0?'Nose too low':'Nose too high',
+        pitchError<0?'The nose was too low for the slope. Tap S to bring it up.':'The nose was too high for the slope. Tap W to bring it down.',
+        degrees(pitchError)+' off the slope · '+impact);return;
+    }
+    crash(rider,'hard-landing','Hard landing',
+      'The impact into the surface was too heavy. Match the slope and use a longer downslope to absorb the drop.',
+      impact+' · Bike limit '+limit.toFixed(1)+' m/s'+takeoff);
+  }
+  function startKick(rider,side){
+    if(rider.phase!=='riding'||rider.kickCooldown>0||Math.abs(side)!==1)return false;
+    rider.kickSide=side;
+    rider.kickAge=dt;
+    rider.kickCooldown=.70;
+    return true;
+  }
+  function takeKick(rider,x,y,solid=false){
+    if(rider.phase!=='riding'||!Number.isFinite(x)||!Number.isFinite(y))return false;
+    rider.vx+=x;
+    rider.vy+=y;
+    rider.lean=clamp(rider.lean+.31*Math.sign(x*Math.cos(rider.yaw)-y*Math.sin(rider.yaw)),-.78,.78);
+    rider.shove=.40;
+    if(solid){
+      crash(rider,'kicked-off','Kicked off the bike',
+        'Another rider landed a square kick alongside you. Leave room or time your own kick before they get level.',
+        'Close contact · '+kmh(rider.speed));
+    }
+    return true;
+  }
+  function startFlight(jump,rider){
+    return {jump,speed:rider.speed};
+  }
+  function step(rider,input,T=defaultTrack){
+    if(rider.phase!=='riding')return;
+    rider.time+=dt;
+    rider.impact=Math.max(0,rider.impact-dt*7);
+    rider.landingTime=Math.max(0,rider.landingTime-dt);
+    rider.kickCooldown=Math.max(0,rider.kickCooldown-dt);
+    rider.shove=Math.max(0,rider.shove-dt);
+    if(rider.grounded&&rider.recovery>0){
+      const countersteer=input.steer*rider.recoveryLean<-.035;
+      const calm=Math.abs(input.steer)<.22;
+      rider.recovery=Math.max(0,rider.recovery-dt*(countersteer?1.25:calm?.72:.38));
+      rider.recoveryLean*=Math.exp(-(countersteer?7:calm?3.6:1.8)*dt);
+      if(rider.recovery===0&&rider.recoveryPending){
+        rider.saves++;rider.lastSave=rider.time;rider.recoveryPending=false;
+      }
+    }
+    if(rider.kickAge>0)rider.kickAge=rider.kickAge>=.38?0:rider.kickAge+dt;
+    const {x,y,z}=rider;
+    const ground=solids.sample(T,x,y,z-clearance);
+    const [front,rear]=axleContacts(T,x,y,rider.yaw,ground,z-clearance);
+    const groundPitch=Math.atan2(front-rear,1.28);
+    const heldGround=rider.grounded;
+    const beforeHop=rider.hopAge;
+    if(beforeHop>0)rider.hopAge=beforeHop+dt>=hopRecovery?0:beforeHop+dt;
+    if(input.hop&&heldGround&&rider.speed>2.2&&rider.hopAge===0)rider.hopAge=dt;
+    if(beforeHop<hopWindup&&rider.hopAge>=hopWindup){
+      if(heldGround&&!ground.gap){
+        // Apply a bounded impulse along the actual surface normal. Dividing
+        // the vertical impulse by cos(slope) injected extra energy on steeps.
+        const sx=ground.solid?-ground.normal[0]/ground.normal[2]:
+          (T.sample(x+.25,y).z-T.sample(x-.25,y).z)*2;
+        const sy=ground.solid?-ground.normal[1]/ground.normal[2]:
+          (T.sample(x,y+.25).z-T.sample(x,y-.25).z)*2;
+        const n=Math.hypot(1,sx,sy),pop=hopPop/Math.sqrt(n);
+        rider.vz=sx*rider.vx+sy*rider.vy+pop/n;
+        rider.vx-=sx*pop/n;rider.vy-=sy*pop/n;
+        rider.grounded=false;
+        rider.pitch+=.043;
+      }else rider.hopAge=0;
+    }
+    const surface=T.surfaces[ground.kind];
+    rider.surface=ground.kind;
+    rider.grip=surface.grip;
+    rider.shift=follow(rider.shift,rider.grounded?Number(!!input.brake||!!input.back)*.76:0,8.3);
+    rider.brake=follow(rider.brake,Number(!!input.brake),input.brake?13:19);
+    rider.drive=follow(rider.drive,rider.grounded?Number(!!input.pedal):0,16);
+    const airPitch=input.airPitch??(Number(!!input.back)-Number(!!input.pedal));
+    rider.airTrim=follow(rider.airTrim,rider.grounded?0:clamp(airPitch,-1,1),7);
+    rider.turn=follow(rider.turn,clamp(input.steer,-1,1),11.5);
+    const speed=Math.hypot(rider.vx,rider.vy);
+    const pressure=rider.brake*(.58+.42*rider.brake);
+    const loose=clamp((1.04-surface.grip)/.36,0,1);
+    const turning=clamp((Math.abs(rider.turn)-.09)/.72,0,1);
+    const lockDemand=clamp((pressure*(1+.17*loose)-.38)*1.45,0,1);
+    const lock=rider.grounded&&input.brake?lockDemand*clamp((speed-3.5)/5,0,1)*(.19+.81*turning):0;
+    rider.rearSkid=follow(rider.rearSkid,lock,lock>rider.rearSkid?9:15);
+    const sideBefore=rider.vx*Math.cos(rider.yaw)-rider.vy*Math.sin(rider.yaw);
+    const slideRatio=Math.abs(sideBefore)/Math.max(speed,1);
+    // Ease the steering into a growing slide. Countersteering keeps its full response.
+    const growingSlide=rider.grounded&&sideBefore*rider.turn<0;
+    const driftLimit=.15+.035*loose+.11*rider.rearSkid;
+    const steeringSupport=growingSlide?1-.73*clamp((slideRatio-driftLimit)/.16,0,1):1;
+    const baseSteer=rider.turn*(.95+Math.min(speed,16)*.021)*clamp(speed/1.8,0,1)/(1+.038*Math.max(0,speed-15));
+    const steerRate=baseSteer*(1+.14*rider.rearSkid)*steeringSupport;
+    rider.yaw+=steerRate*(rider.grounded?1:.21)*dt;
+    if(rider.grounded){
+      // The front tire still guides the bike as the rear slides. Its pull
+      // fades with speed and brake pressure, and returns as the brake lifts.
+      const coastGrip=(.18+.56*clamp((20-speed)/9,0,1))*(1-.38*loose);
+      const rollingGrip=coastGrip*(1-.85*pressure)*(1-.35*rider.rearSkid)*(1-rider.shove*1.5);
+      const turn=steerRate*dt*rollingGrip;
+      const oldX=rider.vx;
+      rider.vx=oldX*Math.cos(turn)+rider.vy*Math.sin(turn);
+      rider.vy=rider.vy*Math.cos(turn)-oldX*Math.sin(turn);
+    }
+    const fx=Math.sin(rider.yaw),fy=Math.cos(rider.yaw);
+    let forward=rider.vx*fx+rider.vy*fy;
+    let sideways=rider.vx*fy-rider.vy*fx;
+    if(rider.grounded){
+      const settled=1-.22*clamp(rider.landingTime/.18,0,1)-rider.shove*.95-.10*rider.recovery;
+      const pedal=rider.drive*(1-pressure)*3.9*clamp(1-Math.max(0,forward)/24,0,1);
+      const downhillForce=-gravity*Math.sin(groundPitch);
+      const resistance=surface.drag*forward+.0055*forward*Math.abs(forward);
+      forward+=(downhillForce+pedal-resistance)*dt;
+      const brake=pressure*settled*surface.grip*(9.75+rider.shift*.85)*(1-.15*rider.rearSkid)*dt;
+      forward=Math.sign(forward)*Math.max(0,Math.abs(forward)-brake);
+      if(!input.pedal&&speed<.1&&Math.abs(groundPitch)<.026)forward=0;
+      const cross=ground.solid?-(ground.normal[0]*fy-ground.normal[1]*fx)/ground.normal[2]:
+        (T.sample(x+fy*.4,y-fx*.4).z-T.sample(x-fy*.4,y+fx*.4).z)/.8;
+      sideways-=clamp(cross,-1.2,1.2)*4.6*dt;
+      // Braking spends part of the tire's grip that would otherwise be
+      // available for turning. Brief skids remain recoverable on dirt.
+      const straightening=(1-turning)*(1-pressure);
+      const lateralBudget=settled*surface.grip*9.81*(1+.24*straightening)*
+        Math.sqrt(1-(.39+.29*rider.rearSkid)*pressure*pressure)*dt;
+      sideways-=clamp(sideways*dt*(10+2*straightening-4*rider.rearSkid),-lateralBudget,lateralBudget);
+      rider.vx=fx*forward+fy*sideways;
+      rider.vy=fy*forward-fx*sideways;
+      // A supported bike moves along the contact plane. Stale vertical
+      // velocity (including a practice start at speed) must not launch it
+      // horizontally off an otherwise continuous downhill surface.
+      rider.vz=clamp(Math.tan(groundPitch)*forward+cross*sideways,-32,12);
+    }
+    rider.slip+=(Math.abs(sideways)-rider.slip)*dt*9;
+    rider.slipSide=sideways;
+    const speedNow=Math.hypot(rider.vx,rider.vy);
+    if(speedNow>25){rider.vx*=25/speedNow;rider.vy*=25/speedNow;}
+    rider.speed=Math.min(speedNow,25);
+    rider.peak=Math.max(rider.speed,rider.peak);
+    const spinStep=forward*dt/.355;
+    rider.spin-=spinStep;
+    rider.rearSpin-=spinStep*(1-.83*rider.rearSkid);
+    rider.crank+=rider.drive*(1-rider.brake)*clamp(2.2+rider.speed*.43,2.2,9.5)*dt;
+    if(Math.abs(rider.yaw)>Math.PI*2)rider.yaw-=Math.sign(rider.yaw)*Math.PI*2;
+    rider.x+=rider.vx*dt;
+    rider.y+=rider.vy*dt;
+    const next=solids.sample(T,rider.x,rider.y,Math.max(z,z+(rider.vz-gravity*dt)*dt)-clearance);
+    const j=next.jump;
+    if(j&&next.gap&&y<j.lip&&rider.y>=j.lip&&!rider.flight){
+      if(rider.grounded&&rider.vy>0){
+        rider.grounded=false;
+        rider.vz=rider.vy*j.lift;
+      }
+      rider.flight=startFlight(j,rider);
+    }
+    const flightJump=rider.flight?.jump;
+    if(flightJump&&y<flightJump.land&&rider.y>=flightJump.land&&next.jump===flightJump&&z<flightJump.landing+clearance-.42){
+      shortJump(rider,flightJump,z);return;
+    }
+    const [nextFront,nextRear]=axleContacts(T,rider.x,rider.y,rider.yaw,next,z-clearance);
+    const floor=Math.max((nextFront+nextRear)*.5,next.z-.035)+clearance;
+    const hopFlight=!rider.grounded&&rider.hopAge>=hopWindup&&!rider.flight;
+    const popPhase=rider.hopAge-hopWindup;
+    const popPitch=hopFlight?.12*Math.max(0,1-Math.abs(popPhase-.062)/.12):0;
+    const travelPitch=clamp(Math.atan2(rider.vz,Math.max(3,rider.speed)),-.86,.62);
+    let slopePitch=flightJump?Math.atan(flightJump.catchSlope*fy):clamp(groundPitch,-.78,.62);
+    let slopeRoll=0;
+    if(!rider.grounded){
+      const lookTime=clamp((z-floor)/Math.max(3,-rider.vz),.17,.48);
+      const ax=rider.x+rider.vx*lookTime,ay=rider.y+rider.vy*lookTime;
+      const landing=solids.sample(T,ax,ay,z-clearance);
+      if(!landing.gap){
+        const [aimFront,aimRear]=axleContacts(T,ax,ay,rider.yaw,landing);
+        slopePitch=clamp(Math.atan2(aimFront-aimRear,1.28),-.82,.65);
+        const left=solids.sample(T,ax-fy*.38,ay+fx*.38,z-clearance);
+        const right=solids.sample(T,ax+fy*.38,ay-fx*.38,z-clearance);
+        if(!left.gap&&!right.gap)slopeRoll=clamp(-Math.atan2(right.z-left.z,.76),-.80,.80);
+      }
+    }
+    const slopeBlend=rider.vz<0?.70:.16;
+    const airTarget=travelPitch+(slopePitch-travelPitch)*slopeBlend;
+    const pitchTarget=rider.grounded?groundPitch+.055*rider.shift-.048*rider.brake:
+      clamp(airTarget+.40*rider.airTrim+popPitch,-1.12,.85);
+    rider.pitch=follow(rider.pitch,pitchTarget,rider.grounded?12:hopFlight?10:rider.vz<0?4.6:3.9);
+    const leanTarget=rider.grounded?clamp(steerRate*rider.speed*.060+rider.recoveryLean,-.65,.65):rider.turn*.71+slopeRoll*.23;
+    rider.lean=follow(rider.lean,leanTarget,rider.grounded?9:6);
+    rider.airPitchError=rider.pitch-slopePitch;
+    rider.airRollError=rider.lean-slopeRoll;
+    const predicted=z+(rider.vz-gravity*dt)*dt;
+    const rideDrop=clamp(.053+rider.speed*.003,.053,.115);
+    let landingImpulse=0;
+    if(next.gap&&predicted<next.z+clearance+.6){
+      shortJump(rider,next.jump,predicted);return;
+    }
+    // Compare the next tire contact with the bike's current vertical motion.
+    // A smooth steep slope can stay under the tires even at high speed.
+    const followsSlope=rider.grounded&&floor>=predicted-rideDrop&&Math.abs(floor-z)<.32;
+    const wheelReach=!rider.grounded&&!flightJump&&!hopFlight&&rider.airTime<.12&&rider.vz<=0&&
+      predicted-floor<=.16&&Math.abs(floor-z)<.30;
+    if(!next.gap&&(predicted<=floor||followsSlope||wheelReach)){
+      const pitchError=rider.pitch-Math.atan2(nextFront-nextRear,1.28);
+      if(!rider.grounded&&rider.airTime>.085&&predicted<=floor){
+        const sx=next.solid?-next.normal[0]/next.normal[2]:(T.sample(rider.x+.25,rider.y).z-T.sample(rider.x-.25,rider.y).z)*2;
+        const sy=next.solid?-next.normal[1]/next.normal[2]:next.landing&&rider.y-next.jump.land<.25?next.jump.catchSlope:
+          (T.sample(rider.x,rider.y+.25).z-T.sample(rider.x,rider.y-.25).z)*2;
+        const hit=Math.max(0,(sx*rider.vx+sy*rider.vy-rider.vz)/Math.hypot(1,sx,sy));
+        rider.impact=clamp(hit*.14,0,1);
+        const bankRoll=-Math.atan(sx*fy-sy*fx);
+        const rollError=rider.lean-bankRoll;
+        // Suspension support fades with misalignment instead of switching
+        // off at a single angle. Small corrections should have small effects.
+        const alignment=clamp(1-Math.max(
+          Math.max(0,Math.abs(pitchError)-.26)/.46,
+          Math.max(0,Math.abs(rollError)-.24)/.44,
+          Math.max(0,Math.abs(sideways)-2)/4.4),0,1);
+        // Wheel alignment earns the same suspension tolerance on a boulder,
+        // an unmarked bank or an authored catch. A label is not extra grip.
+        const limit=8.8+alignment*4.0;
+        const pitchCost=Math.max(0,Math.abs(pitchError)-.43)*5.4;
+        const rollCost=Math.max(0,Math.abs(rollError)-.36)*5.2;
+        const sideCost=Math.max(0,Math.abs(sideways)-3.7)*.62;
+        const load=hit+pitchCost+rollCost+sideCost;
+        // A moderately overloaded, reasonably aligned landing gets a save
+        // window. Severe nose/side impacts still bail with a specific reason.
+        const dangerousAngle=Math.abs(pitchError)>.78||Math.abs(rollError)>.82||Math.abs(sideways)>7.2;
+        if(hit>3.5&&(load>limit+2.1||dangerousAngle&&load>limit)){
+          failedLanding(rider,next,hit,limit,pitchError,rollError,sideways);return;
+        }
+        if(load>Math.min(9,limit*.78)&&hit>3.5){
+          unsettle(rider,(load-limit*.68)/4,rollError*.6+sideways*.035);
+        }else if(rider.airTime>.28&&hit>1.8){rider.cleanLandings++;}
+        const scrub=1-clamp((load-2.2)*.023,0,.18);
+        rider.vx*=scrub;rider.vy*=scrub;
+        rider.landingTime=.25*clamp(load/limit,0,1);
+        landingImpulse=hit;
+      }
+      // Contact correction is not takeoff energy. On the first landing,
+      // follow the catch's tangent instead of turning a small penetration
+      // into an artificial upward launch on the next step.
+      rider.vz=!rider.grounded||wheelReach&&predicted>floor?
+        clamp((nextFront-nextRear)/1.28*forward,-26,12):clamp((floor-z)/dt,-26,12);
+      rider.z=floor;rider.grounded=true;rider.airTime=0;
+      rider.supportId=next.solid?.index??null;
+      rider.flight=null;
+    } else {
+      rider.z=predicted;rider.vz-=gravity*dt;rider.grounded=false;
+      rider.supportId=null;
+      rider.airTime+=dt;
+    }
+    // Remove the underlying grade so suspension responds to bumps and
+    // changes in slope, rather than compressing on every descent.
+    const gradeStep=forward*Math.tan(groundPitch)*dt;
+    suspension(rider,(nextFront-front-gradeStep)/dt,(nextRear-rear-gradeStep)/dt,landingImpulse);
+    const pitchHeight=Math.sin(rider.pitch)*.64;
+    rider.frontTravel=follow(rider.frontTravel,rider.grounded?
+      clamp(nextFront+clearance-rider.z-pitchHeight,-.14,.14):0,24);
+    rider.rearTravel=follow(rider.rearTravel,rider.grounded?
+      clamp(nextRear+clearance-rider.z+pitchHeight,-.14,.14):0,24);
+    if(!T.inside(rider.x,rider.y)){
+      crash(rider,'off-course','Off the mountain','Give the exposed edges more room.','Exit speed '+kmh(rider.speed));return;
+    }
+    const offSlope=(next.z-ground.z)/Math.max(.025,rider.speed*dt);
+    const rough=next.kind==='grass'&&rider.grounded&&rider.landingTime<.05&&rider.speed>9&&
+      (offSlope>1.15||(Math.abs(offSlope)>.90&&rider.slip>2.8));
+    rider.roughTime=rough?rider.roughTime+dt:Math.max(0,rider.roughTime-dt*2);
+    if(rider.roughTime>.12&&rider.recovery<.1){
+      unsettle(rider,.56,clamp(sideways*.08,-.3,.3));
+      rider.vx*=.93;rider.vy*=.93;rider.roughTime=0;
+    }
+    const contact=solids.collision(T,[x,y,z],[rider.x,rider.y,rider.z],.26,[ground.solid?.index,next.solid?.index]);
+    if(contact){
+      const n=contact.normal,closing=Math.max(0,-(rider.vx*n[0]+rider.vy*n[1]+rider.vz*n[2]));
+      if(closing>.01){
+        const t=Math.max(0,contact.t-.001);
+        const rest=[(rider.x-x)*(1-t),(rider.y-y)*(1-t),(rider.z-z)*(1-t)];
+        rider.x=x+(rider.x-x)*t;rider.y=y+(rider.y-y)*t;rider.z=z+(rider.z-z)*t;
+        if(closing>5.8){
+          const tree=contact.solid.kind==='tree';
+          crash(rider,tree?'tree-strike':'rock-strike',tree?'Trunk strike':'Rock face impact',tree?
+            'The bike hit a solid tree trunk. Steer through the opening or brake before contact.':
+            'The bike struck the steep face of the rock. Its upper faces can support a landing; approach above the lip and align with the slope.',
+            'Into the face '+kmh(closing)+' · Riding '+kmh(rider.speed));return;
+        }
+        // Spend the remaining part of this step sliding along the face.
+        // Discarding it would pin a bike at an edge while gravity built up.
+        const inward=Math.min(0,rest[0]*n[0]+rest[1]*n[1]+rest[2]*n[2]);
+        rider.x+=rest[0]-n[0]*inward;rider.y+=rest[1]-n[1]*inward;rider.z+=rest[2]-n[2]*inward;
+        rider.vx+=n[0]*closing;rider.vy+=n[1]*closing;rider.vz+=n[2]*closing;
+        if(closing>1.5)unsettle(rider,closing/7,clamp((n[0]*fy-n[1]*fx)*.28,-.28,.28));
+      }
+    }
+    if(next.kind==='gravel')rider.looseTime+=dt;
+    if(rider.grounded&&T.reachedValley(rider.x,rider.y,rider.z))rider.phase='finished';
+  }
+  return {create,step,startKick,takeKick,dt,clearance,hopWindup};
+})();
+if(typeof module!=='undefined'&&module.exports)module.exports=BikeMotion;
+
+
+/* Solo rest points are earned by stopping on a broad outlook. Crew races
+ * retain their one-life rules. No markers or mandatory checkpoint gates. */
+function createDescentJourney(track){
+  let restFor=0;
+  const state={checkpoint:null,falls:0,time:0,cleanLandings:0,saves:0,restUntil:0};
+  function update(rider,dt){
+    if(rider.phase!=='riding')return;
+    state.time=rider.time;state.saves=rider.saves;state.cleanLandings=rider.cleanLandings;
+    const shelf=track.shelves.find(s=>
+      Math.hypot((rider.x-track.mirrored*s.x)/s.rx,(rider.y-s.y)/s.ry)<.48&&
+      s.y>(state.checkpoint?.shelfY??-Infinity));
+    const safe=rider.grounded&&rider.speed<1.8&&rider.recovery<.1&&shelf&&
+      !track.sample(rider.x,rider.y).gap;
+    restFor=safe?restFor+dt:0;
+    if(restFor<.85)return;
+    state.checkpoint={x:rider.x,y:rider.y,yaw:rider.yaw,shelfY:shelf.y};
+    state.restUntil=rider.time+3.5;restFor=0;
+  }
+  function fall(rider){
+    state.falls++;state.time=rider.time;state.saves=rider.saves;state.cleanLandings=rider.cleanLandings;
+  }
+  function resume(motion){
+    if(!state.checkpoint)return null;
+    const rider=motion.create(track);
+    Object.assign(rider,state.checkpoint,{phase:'riding',time:state.time,saves:state.saves,cleanLandings:state.cleanLandings});
+    rider.z=track.sample(rider.x,rider.y).z+motion.clearance;
+    restFor=0;
+    return rider;
+  }
+  return {state,update,fall,resume};
+}
+if(typeof module!=='undefined'&&module.exports)module.exports=createDescentJourney;
+
+
+/* Mouse intent feeds the same steering input as the keys. It never writes
+ * position, velocity, grip, or airborne orientation into the bike solver. */
+function createMouseRiding(){
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const angle=v=>Math.atan2(Math.sin(v),Math.cos(v));
+  const state={active:false,targetYaw:0,lookTargetYaw:0,pitch:0,x:0,y:0,free:false};
+  let sensitivity=1;
+  function release(){state.active=false;state.pitch=0;state.free=false;}
+  function begin(x,y,yaw,free=false){Object.assign(state,{active:true,x,y,targetYaw:yaw,lookTargetYaw:yaw,pitch:0,free});}
+  function move(x,y,yaw,free=false,override=false){
+    if(!state.active)return;
+    const dx=clamp(x-state.x,-150,150),dy=clamp(y-state.y,-150,150);state.x=x;state.y=y;
+    const limit=free?.95:.62;
+    state.lookTargetYaw=yaw+clamp(angle(state.lookTargetYaw-yaw)+dx*.0028*sensitivity,-limit,limit);
+    state.pitch=clamp(state.pitch-dy*.0016*sensitivity,-.22,.26);
+    if(override&&!free){state.targetYaw=yaw;return;}
+    state.targetYaw=yaw+clamp(angle(state.targetYaw-yaw)+dx*.0028*sensitivity,-limit,limit);
+  }
+  function rebase(yaw){state.targetYaw=yaw;state.lookTargetYaw=yaw;}
+  function steer(rider,keyboard=0,override=false,scout=false){
+    if(!state.active)return keyboard;
+    const free=scout||!rider.grounded;
+    // Looking during a jump/scout must not queue a surprise turn on landing.
+    if(state.free&&!free)rebase(rider.yaw);
+    state.free=free;
+    if(free)return keyboard;
+    if(override){state.targetYaw=rider.yaw;return keyboard;}
+    const error=angle(state.targetYaw-rider.yaw),dead=.025;
+    const demand=Math.sign(error)*Math.max(0,Math.abs(error)-dead)*2.4;
+    const limit=.82-.24*clamp((rider.speed-8)/14,0,1);
+    return clamp(demand,-limit,limit);
+  }
+  function view(yaw){return state.active?{yaw:clamp(angle(state.lookTargetYaw-yaw),-.95,.95),pitch:state.pitch}:{yaw:0,pitch:0};}
+  return {state,begin,move,release,rebase,steer,view,setSensitivity(value){sensitivity=clamp(value,.5,1.5);}};
+}
+if(typeof module!=='undefined'&&module.exports)module.exports=createMouseRiding;
+
+
+// Position-based bodies. Distances keep the bike rigid and the
+// rider articulated. Each point can independently contact the mountain.
+function createBikeBail(track,seeds,edges,velocity,spin,drag){
+  const dt=1/120;
+  const points=seeds.map(({position,radius,mass=1})=>({
+    position:position.clone(),previous:position.clone(),normal:new THREE.Vector3(),incoming:new THREE.Vector3(),
+    radius,weight:1/mass,contact:false
+  }));
+  const center=seeds[0].position;
+  const delta=new THREE.Vector3();
+  for(const point of points){
+    delta.subVectors(point.position,center).crossVectors(spin,delta).add(velocity);
+    point.previous.addScaledVector(delta,-dt);
+  }
+  const links=edges.map(([a,b,min=1,max=1])=>{
+    const length=points[a].position.distanceTo(points[b].position);
+    return {a:points[a],b:points[b],min:min*length,max:max*length};
+  });
+  const solids=BikeSolids.get(track);
+  let accumulator=0,age=0,quietSteps=0,asleep=false;
+
+  function collide(point){
+    const p=point.position;
+    for(const rock of solids.near(p.y)){
+      if(Math.abs(p.x-rock.x)>rock.r+point.radius||Math.abs(p.y-rock.y)>rock.r+point.radius)continue;
+      const from=point.previous.toArray(),to=p.toArray();
+      const hit=BikeSolids.sweep(rock,from,to,point.radius);
+      if(!hit)continue;
+      point.normal.fromArray(hit.normal);
+      if(hit.depth>0)delta.copy(point.normal).multiplyScalar(Math.min(.08,hit.depth));
+      else delta.copy(point.previous).lerp(p,Math.max(0,hit.t-.001)).sub(p);
+      p.add(delta);point.previous.add(delta);point.contact=true;
+    }
+    const floor=track.sample(p.x,p.y).z;
+    if(p.z>floor+point.radius*2.3)return;
+    const xSlope=(track.sample(p.x+.14,p.y).z-track.sample(p.x-.14,p.y).z)/.28;
+    const ySlope=(track.sample(p.x,p.y+.14).z-track.sample(p.x,p.y-.14).z)/.28;
+    const slopeX=track.clamp(xSlope,-1.45,1.45);
+    const slopeY=track.clamp(ySlope,-1.45,1.45);
+    const height=floor+point.radius*Math.hypot(1,slopeX,slopeY);
+    if(p.z<height){
+      point.previous.z+=height-p.z;
+      p.z=height;
+      point.normal.set(-slopeX,-slopeY,1).normalize();
+      point.contact=true;
+    }
+  }
+
+  function step(){
+    let maxMotion=0;
+    let settledMotion=0;
+    for(const point of points){
+      point.incoming.subVectors(point.position,point.previous).multiplyScalar(.998);
+      point.incoming.z-=9.81*dt*dt;
+      point.previous.copy(point.position);
+      point.position.add(point.incoming);
+      maxMotion=Math.max(maxMotion,point.incoming.length());
+      point.contact=false;
+    }
+    for(let pass=0;pass<6;pass++){
+      for(const link of links){
+        delta.subVectors(link.b.position,link.a.position);
+        const distance=delta.length();
+        if(distance<.0001)continue;
+        const correction=(distance-track.clamp(distance,link.min,link.max))/distance;
+        const weight=link.a.weight+link.b.weight;
+        link.a.position.addScaledVector(delta,correction*link.a.weight/weight);
+        link.b.position.addScaledVector(delta,-correction*link.b.weight/weight);
+      }
+      for(const point of points)collide(point);
+    }
+    for(const point of points){
+      // Constraint projections may be large when the crash starts inside a
+      // rock. They cannot create a new launch impulse on the next step.
+      delta.subVectors(point.position,point.previous).clampLength(0,Math.min(.145,maxMotion+.004));
+      delta.z=Math.min(delta.z,point.incoming.z+.021);
+      if(point.contact){
+        const approach=point.incoming.dot(point.normal);
+        delta.addScaledVector(point.normal,-delta.dot(point.normal)).multiplyScalar(drag);
+        if(approach<-.026)delta.addScaledVector(point.normal,-approach*.11);
+      }
+      point.previous.copy(point.position).sub(delta);
+      settledMotion=Math.max(settledMotion,delta.length());
+    }
+    quietSteps=age>.5&&settledMotion<.0013?quietSteps+1:0;
+    asleep=quietSteps>120;
+  }
+
+  function update(elapsed){
+    if(asleep)return;
+    accumulator+=Math.min(elapsed,.05);
+    while(accumulator>=dt&&!asleep){
+      step();
+      accumulator-=dt;
+      age+=dt;
+    }
+  }
+  return {update,positions:points.map(point=>point.position)};
+}
+
+
+/* Series 02: original low-poly freerider, textured like a 2000s sports game.
+ * Two-bone limbs track the pedals and grips during every riding pose. */
+function createRiderFactory(world,paintTile){
+  const material=color=>new THREE.MeshStandardMaterial({color,roughness:.84,flatShading:true});
+  const alloy=material('#aab5b4'), rubber=material('#242626'), skin=material('#bd8666');
+  const canvas=material('#6d6351'), cargo=material('#564f42'), pad=material('#353a3d');
+  const goggles=material('#252832'), lens=material('#657b86'), boot=material('#333a42');
+  const sole=material('#b0a392'), binding=material('#d4c5ad');
+  const kits=[
+    ['#252f48','#ece1c7','#bad05f','#a0a969','#465e9c'],
+    ['#2c464c','#eddbc1','#e69c54','#517078','#98593d'],
+    ['#443750','#e9dfc4','#e0ae66','#866c8b','#5d4974'],
+    ['#48533c','#ead8bd','#85c1b6','#879568','#547566']
+  ];
+  const unit=new THREE.Vector3(0,1,0);
+  const box=(x,y,z)=>new THREE.BoxGeometry(x,y,z);
+  const ball=new THREE.IcosahedronGeometry(1,1);
+  const bar=new THREE.CylinderGeometry(1,1,1,6);
+  function body(rows,sides=10){
+    const positions=[],uvs=[],indices=[];
+    for(const [z,width,depth,shift=0] of rows){
+      const v=(z-rows[0][0])/(rows.at(-1)[0]-rows[0][0]);
+      for(let i=0;i<=sides;i++){
+        const u=i/sides,a=u*2*Math.PI;
+        positions.push(Math.sin(a)*width,shift+Math.cos(a)*depth,z);
+        uvs.push(u,v);
+      }
+    }
+    for(let row=0;row<rows.length-1;row++)for(let i=0;i<sides;i++){
+      const a=row*(sides+1)+i,b=a+sides+1;
+      indices.push(a,b,a+1,a+1,b,b+1);
+    }
+    const geometry=new THREE.BufferGeometry();
+    geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+    geometry.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    return geometry;
+  }
+  const shirtGeo=body([
+    [0,.012,.018,-.014],[.014,.171,.110,-.014],[.100,.163,.116,-.006],
+    [.242,.195,.131,-.005],[.340,.226,.124,.008],[.389,.208,.109,.009],
+    [.430,.082,.076,.018],[.437,.010,.012,.018]
+  ],12);
+  const hipGeo=body([[-.113,.012,.012,-.01],[-.096,.185,.119,-.018],[-.01,.177,.123,-.007],
+    [.034,.158,.108,.005],[.040,.008,.008,.005]]);
+  const shellGeo=body([[-.014,.106,.116,-.015],[.012,.165,.156,-.016],[.082,.171,.160,-.027],
+    [.135,.139,.132,-.026],[.177,.088,.085,-.030],[.184,.006,.006,-.031]],12);
+  const visorGeo=body([[.021,.018,.031,.119],[.024,.143,.139,.126],[.056,.156,.127,.098],
+    [.078,.100,.078,.080],[.080,.012,.015,.066]],8);
+  const shoeGeo=body([[-.046,.008,.012,.038],[-.034,.071,.139,.036],[.002,.072,.143,.039],
+    [.049,.063,.115,.021],[.083,.050,.067,-.015],[.087,.006,.008,-.014]],8);
+  const soleGeo=body([[-.056,.009,.012,.037],[-.048,.075,.141,.038],[-.024,.073,.143,.039],
+    [-.019,.010,.010,.039]],8);
+  function limbShape(profile){return new THREE.LatheGeometry(profile.map(([y,r])=>new THREE.Vector2(r,y)),8);}
+  const shortsGeo=limbShape([[-.50,.78],[-.39,1.06],[-.15,1.00],[.20,.86],[.45,.91],[.49,0]]);
+  const shinGeo=limbShape([[-.50,.82],[-.24,1.00],[.08,.82],[.35,.57],[.49,.54]]);
+  const sleeveGeo=limbShape([[-.50,1.05],[-.32,1.04],[.12,.89],[.43,.85],[.49,0]]);
+  const forearmGeo=limbShape([[-.50,.83],[-.17,1.00],[.14,.81],[.49,.58]]);
+  const rimGeo=new THREE.TorusGeometry(.282,.014,5,20).rotateY(Math.PI/2);
+  const tireGeo=new THREE.TorusGeometry(.318,.037,6,24).rotateY(Math.PI/2);
+  const vec=(...xyz)=>new THREE.Vector3(...xyz);
+  function add(parent,geo,mat,x=0,y=0,z=0){
+    const object=new THREE.Mesh(geo,mat);
+    object.position.set(x,y,z);
+    parent.add(object);
+    return object;
+  }
+  function joint(parent,x,y,z){
+    const group=new THREE.Group();
+    group.position.set(x,y,z);
+    parent.add(group);
+    return group;
+  }
+  const direction=vec(), jointAxis=vec(), guide=vec(), bendPoint=vec(), target=vec();
+  function segment(mesh,start,end,radius){
+    direction.subVectors(end,start);
+    const length=Math.max(.001,direction.length());
+    mesh.position.copy(start).addScaledVector(direction,.5);
+    mesh.quaternion.setFromUnitVectors(unit,direction.divideScalar(length));
+    mesh.scale.set(radius,length,radius);
+  }
+  function tube(parent,mat,a,b,radius){
+    const mesh=add(parent,bar,mat);
+    segment(mesh,vec(...a),vec(...b),radius);
+    return mesh;
+  }
+  function limb(parent,upperMat,lowerMat,r1,r2,a,b,kind,trim){
+    const arm=kind==='arm';
+    const upper=add(parent,arm?sleeveGeo:shortsGeo,upperMat);
+    const lower=add(parent,arm?forearmGeo:shinGeo,lowerMat);
+    const jointPad=add(parent,ball,arm?trim:pad);
+    const cuff=add(parent,bar,arm?trim:cargo);
+    const bend=vec();
+    function place(from,knee,to){
+      segment(upper,from,knee,r1);
+      segment(lower,knee,to,r2);
+      jointPad.position.copy(knee);
+      jointPad.scale.set(arm?.067:.088,arm?.067:.091,arm?.065:.091);
+      target.copy(knee).lerp(from,.13);
+      segment(cuff,target,knee,arm?.068:.091);
+    }
+    function solve(from,to,plane){
+      jointAxis.subVectors(to,from);
+      const length=THREE.MathUtils.clamp(jointAxis.length(),Math.abs(a-b)+.015,a+b-.007);
+      jointAxis.normalize();
+      guide.copy(plane).addScaledVector(jointAxis,-plane.dot(jointAxis)).normalize();
+      const along=(a*a-b*b+length*length)/(2*length);
+      bendPoint.copy(from).addScaledVector(jointAxis,along).addScaledVector(guide,Math.sqrt(Math.max(0,a*a-along*along)));
+      bend.copy(bendPoint);
+      place(from,bend,to);
+    }
+    return {solve,place,bend};
+  }
+  function wheel(parent,x,y,z){
+    const hub=joint(parent,x,y,z),spindle=joint(hub,0,0,0);
+    add(spindle,tireGeo,rubber);
+    add(spindle,rimGeo,alloy);
+    add(spindle,ball,alloy).scale.set(.060,.044,.044);
+    for(let i=0;i<8;i++){
+      const a=i*Math.PI/4;
+      tube(spindle,alloy,[0,0,0],[0,.275*Math.sin(a),.275*Math.cos(a)],.006);
+    }
+    return {hub,spindle};
+  }
+  const kitMaterials=new Map();
+  function kit(slot){
+    const id=slot%kits.length;
+    if(kitMaterials.has(id))return kitMaterials.get(id);
+    const [base,cream,accent,trimColor,frameColor]=kits[id];
+    const sleeve=material(cream),trim=material(trimColor),frame=material(frameColor);
+    const jersey=material('#ffffff'),helmet=material('#ffffff'),visor=material(base),guard=material(accent);
+    jersey.map=paintTile(256,128,ctx=>{
+      ctx.fillStyle=base;ctx.fillRect(0,0,256,128);
+      ctx.fillStyle=cream;ctx.beginPath();
+      ctx.moveTo(0,0);ctx.lineTo(256,0);ctx.lineTo(256,48);ctx.lineTo(208,37);
+      ctx.lineTo(163,54);ctx.lineTo(94,59);ctx.lineTo(50,39);ctx.lineTo(0,48);ctx.fill();
+      ctx.fillStyle=accent;ctx.beginPath();
+      ctx.moveTo(0,83);ctx.lineTo(256,72);ctx.lineTo(256,89);ctx.lineTo(0,101);ctx.fill();
+      ctx.fillStyle=base;ctx.fillRect(0,0,256,11);
+      ctx.fillStyle=accent;ctx.fillRect(84,15,88,5);
+      ctx.textAlign='center';ctx.fillStyle=base;ctx.font='900 11px system-ui';ctx.fillText('RIDGE CREW',128,37);
+      ctx.fillStyle=cream;ctx.font='italic 900 40px system-ui';
+      ctx.lineWidth=4;ctx.strokeStyle=base;
+      const bib=String(17+id*7);
+      ctx.strokeText(bib,128,84);ctx.fillText(bib,128,84);
+      ctx.font='italic 900 22px system-ui';ctx.fillStyle=base;
+      ctx.fillText(bib,2,36);ctx.fillText(bib,258,36);
+      ctx.fillStyle=accent;ctx.fillRect(0,114,256,3);
+    });
+    jersey.map.repeat.x=-1;
+    jersey.map.offset.x=1;
+    helmet.map=paintTile(128,64,ctx=>{
+      ctx.fillStyle=base;ctx.fillRect(0,0,128,64);
+      ctx.fillStyle=cream;ctx.fillRect(0,4,128,28);
+      ctx.fillStyle=accent;ctx.fillRect(53,0,23,64);
+      ctx.fillStyle=base;ctx.fillRect(61,0,6,64);
+      ctx.fillRect(37,25,12,4);ctx.fillRect(79,25,12,4);
+      ctx.fillStyle=cream;ctx.fillRect(24,41,25,4);ctx.fillRect(79,41,25,4);
+    });
+    const result={jersey,sleeve,trim,helmet,visor,guard,frame};
+    kitMaterials.set(id,result);
+    return result;
+  }
+  function create(slot,track){
+    const {jersey,sleeve,trim,helmet,visor,guard,frame}=kit(slot);
+    const root=joint(world,0,0,0),attitude=joint(root,0,0,0),chassis=joint(attitude,0,0,0);
+    const stem=[0,.39,.65],seat=[0,-.26,.64],crank=[0,-.12,.12];
+    for(const [a,b,radius] of [
+      [seat,stem,.046],
+      [stem,crank,.055],[crank,seat,.041],[[0,-.30,.61],[0,-.31,.70],.033]
+    ]) tube(chassis,frame,a,b,radius);
+    add(chassis,box(.20,.33,.055),rubber,0,-.31,.71);
+    tube(chassis,alloy,[-.18,-.12,.12],[.18,-.12,.12],.026);
+    const fork=joint(chassis,...stem);
+    const forkLegs=[-.084,.084].map(x=>({
+      x,upper:tube(fork,alloy,[x,0,.01],[x,.14,-.34],.021),
+      lower:tube(fork,frame,[x,.14,-.34],[x,.25,-.65],.035)
+    }));
+    tube(fork,alloy,[-.36,-.067,.073],[.36,-.067,.073],.023);
+    for(const side of [-1,1]){
+      tube(fork,boot,[side*.285,-.067,.073],[side*.377,-.067,.073],.030);
+      add(fork,box(.042,.125,.030),alloy,side*.28,.012,.055);
+    }
+    const front=wheel(fork,0,.25,-.65),rear=wheel(attitude,0,-.64,0);
+    const pivot=vec(0,-.16,.18);
+    const swingarm=[-1,1].map(side=>tube(chassis,frame,[side*.071,-.16,.18],[side*.082,-.64,0],.032));
+    const shockBody=tube(chassis,alloy,[0,-.035,.37],[0,-.31,.17],.043);
+    const shockShaft=tube(chassis,alloy,[0,-.31,.17],[0,-.48,.08],.019);
+    const shockTop=vec(0,-.035,.37),axle=vec(),rocker=vec(),shockSplit=vec();
+    const pedals=[-1,1].map(side=>add(chassis,box(.122,.132,.037),rubber,side*.18,-.12,.12));
+    const crankArms=[-1,1].map(side=>tube(chassis,alloy,[side*.14,-.12,.12],[side*.18,.04,.12],.013));
+
+    const bodyRig=joint(root,0,0,0),torso=joint(bodyRig,0,0,0);
+    add(torso,shirtGeo,jersey);
+    add(torso,hipGeo,canvas);
+    add(torso,ball,skin,0,.012,.458).scale.set(.076,.071,.088);
+    const head=joint(torso,0,.012,.541);
+    add(head,ball,skin,0,.030,-.018).scale.set(.118,.118,.127);
+    add(head,shellGeo,helmet);
+    add(head,visorGeo,visor);
+    add(head,ball,visor,0,-.089,-.037).scale.set(.149,.100,.090);
+    const jaw=add(head,ball,guard,0,.103,-.088);
+    jaw.scale.set(.141,.130,.057);
+    add(head,box(.121,.019,.022),goggles,0,.223,-.079);
+    for(const s of [-1,1]){
+      add(head,ball,visor,s*.115,.035,-.053).scale.set(.052,.114,.066);
+      const eye=add(head,box(.112,.035,.063),goggles,s*.051,.137,-.010);
+      eye.rotation.z=-s*.22;
+      const glass=add(head,box(.090,.018,.044),lens,s*.052,.153,-.010);
+      glass.rotation.z=-s*.22;
+      add(head,box(.035,.036,.037),trim,s*.151,.054,-.027);
+    }
+    const limbs=[-1,1].map(side=>({
+      side,
+      leg:limb(bodyRig,canvas,skin,.103,.064,.385,.416,'leg',trim),
+      arm:limb(bodyRig,sleeve,skin,.069,.054,.26,.274,'arm',trim),
+      glove:add(bodyRig,ball,boot),
+      shoe:joint(bodyRig,0,0,0),
+      hip:vec(),shoulder:vec(),hand:vec(),foot:vec(),
+      kneePlane:vec(side*.12,1,.03),elbowPlane:vec(side*.8,-.10,-.65),
+      localGrip:vec(side*.355,-.067,.073)
+    }));
+    for(const part of limbs){
+      add(part.shoe,shoeGeo,boot);add(part.shoe,soleGeo,sole);
+      for(let i=0;i<3;i++)add(part.shoe,box(.083,.013,.009),binding,0,.038+i*.022,.062-i*.005);
+    }
+    const position=vec(),torsoRotation=new THREE.Quaternion(),chassisInverse=new THREE.Quaternion();
+    const sideAxis=vec(),forwardAxis=vec(),upAxis=vec(),midpoint=vec();
+    const basis=new THREE.Matrix4(),orientation=new THREE.Quaternion();
+    let bail=null;
+    function ridePose(p){
+      const braking=p.brake||0,drive=p.drive||0,shift=p.shift||0;
+      const airborne=p.grounded===false?1:0,age=p.hopAge||0;
+      const launch=BikeMotion.hopWindup,fly=age-launch;
+      const ease=THREE.MathUtils.smoothstep;
+      const load=age>0?ease(age,0,launch)*(1-ease(age,launch,launch+.096)):0;
+      const pull=airborne&&age>launch?(1-ease(fly,.028,.163))*ease(fly,0,.052):0;
+      const tuck=airborne&&age>launch?ease(fly,.060,.193)*(1-ease(fly,.24,.43)):0;
+      const kickAge=p.kickAge||0;
+      const kick=ease(kickAge,0,.10)*(1-ease(kickAge,.155,.37));
+      const forkLoad=(p.forkLoad??p.compression??0)+.025*load;
+      const shockLoad=(p.shockLoad??p.compression??0)+.035*load;
+      const compress=(forkLoad+shockLoad)*.5;
+      const effort=(1-airborne)*drive*(1-braking),steering=p.turn||0;
+      const rise=Math.min(1,(p.speed||0)*.24)*effort;
+      root.position.set(p.x,p.y,p.z);
+      root.rotation.z=-p.yaw;
+      attitude.position.set(0,0,0);
+      attitude.rotation.set(p.pitch||0,p.lean||0,0,'XYZ');
+      bodyRig.position.set(0,0,0);
+      bodyRig.quaternion.copy(attitude.quaternion);
+      chassis.position.z=-compress;
+      chassis.rotation.x=(shockLoad-forkLoad)/1.28;
+      chassisInverse.copy(chassis.quaternion).invert();
+      fork.rotation.z=-(p.turn||0)*.26;
+      front.hub.position.set(0,.25-forkLoad*.29,-.65+(p.frontTravel||0)+forkLoad);
+      rear.hub.position.z=p.rearTravel||0;
+      for(const {x,upper,lower} of forkLegs){
+        position.set(x,front.hub.position.y-.107,front.hub.position.z+.292);
+        segment(upper,target.set(x,0,.01),position,.021);
+        segment(lower,position,target.set(x,front.hub.position.y,front.hub.position.z),.035);
+      }
+      axle.copy(rear.hub.position).sub(chassis.position).applyQuaternion(chassisInverse);
+      for(let i=0;i<2;i++){
+        const x=i===0?-.078:.078;
+        segment(swingarm[i],position.copy(pivot).setX(x),target.copy(axle).setX(x),.032);
+      }
+      rocker.copy(pivot).lerp(axle,.52);
+      shockSplit.copy(shockTop).lerp(rocker,.61+shockLoad*.9);
+      segment(shockBody,shockTop,shockSplit,.043);
+      segment(shockShaft,shockSplit,rocker,.019);
+      front.spindle.rotation.x=p.spin||0;
+      rear.spindle.rotation.x=p.rearSpin??p.spin??0;
+      const breath=.009*Math.sin((p.time||0)*3.7),recover=p.recovery||0;
+      const crankAngle=p.crank||0;
+      torso.position.set(.046*Math.sin(crankAngle)*effort-(p.recoveryLean||0)*.13,
+        -.28-shift*.16+effort*.063-.079*load-.103*pull+.089*tuck,
+        .814+rise*.039-compress*.85-braking*.068-airborne*.038+breath-.077*load+.031*pull-.061*tuck-.055*recover);
+      torso.rotation.set(-.70-braking*.19+shift*.20-airborne*.09+.18*pull-.13*tuck,
+        -.06*steering-(p.kickSide||0)*kick*.14,.067*steering);
+      head.position.set(0,.012,.541);
+      head.rotation.x=.50+airborne*.16-braking*.055;
+      head.rotation.y=0;
+      head.rotation.z=-steering*.24-(p.lookYaw||0)*.45;
+      torsoRotation.copy(torso.quaternion);
+      for(let i=0;i<limbs.length;i++){
+        const part=limbs[i],s=part.side,a=crankAngle+i*Math.PI;
+        part.hip.set(s*.103,-.013,-.024).applyQuaternion(torsoRotation).add(torso.position);
+        part.shoulder.set(s*.190,-.012,.337).applyQuaternion(torsoRotation).add(torso.position);
+        pedals[i].position.set(s*.184,-.12+Math.cos(a)*.137,.12+Math.sin(a)*.137);
+        segment(crankArms[i],position.set(s*.14,-.12,.12),pedals[i].position,.014);
+        part.foot.copy(pedals[i].position);
+        part.foot.applyQuaternion(chassis.quaternion).add(chassis.position);
+        part.foot.z+=.046;
+        if(s===p.kickSide){
+          part.foot.x+=s*kick*.37;
+          part.foot.y+=kick*.05;
+          part.foot.z+=kick*.24;
+        }
+        part.hand.copy(part.localGrip).applyQuaternion(fork.quaternion).add(fork.position);
+        part.hand.applyQuaternion(chassis.quaternion).add(chassis.position);
+        part.leg.solve(part.hip,part.foot,part.kneePlane);
+        part.arm.solve(part.shoulder,part.hand,part.elbowPlane);
+        part.shoe.position.copy(part.foot);part.shoe.position.y+=.048;
+        part.shoe.rotation.set(.13*Math.sin(a)+airborne*.16,0,0);
+        part.glove.position.copy(part.hand);part.glove.scale.set(.050,.060,.042);
+      }
+    }
+    function worldPoint(object,point=vec()){
+      return world.worldToLocal(object.localToWorld(point.clone()));
+    }
+    function bodyBasis(q){
+      sideAxis.subVectors(q[1],q[0]).add(forwardAxis.subVectors(q[3],q[2])).normalize();
+      upAxis.copy(q[2]).add(q[3]).sub(q[0]).sub(q[1]).normalize();
+      forwardAxis.crossVectors(upAxis,sideAxis).normalize();
+      upAxis.crossVectors(sideAxis,forwardAxis).normalize();
+      return orientation.setFromRotationMatrix(basis.makeBasis(sideAxis,forwardAxis,upAxis));
+    }
+    function bikeBasis(q){
+      forwardAxis.subVectors(q[1],q[0]).normalize();
+      sideAxis.subVectors(q[4],q[3]).normalize();
+      upAxis.crossVectors(sideAxis,forwardAxis).normalize();
+      sideAxis.crossVectors(forwardAxis,upAxis).normalize();
+      return orientation.setFromRotationMatrix(basis.makeBasis(sideAxis,forwardAxis,upAxis));
+    }
+    function startBail(p){
+      const bodyNodes=[
+        {position:worldPoint(bodyRig,limbs[0].hip),radius:.15,mass:3},
+        {position:worldPoint(bodyRig,limbs[1].hip),radius:.15,mass:3},
+        {position:worldPoint(bodyRig,limbs[0].shoulder),radius:.14,mass:3},
+        {position:worldPoint(bodyRig,limbs[1].shoulder),radius:.14,mass:3},
+        {position:worldPoint(head),radius:.16,mass:1.6}
+      ];
+      const bodyEdges=[[0,1],[2,3],[0,2],[1,3],[0,3],[1,2],[2,4],[3,4]];
+      for(let i=0;i<2;i++){
+        const part=limbs[i],start=bodyNodes.length;
+        for(const [joint,radius] of [[part.leg.bend,.084],[part.foot,.083],[part.arm.bend,.065],[part.hand,.061]]){
+          bodyNodes.push({position:worldPoint(bodyRig,joint),radius});
+        }
+        bodyEdges.push([i,start],[start,start+1],[i+2,start+2],[start+2,start+3],
+          [i,start+1,.67,1.34],[i+2,start+3,.58,1.38]);
+      }
+      const bikeNodes=[
+        {position:worldPoint(rear.hub),radius:.31,mass:2},
+        {position:worldPoint(front.hub),radius:.31,mass:2},
+        {position:worldPoint(chassis,vec(0,-.28,.71)),radius:.12,mass:2},
+        {position:worldPoint(fork,limbs[0].localGrip),radius:.065},
+        {position:worldPoint(fork,limbs[1].localGrip),radius:.065}
+      ];
+      const bikeEdges=[];
+      for(let a=0;a<bikeNodes.length;a++)for(let b=a+1;b<bikeNodes.length;b++)bikeEdges.push([a,b]);
+      const sin=Math.sin(p.yaw),cos=Math.cos(p.yaw);
+      const velocity=vec(p.vx??sin*p.speed,p.vy??cos*p.speed,p.vz??0);
+      const direction=Math.sign(p.slipSide||p.lean||p.turn||1);
+      const strength=Math.min(1,p.speed/14);
+      const personVelocity=velocity.clone().multiplyScalar(.61);
+      personVelocity.add(vec(cos*.8*direction,-sin*.8*direction,.38));
+      const personSpin=vec(cos*(-1.5-2.6*strength),-sin*(-1.5-2.6*strength),direction*.8);
+      const bikeSpin=vec(sin*direction*2.2,cos*direction*2.2,.65*direction);
+      const bikeOffset=worldPoint(attitude).sub(bikeNodes[0].position);
+      const bikeReference=bikeBasis(bikeNodes.map(node=>node.position)).clone().invert();
+      const bikeRotation=root.quaternion.clone().multiply(attitude.quaternion);
+      const torsoWorld=root.quaternion.clone().multiply(bodyRig.quaternion).multiply(torso.quaternion);
+      const bodyReference=bodyBasis(bodyNodes.map(node=>node.position)).clone().invert();
+      const hipOffset=worldPoint(torso).sub(bodyNodes[0].position.clone().lerp(bodyNodes[1].position,.5));
+      bail={
+        person:createBikeBail(track,bodyNodes,bodyEdges,personVelocity,personSpin,.79),
+        bike:createBikeBail(track,bikeNodes,bikeEdges,velocity.multiplyScalar(.38),bikeSpin,.83),
+        bikeOffset,bikeReference,bikeRotation,bodyReference,torsoWorld,hipOffset
+      };
+    }
+    function poseBail(dt){
+      bail.person.update(dt);
+      bail.bike.update(dt);
+      const human=bail.person.positions,bike=bail.bike.positions;
+      root.position.set(0,0,0);root.rotation.set(0,0,0);
+      bodyRig.position.set(0,0,0);bodyRig.rotation.set(0,0,0);
+      const rotation=bikeBasis(bike).multiply(bail.bikeReference);
+      attitude.position.copy(bail.bikeOffset).applyQuaternion(rotation).add(bike[0]);
+      attitude.quaternion.copy(rotation).multiply(bail.bikeRotation);
+      const bodyRotation=bodyBasis(human).multiply(bail.bodyReference);
+      midpoint.copy(human[0]).lerp(human[1],.5);
+      torso.position.copy(bail.hipOffset).applyQuaternion(bodyRotation).add(midpoint);
+      torso.quaternion.copy(bodyRotation).multiply(bail.torsoWorld);
+      head.position.copy(human[4]).sub(torso.position).applyQuaternion(torsoRotation.copy(torso.quaternion).invert());
+      for(let i=0;i<2;i++){
+        const part=limbs[i],start=5+i*4;
+        part.leg.place(human[i],human[start],human[start+1]);
+        part.arm.place(human[i+2],human[start+2],human[start+3]);
+        part.shoe.position.copy(human[start+1]);
+        part.shoe.quaternion.setFromUnitVectors(unit,direction.subVectors(human[start+1],human[start]).normalize());
+        part.glove.position.copy(human[start+3]);
+      }
+    }
+    function pose(p,dt,snap=false){
+      if(snap||p.phase!=='crashed')bail=null;
+      if(p.phase!=='crashed'){ridePose(p);return;}
+      if(!bail){ridePose(p);startBail(p);}
+      poseBail(dt);
+    }
+    return {root,pose,bailFocus:()=>bail?.person.positions[0]??null};
+  }
+  return {create};
+}
+
+
+// A bounded pool shared by the local and crew riders. No meshes are allocated
+// per puff, and the rear wheel only throws dirt while it touches the trail.
+function createBikeDust(world,track){
+  const capacity=120;
+  const positions=new Float32Array(capacity*3);
+  const colors=new Float32Array(capacity*3);
+  const alpha=new Float32Array(capacity);
+  const size=new Float32Array(capacity);
+  const pool=Array.from({length:capacity},()=>({age:1,life:0,vx:0,vy:0,vz:0,opacity:0,radius:0,grit:false}));
+  const remainders=new Float32Array(5);
+  const geometry=new THREE.BufferGeometry();
+  const attributes={position:positions,tint:colors,opacity:alpha,radius:size};
+  for(const [name,data] of Object.entries(attributes)){
+    geometry.setAttribute(name,new THREE.BufferAttribute(data,data===positions||data===colors?3:1).setUsage(THREE.DynamicDrawUsage));
+  }
+  const material=new THREE.ShaderMaterial({
+    transparent:true,depthWrite:false,
+    uniforms:{screenHeight:{value:720}},
+    vertexShader:`
+      attribute vec3 tint;
+      attribute float opacity, radius;
+      uniform float screenHeight;
+      varying vec4 vPuff;
+      void main(){
+        vec4 eye = modelViewMatrix * vec4(position, 1.0);
+        gl_Position = projectionMatrix * eye;
+        gl_PointSize = clamp(radius * screenHeight / max(0.1, -eye.z), 1.0, 58.0);
+        vPuff = vec4(tint, opacity);
+      }`,
+    fragmentShader:`
+      varying vec4 vPuff;
+      void main(){
+        float r = length(gl_PointCoord - 0.5) * 2.0;
+        float edge = 1.0 - smoothstep(0.13, 1.0, r);
+        if (vPuff.a < 0.005 || edge < 0.005) discard;
+        gl_FragColor = vec4(vPuff.rgb, edge * vPuff.a);
+        #include <colorspace_fragment>
+      }`
+  });
+  const points=new THREE.Points(geometry,material);
+  points.frustumCulled=false;
+  points.visible=false;
+  world.add(points);
+  const tints={dirt:new THREE.Color('#d8b07b'),gravel:new THREE.Color('#c0ad92'),stone:new THREE.Color('#a8a49b'),grass:new THREE.Color('#91825b')};
+  const gritTint=new THREE.Color('#735337');
+  let cursor=0;
+  function emit(rider,dt,slot){
+    if(!rider.grounded||rider.phase!=='riding'||rider.speed<3.5)return;
+    const brakeSlide=(rider.rearSkid||0)*.83;
+    const naturalSlide=Math.max(0,(rider.slip||0)-.8)*.15;
+    const skid=track.clamp(brakeSlide+naturalSlide,0,1);
+    if(skid<.055)return;
+    const sin=Math.sin(rider.yaw),cos=Math.cos(rider.yaw);
+    const x=rider.x-sin*.65,y=rider.y-cos*.65;
+    const ground=track.sample(x,y);
+    if(ground.gap)return;
+    const loose=ground.kind==='gravel'?1.3:ground.kind==='stone'?.28:ground.kind==='grass'?.48:1;
+    remainders[slot]+=dt*(18+skid*61)*skid*loose;
+    const count=Math.floor(remainders[slot]);
+    remainders[slot]-=count;
+    for(let n=0;n<count;n++){
+      const i=cursor,j=i*3,puff=pool[i];
+      cursor=(cursor+1)%capacity;
+      puff.grit=i%5===0;
+      const tint=puff.grit?gritTint:(tints[ground.kind]||tints.dirt);
+      const spread=(Math.random()-.5)*.38;
+      positions[j]=x+cos*spread;
+      positions[j+1]=y-sin*spread;
+      positions[j+2]=ground.z+.10;
+      const kick=.65+Math.random()*rider.speed*(puff.grit?.30:.23);
+      const sweep=(Math.random()-.5)*2.2+(rider.slipSide||0)*.27;
+      puff.vx=-sin*kick+cos*sweep;
+      puff.vy=-cos*kick-sin*sweep;
+      puff.vz=(puff.grit?.8:.45)+Math.random()*.76;
+      puff.age=0;
+      puff.life=puff.grit?.24+Math.random()*.22:.46+Math.random()*.48;
+      puff.opacity=Math.min(.86,(.28+skid*.52)*loose);
+      puff.radius=puff.grit?.03+Math.random()*.045:.19+Math.random()*.23;
+      colors[j]=tint.r;colors[j+1]=tint.g;colors[j+2]=tint.b;
+    }
+  }
+  function update(local,others,dt,clear,screenHeight){
+    material.uniforms.screenHeight.value=screenHeight;
+    if(clear){
+      for(const puff of pool)puff.age=puff.life;
+      alpha.fill(0);remainders.fill(0);
+      points.visible=false;
+      return;
+    }
+    emit(local,dt,0);
+    for(const other of others)emit(other,dt,1+other.slot);
+    let visible=false;
+    for(let i=0;i<capacity;i++){
+      const puff=pool[i],j=i*3;
+      if(puff.age>=puff.life){alpha[i]=0;continue;}
+      puff.age+=dt;
+      const t=Math.min(1,puff.age/puff.life);
+      positions[j]+=puff.vx*dt;
+      positions[j+1]+=puff.vy*dt;
+      positions[j+2]+=puff.vz*dt;
+      puff.vz-=dt*(puff.grit?4.4:.55);
+      size[i]=puff.radius*(puff.grit?1:1+t*1.85);
+      alpha[i]=puff.opacity*(1-t)**1.5;
+      visible=true;
+    }
+    points.visible=visible;
+    if(visible)for(const name of Object.keys(attributes))geometry.getAttribute(name).needsUpdate=true;
+  }
+  return {update};
+}
+
+
+/* Lightweight authored scenery. Terrain remains the shared collision surface.
+ * Cliffs/waterfall are beyond the playable boundary; huts are beyond arrival.
+ * Repeated grass uses opaque instancing, not thousands of transparent planes. */
+function createMountainScenery(world,T,random,terrainMaterial){
+  const clock={value:0},meshes=[];
+  const material=color=>new THREE.MeshStandardMaterial({color,roughness:1,flatShading:true});
+  const stone=material('#66717a'),darkStone=material('#465559');
+  const wood=material('#6b4835'),roof=material('#36555b'),wall=material('#b7a382');
+  const lamp=new THREE.MeshBasicMaterial({color:'#ffda87'});
+  function mesh(geometry,mat,x,y,z,sx=1,sy=1,sz=1){
+    const m=new THREE.Mesh(geometry,mat);m.position.set(x,y,z);m.scale.set(sx,sy,sz);world.add(m);return m;
+  }
+  const box=new THREE.BoxGeometry(1,1,1),rock=new THREE.DodecahedronGeometry(1,0);
+  // Continue the valley behind the refuge so arrival never looks like the
+  // square edge of a floating heightfield. The run ends before this backdrop.
+  const apron=new THREE.BufferGeometry(),ap=[],ac=[],aw=[],ai=[],columns=42,rows=24;
+  const meadow=new THREE.Color('#678051');
+  for(let j=0;j<=rows;j++)for(let i=0;i<=columns;i++){
+    const x=T.landscape?-1500+3000*i/columns:T.bounds.left-80+(T.bounds.right-T.bounds.left+160)*i/columns;
+    const d=j/rows,y=T.bounds.bottom+d*(T.landscape?1600:260);
+    const edge=T.landscape?Math.max(0,Math.abs(x)-1150)/450:Math.max(0,Math.abs(x)-140)/70;
+    const z=T.sample(x,T.bounds.bottom).z+Math.sin(Math.PI*d)*(13+11*Math.sin(x*.027))
+      -Math.pow(d,4)*145-Math.pow(edge,3)*100*d;
+    ap.push(x,y,z);ac.push(meadow.r,meadow.g,meadow.b);aw.push(1,0,0);
+    if(i<columns&&j<rows){const a=j*(columns+1)+i,b=a+columns+1;ai.push(a,a+1,b,b,a+1,b+1);}
+  }
+  apron.setAttribute('position',new THREE.Float32BufferAttribute(ap,3));
+  apron.setAttribute('color',new THREE.Float32BufferAttribute(ac,3));
+  apron.setAttribute('surfaceMix',new THREE.Float32BufferAttribute(aw,3));
+  apron.setIndex(ai);apron.computeVertexNormals();mesh(apron,terrainMaterial,0,0,0);
+  // Continue the sheer outer faces below the playable edge. These steep
+  // background flanks give the long mountain volume instead of a floating
+  // ribbon silhouette; all navigable terrain remains inside the shared bounds.
+  if(T.expedition)for(const side of [-1,1]){
+    const vertices=[],colors=[],weights=[],faces=[],distances=[0,7,20,50,100,180,300,460,650];
+    const drops=[0,16,31,53,93,150,225,310,390],rows=Math.ceil((T.bounds.bottom-T.bounds.top)/18);
+    const tint=new THREE.Color('#72756a'),stride=distances.length;
+    for(let row=0;row<=rows;row++)for(let col=0;col<stride;col++){
+      const y=T.bounds.top+(T.bounds.bottom-T.bounds.top)*row/rows;
+      const edge=T.landscape?T.spine(y)+(side<0?-1060:1060):side<0?T.bounds.left:T.bounds.right;
+      const x=edge+side*distances[col],z=T.sample(edge,y).z-drops[col]+
+        Math.sin(y*.024+col*.7)*Math.min(18,distances[col]*.08);
+      vertices.push(x,y,z);colors.push(tint.r,tint.g,tint.b);weights.push(.12,0,.88);
+      if(row<rows&&col<stride-1){const a=row*stride+col,b=a+stride;
+        if(side>0)faces.push(a,a+1,b,b,a+1,b+1);else faces.push(a,b,a+1,b,b+1,a+1);}
+    }
+    const skirt=new THREE.BufferGeometry();skirt.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
+    skirt.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));skirt.setAttribute('surfaceMix',new THREE.Float32BufferAttribute(weights,3));
+    skirt.setIndex(faces);skirt.computeVertexNormals();mesh(skirt,terrainMaterial,0,0,0);
+  }
+  // Several rows of real slopes form the distant range. The old two flat
+  // skyline curtains made the mountain look like a narrow lane in a box.
+  if(T.landscape)for(let ring=0;ring<2;ring++){
+    const vertices=[],colors=[],faces=[],segments=144,bands=[.72,.82,.90,.96,1,1.04,1.12,1.25,1.42];
+    const radiusX=1800+ring*800,radiusY=2600+ring*650;
+    const baseTint=new THREE.Color(ring?'#a6b3c1':'#7d8e9f'),peakTint=new THREE.Color(ring?'#d2d6dd':'#c3c6c5');
+    for(let band=0;band<bands.length;band++)for(let i=0;i<=segments;i++){
+      const a=i/segments*Math.PI*2;
+      const ridge=1+.065*Math.sin(a*7+ring)+.035*Math.sin(a*13);
+      const x=Math.sin(a)*radiusX*bands[band]*ridge,y=T.finish*.50+Math.cos(a)*radiusY*bands[band]*ridge;
+      const height=(480+ring*180)*(1+.34*Math.sin(a*5+ring)+.22*Math.cos(a*11)+.14*Math.sin(a*19+.7))*
+        [0,.24,.55,.78,1,.72,.42,.16,0][band];
+      const ground=T.sample(0,T.clamp(y,0,T.finish)).z-160;
+      vertices.push(x,y,ground+height);
+      const tint=baseTint.clone().lerp(peakTint,T.clamp((height-280)/450,0,.72));
+      colors.push(tint.r,tint.g,tint.b);
+      if(band<bands.length-1&&i<segments){const k=band*(segments+1)+i,n=k+segments+1;faces.push(k,n,k+1,n,n+1,k+1);}
+    }
+    const range=new THREE.BufferGeometry();range.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
+    range.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));range.setIndex(faces);
+    const facets=range.toNonIndexed();range.dispose();facets.computeVertexNormals();
+    const normals=facets.getAttribute('normal'),tones=facets.getAttribute('color');
+    for(let i=0;i<normals.count;i++){
+      const light=Math.abs(normals.getX(i)*-.52+normals.getY(i)*.73+normals.getZ(i)*.46);
+      const shade=light>.65?1:light>.3?.92:.84;
+      tones.setXYZ(i,tones.getX(i)*shade,tones.getY(i)*shade,tones.getZ(i)*shade);
+    }
+    mesh(facets,new THREE.MeshBasicMaterial({vertexColors:true,fog:false,side:THREE.DoubleSide}),0,0,0);
+  }
+  // Large, recognisable silhouettes framing the gorge rather than tiny props.
+  for(const side of [-1,1])for(let i=0;i<(T.expedition?16:8);i++){
+    const y=T.expedition?1390+i*47:195+i*40,x=side<0?T.bounds.left-18-i%2*11:T.bounds.right+19+i%2*12;
+    const z=T.sample(side<0?T.bounds.left+2:T.bounds.right-2,y).z;
+    const m=mesh(rock,i%2?stone:darkStone,x,y,z+9,17+random()*9,22+random()*12,29+random()*23);
+    m.rotation.z=random()*.8;
+  }
+  // Water spills outside the traversable mountainside, with an opaque face
+  // and a cheap moving band pattern. It introduces no false rideable surface.
+  const fallX=T.bounds.left-7,fallY=T.waterfallY??324,fallTop=T.sample(T.bounds.left+2,fallY).z+48,fallHeight=65;
+  const fallMaterial=new THREE.MeshBasicMaterial({color:'#9acacb',side:THREE.DoubleSide});
+  fallMaterial.onBeforeCompile=shader=>{
+    shader.uniforms.fallTime=clock;
+    shader.vertexShader='varying vec2 vFall;\n'+shader.vertexShader.replace('#include <begin_vertex>',
+      '#include <begin_vertex>\nvFall=uv;');
+    shader.fragmentShader='uniform float fallTime; varying vec2 vFall;\n'+shader.fragmentShader.replace('#include <color_fragment>',
+      '#include <color_fragment>\nfloat ribbon=sin(vFall.x*47.0+sin(vFall.y*9.0+fallTime*3.0));\n'+
+      'float streak=sin(vFall.y*94.0+fallTime*10.0+vFall.x*12.0);\n'+
+      'diffuseColor.rgb*=0.82+0.12*ribbon+0.10*step(0.7,streak);');
+  };
+  mesh(rock,darkStone,fallX-9,fallY,fallTop-fallHeight*.5,12,21,fallHeight*.68);
+  const fallGeometry=new THREE.PlaneGeometry(8,fallHeight);
+  fallGeometry.rotateX(Math.PI/2);fallGeometry.rotateZ(Math.PI/2-.22);
+  mesh(fallGeometry,fallMaterial,fallX+3,fallY-8,fallTop-fallHeight*.5);
+  // A roof is visible before arrival. All flanks share the same valley refuge.
+  const refugeY=T.finish+21;
+  for(const x of (T.landscape?[-350,5,350]:[-72,5,83])){
+    const z=T.sample(x,refugeY).z;
+    mesh(box,wall,x,refugeY,z+1.7,7,5,3.4);
+    for(const side of [-1,1]){
+      const r=mesh(box,roof,x+side*2,refugeY,z+4.1,4.6,6.6,.22);r.rotation.y=side*.40;
+    }
+    mesh(box,wood,x,refugeY-2.54,z+1.1,1.5,.12,2.2);
+    for(const side of [-1,1])mesh(box,lamp,x+side*2.3,refugeY-2.57,z+1.9,1.1,.09,.9);
+    mesh(box,stone,x+2.5,refugeY+1.1,z+4.3,.7,.8,2.7);
+    mesh(box,wood,x,refugeY-4.3,z+.35,5,.6,.24);
+  }
+  // Root ribbons follow the same raised tire surface; dark flanks make their
+  // small height readable without adding separate, mismatched collision boxes.
+  const rootVertices=[];
+  for(const r of T.roots||[]){
+    for(let x=r.x-r.span;x<r.x+r.span;x+=.45){
+      const corners=[];
+      for(const [a,b] of [[x,-.20],[Math.min(x+.45,r.x+r.span),-.20],[x,.20],[Math.min(x+.45,r.x+r.span),.20]]){
+        const y=r.y+r.skew*(a-r.x)+b,p=T.sample(a,y);
+        corners.push([a,y,p.z+.018]);
+      }
+      const p=T.sample(x,r.y+r.skew*(x-r.x));
+      if(p.root<.08||p.jump||p.shelf>.25)continue;
+      for(const i of [0,1,2,2,1,3])rootVertices.push(...corners[i]);
+    }
+  }
+  if(rootVertices.length){
+    const rootGeometry=new THREE.BufferGeometry();
+    rootGeometry.setAttribute('position',new THREE.Float32BufferAttribute(rootVertices,3));rootGeometry.computeVertexNormals();
+    mesh(rootGeometry,wood,0,0,0);
+  }
+  const grassMat=material('#6c8550');grassMat.side=THREE.DoubleSide;
+  grassMat.onBeforeCompile=shader=>{
+    shader.uniforms.grassTime=clock;
+    shader.vertexShader='uniform float grassTime;\n'+shader.vertexShader.replace('#include <begin_vertex>',
+      '#include <begin_vertex>\ntransformed.x+=sin(grassTime*1.8+instanceMatrix[3].x*.37+instanceMatrix[3].y*.19)*position.z*.14;');
+  };
+  const tuft=new THREE.BufferGeometry();
+  tuft.setAttribute('position',new THREE.Float32BufferAttribute([
+    -.19,0,0,.13,0,0,-.06,.02,.52, 0,-.14,0,0,.18,0,.04,.02,.39,
+    -.12,-.09,0,.17,.09,0,.12,.06,.32],3));
+  tuft.computeVertexNormals();
+  const transform=new THREE.Object3D();
+  for(let band=0;band<Math.ceil((T.finish+8)/100);band++){
+    const spots=[];
+    for(let i=0;i<(T.expedition?850:1500);i++){
+      const x=T.bounds.left+9+random()*(T.bounds.right-T.bounds.left-18),y=band*100+random()*100;
+      const g=T.sample(x,y),region=T.region(y);
+      if(y>T.finish+8||g.kind!=='grass'||g.gap||g.ledge>.32||g.jumpOffset<1||random()> .30+.65*region.valley+.3*region.forest)continue;
+      const slope=Math.abs(T.sample(x+.4,y).z-g.z)+Math.abs(T.sample(x,y+.4).z-g.z);
+      if(slope>.5)continue;
+      // Small islands of grass leave soil visible between clusters.
+      for(let blade=0;blade<5;blade++){
+        const bx=x+(random()-.5)*1.4,by=y+(random()-.5)*1.4;
+        spots.push({x:bx,y:by,z:T.sample(bx,by).z,size:.65+random()*.8});
+      }
+    }
+    const batch=new THREE.InstancedMesh(tuft,grassMat,spots.length);
+    spots.forEach((p,i)=>{
+      transform.position.set(p.x,p.y,p.z-.025);transform.rotation.z=random()*Math.PI;
+      transform.scale.setScalar(p.size);transform.updateMatrix();batch.setMatrixAt(i,transform.matrix);
+      batch.setColorAt(i,new THREE.Color().setHSL(.20+random()*.06,.24+random()*.18,.52+random()*.12));
+    });
+    batch.computeBoundingSphere();world.add(batch);meshes.push(batch);
+  }
+  return {clock,update(time){clock.value=time;}};
+}
+
+
+/* Original low-poly assets, generated in GDevelop's existing Three scene. */
+function createBikeView(scene,T=BikeTrack){
+  const layer=scene.getLayer('');
+  const renderer=layer.getRenderer();
+  const camera=renderer.getThreeCamera();
+  const world=new THREE.Group();
+  const unit=scene.getRenderer3DWorldScale();
+  world.scale.set(unit,-unit,unit); // Cancel the scene Y reflection for this metre-based view.
+  renderer.getThreeGroup().add(world);
+  const scene3D=renderer.getThreeScene();
+  scene3D.background=new THREE.Color('#9bbfcf');
+  scene3D.fog=new THREE.FogExp2('#b6bfc5',.00165);
+  world.add(new THREE.HemisphereLight('#dce6ef','#625c54',1.55));
+  const sun=new THREE.DirectionalLight('#ffe0b7',2.8);
+  sun.position.set(-32,45,28);
+  world.add(sun);
+  let randomState=(40785^T.seed^Math.imul(T.stage-1,2246822519))>>>0;
+  function random(){
+    randomState=(Math.imul(1664525,randomState)+1013904223)>>>0;
+    return randomState/4294967296;
+  }
+  const mat=(color)=>new THREE.MeshStandardMaterial({color,roughness:.88,flatShading:true});
+  const grass=new THREE.Color('#65824d'), dirt=new THREE.Color('#aa8460'), gravel=new THREE.Color('#92908a');
+  const alpine=new THREE.Color('#929b98'),forestFloor=new THREE.Color('#586547'),wetGreen=new THREE.Color('#547c59');
+  const rock=new THREE.Color('#65635e'), shoulder=new THREE.Color('#847454'), color=new THREE.Color();
+  const exposedRock=new THREE.Color('#716a5d');
+  const valleyGrass=new THREE.Color('#748257'),pit=new THREE.Color('#4d4744');
+  const positions=[],colors=[],weights=[],indices=[];
+  const {left,right,top,bottom}=T.bounds;
+  const xs=[];
+  if(T.landscape){
+    for(let x=-1060;x< -460;x+=18)xs.push(x);
+    for(let x=-460;x< -160;x+=6)xs.push(x);
+    for(let i=0;i<=200;i++)xs.push(-160+i*1.6);
+    for(let x=166;x<=460;x+=6)xs.push(x);
+    for(let x=478;x<1060;x+=18)xs.push(x);
+    xs.push(1060);
+    for(const j of T.flankJumps||[])for(let dx=-10;dx<=10;dx+=1.25)xs.push(j.flank*T.mirrored+dx);
+    xs.sort((a,b)=>a-b);
+    for(let i=xs.length-1;i>0;i--)if(xs[i]-xs[i-1]<.02)xs.splice(i,1);
+  }else{const count=Math.ceil((right-left)/(T.expedition?1.6:1.36));for(let i=0;i<=count;i++)xs.push(left+(right-left)*i/count);}
+  const cols=xs.length-1,gridRows=Math.ceil((bottom-top)*(T.expedition?.65:.90));
+  const ys=Array.from({length:gridRows+1},(_,i)=>top+(bottom-top)*i/gridRows);
+  for(const {lip,land} of T.jumps)ys.push(lip-.025,lip+.025,land-.025,land+.025);
+  ys.sort((a,b)=>a-b);
+  const rows=ys.length-1;
+  for(let j=0;j<=rows;j++){
+    const y=ys[j];
+    const region=T.region(y);
+    for(let i=0;i<=cols;i++){
+      const x=xs[i]+(T.spine?T.spine(y):0);
+      const p=T.sample(x,y);
+      positions.push(x,y,p.z);
+      const q=Math.abs(p.cutOffset)-T.chuteHalf;
+      color.copy(grass).lerp(rock,T.expedition&&y>620?0:T.clamp((Math.abs(x)-40)/32,0,1));
+      color.lerp(shoulder,p.exposure*.50);
+      const jumpMix=T.clamp((.38-p.jumpOffset)/1.05,0,1);
+      const gravelMix=T.expedition&&y>620?(p.kind==='gravel'?.86:p.kind==='stone'?.92:0):Math.max(p.ledge*.72,T.clamp((.7-q)/1.2,0,1));
+      const dirtMix=p.gap?0:T.expedition&&y>620?(p.kind==='dirt'||p.kind==='roots'?.86:0):T.clamp((p.exposure-.28)*1.24,0,.89)*(1-p.valley*.88);
+      const cutBank=T.clamp(1-Math.abs(Math.abs(p.cutOffset)-3.55)/1.45,0,1)
+        *T.clamp((y-T.chuteStart-15)/21,0,1);
+      const loose=Math.max(gravelMix,cutBank*.68);
+      color.lerp(exposedRock,cutBank*.68).lerp(gravel,gravelMix).lerp(dirt,dirtMix);
+      if(p.kind==='stone')color.lerp(exposedRock,.46).lerp(rock,(p.slab||0)*.22);
+      if(p.ridge>.12){
+        color.lerp(rock,.18+.24*p.ridge);
+        // Restrained strata follow height, not a separate painted backdrop.
+        color.multiplyScalar(Math.sin(p.z*.34+x*.012+y*.018)>.45?.94:1);
+      }
+      color.lerp(rock,p.ledge*.72);
+      color.lerp(valleyGrass,p.valley*.76);
+      color.lerp(valleyGrass,p.shelf*.18);
+      color.lerp(alpine,region.alpine*.25*(1-dirtMix));
+      color.lerp(forestFloor,region.forest*(p.kind==='stone'?.08:.36)).lerp(wetGreen,region.valley*(p.kind==='stone'?.05:.38));
+      if(p.gap)color.lerp(pit,jumpMix);
+      weights.push((1-loose)*(1-dirtMix),dirtMix,loose*(1-dirtMix));
+      const wear=.064*Math.sin(x*.29+y*.61)+.045*Math.sin(x*.48-y*.37);
+      color.multiplyScalar(.92+.14*random()+wear);
+      colors.push(color.r,color.g,color.b);
+      if(j<rows&&i<cols){
+        const a=j*(cols+1)+i,b=a+cols+1;
+        indices.push(a,a+1,b,b,a+1,b+1);
+      }
+    }
+  }
+  const terrain=new THREE.BufferGeometry();
+  terrain.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+  terrain.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+  terrain.setAttribute('surfaceMix',new THREE.Float32BufferAttribute(weights,3));
+  terrain.setIndex(indices);
+  terrain.computeVertexNormals();
+  const terrainMaterial=new THREE.MeshStandardMaterial({vertexColors:true,roughness:1});
+  const images=scene.getGame().getImageManager();
+  let sky=null;
+  if(T.landscape){
+    const panorama=images.getThreeTexture('mountain-sky').clone();
+    panorama.colorSpace=THREE.SRGBColorSpace;panorama.flipY=false;panorama.needsUpdate=true;
+    const globe=new THREE.SphereGeometry(4500,64,32);globe.rotateX(Math.PI/2);
+    // GDevelop uploads ImageBitmaps with top-left image orientation; WebGL
+    // ignores texture.flipY for them. Orient the panorama through UVs instead.
+    const skyUV=globe.getAttribute('uv');for(let i=0;i<skyUV.count;i++)skyUV.setY(i,1-skyUV.getY(i));
+    sky=new THREE.Mesh(globe,new THREE.MeshBasicMaterial({map:panorama,side:THREE.BackSide,depthWrite:false,fog:false}));
+    sky.rotation.z=1.7;sky.renderOrder=-1000;sky.frustumCulled=false;world.add(sky);
+  }
+  const maps=['forest_floor','park_dirt','gravel_floor_04'].map(name=>{
+    const texture=images.getThreeTexture(name).clone();
+    texture.colorSpace=THREE.NoColorSpace;
+    texture.wrapS=texture.wrapT=THREE.RepeatWrapping;
+    texture.generateMipmaps=true;
+    texture.minFilter=THREE.LinearMipmapLinearFilter;
+    texture.anisotropy=4;
+    texture.needsUpdate=true;
+    return texture;
+  });
+  terrainMaterial.onBeforeCompile=shader=>{
+    shader.uniforms.forestDetail={value:maps[0]};
+    shader.uniforms.dirtDetail={value:maps[1]};
+    shader.uniforms.gravelDetail={value:maps[2]};
+    const varyings='varying vec3 vSurfaceMix, vGround, vGroundNormal;\n';
+    shader.vertexShader='attribute vec3 surfaceMix; '+varyings+
+      shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
+        vSurfaceMix=surfaceMix; vGround=position; vGroundNormal=normal;
+      `);
+    shader.fragmentShader='uniform sampler2D forestDetail,dirtDetail,gravelDetail; '+varyings+
+      shader.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
+        vec3 faceNormal=abs(normalize(vGroundNormal));
+        float cliff=1.0-smoothstep(0.32,0.62,faceNormal.z);
+        vec2 faceUV=faceNormal.x>faceNormal.y?vGround.yz:vGround.xz;
+        vec3 materials=mix(vSurfaceMix,vec3(0.0,0.0,1.0),cliff);
+        vec2 gravelUV=mix(vGround.xy,faceUV,cliff);
+        float groundPattern=texture2D(forestDetail,vGround.xy/2.1).r*materials.x
+          +texture2D(dirtDetail,vGround.xy/3.0).r*materials.y
+          +texture2D(gravelDetail,gravelUV/2.5).r*materials.z;
+        float scuff=0.035*sin(vGround.y*3.7+sin(vGround.x*1.8))
+          +0.053*sin(vGround.y*0.51-vGround.x*0.29);
+        float strata=0.91+0.09*sin(vGround.z*1.37+0.36*sin(faceUV.x*0.51));
+        diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.17,0.155,0.134)*strata,cliff*0.84);
+        diffuseColor.rgb *= 1.0 + (groundPattern - 0.5)*1.42 + scuff;
+      `);
+  };
+
+  function add(geo,material,x,y,z,parent=world){
+    const mesh=new THREE.Mesh(geo,material);
+    mesh.position.set(x,y,z);
+    parent.add(mesh);
+    return mesh;
+  }
+  const trunkMat=mat('#594839'), pineMat=mat('#597359');
+  // Layered, uneven boughs give pines a broken silhouette instead of a solid
+  // triangular canopy. Geometry is shared across every tree instance.
+  const crownVertices=[],crownColors=[];
+  for(let tier=0;tier<4;tier++){
+    const z=-.82+tier*.43,radius=1-tier*.21;
+    for(let branch=0;branch<9;branch++){
+      const a=branch/9*Math.PI*2+tier*.47,b=(branch+1)/9*Math.PI*2+tier*.47;
+      const ra=radius*(.85+.15*Math.sin(branch*7.3+tier)),rb=radius*(.85+.15*Math.sin((branch+1)*7.3+tier));
+      crownVertices.push(Math.cos(a)*ra,Math.sin(a)*ra,z-.09*(branch%2),
+        Math.cos(b)*rb,Math.sin(b)*rb,z-.09*((branch+1)%2),.07*Math.sin(tier),0,z+.78);
+      const tone=.76+tier*.055+(branch%3)*.08;
+      for(let vertex=0;vertex<3;vertex++)crownColors.push(tone,tone,tone);
+    }
+  }
+  const treeShape=new THREE.BufferGeometry();
+  treeShape.setAttribute('position',new THREE.Float32BufferAttribute(crownVertices,3));
+  treeShape.setAttribute('color',new THREE.Float32BufferAttribute(crownColors,3));treeShape.computeVertexNormals();
+  pineMat.vertexColors=true;pineMat.side=THREE.DoubleSide;
+  const trunkShape=new THREE.CylinderGeometry(.15,.22,1,5);
+  trunkShape.rotateX(Math.PI/2);
+  const trees=[];
+  for(let i=0;i<3300&&trees.length<420;i++){
+    const x=left+12+random()*(right-left-24),y=8+random()*(T.expedition?602:T.finish+5),p=T.sample(x,y);
+    const region=T.region(y);
+    if(y>T.finish-24||p.ledge>.50||p.shelf>.25||region.alpine>.5&&random()<.82||p.kind!=='grass'||p.jumpOffset<2||
+      Math.abs(p.safeOffset)<2.8||Math.abs(p.cutOffset)<3.7||Math.abs(x)<10&&y<45)continue;
+    trees.push({x,y,z:p.z,h:3+random()*4.3+region.forest*3.5,w:.65+random()*.54});
+  }
+  if(T.trees)trees.push(...T.trees);
+  const needles=new THREE.InstancedMesh(treeShape,pineMat,trees.length*2);
+  const trunks=new THREE.InstancedMesh(trunkShape,trunkMat,trees.length);
+  const transform=new THREE.Object3D();
+  trees.forEach((tree,i)=>{
+    const {x,y,z,h,w}=tree;
+    transform.position.set(x,y,z+h*.31);
+    transform.scale.set(w,w,h*.64);transform.updateMatrix();
+    trunks.setMatrixAt(i,transform.matrix);
+    tree.trunkMatrix=transform.matrix.clone();
+    transform.position.z=z+h*.57;transform.scale.set(w*h*.28,w*h*.28,h*.34);transform.updateMatrix();
+    needles.setMatrixAt(i*2,transform.matrix);
+    tree.crownMatrix=transform.matrix.clone();
+    transform.position.z=z+h*.82;transform.scale.multiplyScalar(.74);transform.updateMatrix();
+    needles.setMatrixAt(i*2+1,transform.matrix);
+    tree.tipMatrix=transform.matrix.clone();
+    const tone=new THREE.Color().setHSL(.28+random()*.03,.20+random()*.13,.58+random()*.13);
+    needles.setColorAt(i*2,tone);
+    needles.setColorAt(i*2+1,tone.clone().multiplyScalar(1.18));
+  });
+  world.add(trunks,needles);
+  needles.computeBoundingSphere();trunks.computeBoundingSphere();
+
+  // Bake broad tree shade into the terrain vertices once. The trail stays in
+  // one mesh and needs no shadow-map pass or transparent shadow decals.
+  const groundColors=terrain.getAttribute('color');
+  const groundPositions=terrain.getAttribute('position');
+  function columnNear(x){let lo=0,hi=cols;while(lo<hi){const mid=(lo+hi)>>1;if(xs[mid]<x)lo=mid+1;else hi=mid;}return lo;}
+  function rowNear(y){
+    let lo=0,hi=rows;
+    while(lo<hi){const mid=(lo+hi)>>1;if(ys[mid]<y)lo=mid+1;else hi=mid;}
+    return lo;
+  }
+  for(const tree of trees){
+    const cx=tree.x+tree.h*.35, cy=tree.y-tree.h*.48;
+    const rx=tree.h*.74, ry=tree.h*.41;
+    const y0=Math.max(0,rowNear(cy-ry)-1),y1=rowNear(cy+ry);
+    for(let j=y0;j<=y1;j++){
+      const offset=T.spine?T.spine(ys[j]):0;
+      const x0=Math.max(0,columnNear(cx-rx-offset)-1),x1=columnNear(cx+rx-offset);
+      for(let i=x0;i<=x1;i++){
+        const d=((groundPositions.getX(j*(cols+1)+i)-cx)/rx)**2+((ys[j]-cy)/ry)**2;
+        if(d>=1)continue;
+        const index=j*(cols+1)+i;
+        const shade=1-(1-d)*.42;
+        groundColors.setXYZ(index,groundColors.getX(index)*shade,
+          groundColors.getY(index)*shade,groundColors.getZ(index)*shade);
+      }
+    }
+  }
+  // Preserve the shared normals along tile edges, then let the camera cull
+  // the mountain behind and beside the rider instead of drawing it every frame.
+  const groundTiles=[];
+  for(let j0=0;j0<rows;j0+=38)for(let i0=0;i0<cols;i0+=44){
+    const w=Math.min(44,cols-i0),h=Math.min(38,rows-j0),stride=w+1;
+    const tile=new THREE.BufferGeometry(),cells=[];
+    for(const name of ['position','normal','color','surfaceMix']){
+      const src=terrain.getAttribute(name).array,dst=new Float32Array(stride*(h+1)*3);
+      for(let j=0;j<=h;j++){
+        const start=((j0+j)*(cols+1)+i0)*3;
+        dst.set(src.subarray(start,start+stride*3),j*stride*3);
+      }
+      tile.setAttribute(name,new THREE.BufferAttribute(dst,3));
+    }
+    for(let j=0;j<h;j++)for(let i=0;i<w;i++){
+      const a=j*stride+i,b=a+stride;
+      cells.push(a,a+1,b,b,a+1,b+1);
+    }
+    tile.setIndex(cells);
+    tile.computeBoundingSphere();
+    const groundTile=new THREE.Mesh(tile,terrainMaterial);world.add(groundTile);groundTiles.push(groundTile);
+  }
+  terrain.dispose();
+
+  const rockPositions=[],rockUV=[];
+  for(const f of BikeSolids.faces)for(let i=1;i<f.ids.length-1;i++)for(const index of [f.ids[0],f.ids[i],f.ids[i+1]]){
+    const v=BikeSolids.vertices[index];rockPositions.push(...v);rockUV.push(v[0]*.5+.5,v[2]*.5+.5);
+  }
+  const boulder=new THREE.BufferGeometry(),stone=mat('#8d8172');
+  boulder.setAttribute('position',new THREE.Float32BufferAttribute(rockPositions,3));
+  boulder.setAttribute('uv',new THREE.Float32BufferAttribute(rockUV,2));boulder.computeVertexNormals();
+  stone.map=maps[2];
+  const stones=BikeSolids.get(T).rocks;
+  const boulders=new THREE.InstancedMesh(boulder,stone,stones.length);
+  stones.forEach(({x,y,z,r,yaw},i)=>{
+    transform.position.set(x,y,z);
+    transform.scale.set(r,r*.86,r*.73);transform.rotation.set(.2,.28,yaw);transform.updateMatrix();
+    boulders.setMatrixAt(i,transform.matrix);
+  });
+  boulders.computeBoundingSphere();world.add(boulders);
+  // Continuous distant ridges hide the horizon below the play space.
+  function skyline(radius,ground,height,tint){
+    const vertices=[],faces=[],segments=46;
+    for(let i=0;i<segments;i++){
+      const a=i/segments*Math.PI*2;
+      const hill=(.38+.38*Math.sin(a*5+radius)+random()*.28)*height;
+      const range=radius+Math.cos(a*4)*29;
+      const x=Math.sin(a)*range,y=T.finish*.50+Math.cos(a)*range;
+      const elevation=T.expedition?T.sample(0,T.clamp(y,0,T.finish)).z+ground:ground;
+      vertices.push(x,y,T.valleyZ-600,x,y,elevation+hill);
+      const k=i*2,next=(i+1)%segments*2;
+      faces.push(k,k+1,next,k+1,next+1,next);
+    }
+    const mesh=new THREE.BufferGeometry();
+    mesh.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));mesh.setIndex(faces);
+    add(mesh,new THREE.MeshBasicMaterial({color:tint,side:THREE.DoubleSide,fog:false}),0,0,0);
+  }
+  if(!T.landscape){
+    skyline(Math.max(620,T.finish*.65+400),50,260,'#91a5ad');
+    skyline(Math.max(440,T.finish*.55+300),15,180,'#7f969a');
+  }
+  const scenery=createMountainScenery(world,T,random,terrainMaterial);
+  pineMat.onBeforeCompile=shader=>{
+    shader.uniforms.pineTime=scenery.clock;
+    shader.vertexShader='uniform float pineTime; varying vec3 vTreeView;\n'+shader.vertexShader.replace('#include <begin_vertex>',
+      '#include <begin_vertex>\ntransformed.x+=sin(pineTime*1.2+instanceMatrix[3].x*.13+instanceMatrix[3].y*.09)*max(0.0,position.z)*0.025;\n'+
+      'vTreeView=(modelViewMatrix*instanceMatrix*vec4(transformed,1.0)).xyz;');
+    shader.fragmentShader='varying vec3 vTreeView;\n'+shader.fragmentShader.replace('#include <clipping_planes_fragment>',
+      '#include <clipping_planes_fragment>\nif(length(vTreeView)<2.7)discard;');
+  };
+  function paintTile(width,height,draw){
+    const canvas=document.createElement('canvas');
+    canvas.width=width;canvas.height=height;
+    draw(canvas.getContext('2d'));
+    const texture=new THREE.CanvasTexture(canvas);
+    texture.colorSpace=THREE.SRGBColorSpace;
+    texture.magFilter=THREE.NearestFilter;
+    texture.anisotropy=4;
+    return texture;
+  }
+  const riders=createRiderFactory(world,paintTile),models=new Map();
+  const dust=createBikeDust(world,T);
+  function modelFor(slot){
+    let model=models.get(slot);
+    if(!model){model=riders.create(slot,T);model.root.visible=false;models.set(slot,model);}
+    return model;
+  }
+  let local=modelFor(0);
+  function setLocalSlot(slot){local.root.visible=false;local=modelFor(slot);}
+  const shadow=add(new THREE.CircleGeometry(1,22),new THREE.MeshBasicMaterial({
+    color:'#2d382b',transparent:true,opacity:.24,depthWrite:false,side:THREE.DoubleSide
+  }),0,0,0);
+  shadow.scale.set(.60,1.29,1);
+
+  const eye=new THREE.Vector3(),look=new THREE.Vector3();
+  const desiredEye=new THREE.Vector3(),desiredLook=new THREE.Vector3();
+  const forward=new THREE.Vector3(),move=new THREE.Vector3();
+  const shadowUp=new THREE.Vector3(0,0,1),shadowNormal=new THREE.Vector3();
+  const hiddenTree=new THREE.Matrix4().makeScale(0,0,0);
+  function clearFoliage(p){
+    // Remove whole decorative trees crossing the camera-to-rider sightline.
+    // This also works in the wide scout view, without transparent overdraw.
+    const dx=p.x-eye.x,dy=p.y-eye.y,dz=p.z+.8-eye.z,length=dx*dx+dy*dy+dz*dz;
+    let changed=false;
+    for(let i=0;i<trees.length;i++){
+      const tree=trees[i],tx=tree.x-eye.x,ty=tree.y-eye.y,tz=tree.z+tree.h*.55-eye.z;
+      const t=T.clamp((tx*dx+ty*dy+tz*dz)/Math.max(length,.01),0,1);
+      const radius=tree.h*.40;
+      const hidden=t<.96&&(tx-dx*t)**2+(ty-dy*t)**2+(tz-dz*t)**2<radius*radius;
+      if(hidden===Boolean(tree.hidden))continue;
+      tree.hidden=hidden;changed=true;
+      trunks.setMatrixAt(i,hidden?hiddenTree:tree.trunkMatrix);
+      needles.setMatrixAt(i*2,hidden?hiddenTree:tree.crownMatrix);
+      needles.setMatrixAt(i*2+1,hidden?hiddenTree:tree.tipMatrix);
+    }
+    if(changed){trunks.instanceMatrix.needsUpdate=true;needles.instanceMatrix.needsUpdate=true;}
+  }
+  function clearBank(cameraEye,p,floor){
+    // A bank can cross the sightline even when both ends are above ground.
+    // Keep the lower chase view outside it without changing the rider path.
+    const anchorZ=Math.max(p.z,floor)+1.1;
+    for(let i=2;i<=9;i++){
+      const t=i/9;
+      const ground=BikeSolids.sample(T,p.x+(cameraEye.x-p.x)*t,p.y+(cameraEye.y-p.y)*t).z;
+      const height=ground+(i===9?.85:.30);
+      cameraEye.z=Math.max(cameraEye.z,anchorZ+(height-anchorZ)/t);
+    }
+  }
+  let scout=0,lookYaw=0,lookPitch=0,actionBank=0,airLift=0,landingDip=0,cameraFov=58;
+  function render(p,dt,snap,inspectionAngle=null,survey=false,mouseLook={yaw:0,pitch:0}){
+    // Fog is effectively opaque here; avoid drawing the entire far mountain
+    // just because the sky needs a long camera far plane.
+    for(const tile of groundTiles){const b=tile.geometry.boundingSphere;tile.visible=Math.hypot(b.center.x-p.x,b.center.y-p.y)<950+b.radius;}
+    const blend=snap?1:1-Math.exp(-7*dt);
+    lookYaw+=(mouseLook.yaw-lookYaw)*blend;lookPitch+=(mouseLook.pitch-lookPitch)*blend;
+    scenery.update(p.time||0);
+    local.root.visible=true;
+    if(inspectionAngle===null)local.pose({...p,lookYaw},dt,snap);
+    else{
+      const dx=Math.sin(p.yaw)*.64,dy=Math.cos(p.yaw)*.64;
+      const front=T.sample(p.x+dx,p.y+dy).z,rear=T.sample(p.x-dx,p.y-dy).z;
+      local.pose({...p,z:(front+rear)/2+.355,pitch:Math.atan2(front-rear,1.28)},dt,snap);
+    }
+    const bail=local.bailFocus();
+    if(bail)p={...p,x:bail.x,y:bail.y,z:bail.z,vx:0,vy:0};
+    const support=BikeSolids.sample(T,p.x,p.y,p.z),floor=support.z;
+    shadow.position.set(p.x,p.y,floor+.075);
+    const slopeX=T.sample(p.x+.5,p.y).z-T.sample(p.x-.5,p.y).z;
+    const slopeY=T.sample(p.x,p.y+.5).z-T.sample(p.x,p.y-.5).z;
+    if(support.solid)shadowNormal.fromArray(support.normal);
+    else shadowNormal.set(-slopeX,-slopeY,1).normalize();
+    shadow.quaternion.setFromUnitVectors(shadowUp,shadowNormal);
+    shadow.rotateZ(-p.yaw);
+    const height=p.z-floor;
+    shadow.material.opacity=.25*T.clamp(1-height*.26,0,1);
+
+    forward.set(Math.sin(p.yaw),Math.cos(p.yaw),0);
+    move.set(p.vx,p.vy,0);
+    if(move.lengthSq()>2)forward.lerp(move.normalize(),.29).normalize();
+    const gaze=Math.atan2(forward.x,forward.y)+lookYaw*.72;
+    forward.set(Math.sin(gaze),Math.cos(gaze),0);
+    const scoutTarget=survey&&inspectionAngle===null?1:0;
+    scout+=(scoutTarget-scout)*(snap?1:1-Math.exp(-6*dt));
+    const speed=T.clamp(p.speed/19,0,1),distance=5.8+.90*speed+7*scout;
+    // Bounded, damped motion follows the bike rather than shaking the screen.
+    const action=p.phase==='riding'&&!survey&&inspectionAngle===null?1:0;
+    const ease=snap?1:1-Math.exp(-8*dt);
+    actionBank+=(T.clamp((p.lean||0)*.055,-.026,.026)*action-actionBank)*ease;
+    airLift+=((!p.grounded?.24:0)*action-airLift)*ease;
+    landingDip+=(T.clamp((p.impact||0)*.025+(p.compression||0)*.12,0,.13)*action-landingDip)*ease;
+    const shoulderOffset=.38+T.clamp(p.turn||0,-1,1)*.10*(1-scout);
+    desiredEye.set(p.x-forward.x*distance+forward.y*shoulderOffset,
+      p.y-forward.y*distance-forward.x*shoulderOffset,p.z+2.35+speed*.40+airLift-landingDip+9*scout);
+    desiredEye.z=Math.max(desiredEye.z,T.sample(desiredEye.x,desiredEye.y).z+.90);
+    const lookAhead=1.8+speed*2.8+10*scout;
+    const ahead=BikeSolids.sample(T,p.x+forward.x*lookAhead,p.y+forward.y*lookAhead,p.z+.3);
+    const lookFloor=ahead.gap?ahead.jump.landing:ahead.z;
+    const terrainLook=T.clamp(lookFloor+.35,p.z-(support.solid?1.1:6),p.z+1);
+    desiredLook.set(p.x+forward.x*lookAhead,p.y+forward.y*lookAhead,
+      (p.z+.30)*.32+terrainLook*.68-1.2*scout+lookPitch*lookAhead);
+    // Follow the impending landing gently, preserving a view of the rider.
+    if(!p.grounded&&p.phase==='riding'){
+      const ahead=BikeSolids.sample(T,p.x+forward.x*lookAhead,p.y+forward.y*lookAhead,p.z+.3);
+      if(!ahead.gap)desiredLook.z+=(Math.max(p.z-4,ahead.z+1.3)-desiredLook.z)*.26;
+    }
+    if(p.phase==='finished'){
+      desiredEye.add(new THREE.Vector3(forward.y*2,-forward.x*2,1.8));
+      desiredLook.set(p.x,p.y+4,p.z+.8);
+    }
+    if(inspectionAngle!==null){
+      const a=inspectionAngle+p.yaw;
+      desiredEye.set(p.x+3.28*Math.sin(a),p.y+3.28*Math.cos(a),p.z+1.39);
+      desiredLook.set(p.x,p.y,p.z+.55);
+    }
+    clearBank(desiredEye,p,floor);
+    eye.lerp(desiredEye,snap?1:1-Math.exp(-10*dt));
+    look.lerp(desiredLook,snap?1:1-Math.exp(-7.7*dt));
+    if(inspectionAngle===null)eye.z=Math.max(eye.z,T.sample(eye.x,eye.y).z+.85);
+    clearBank(eye,p,floor);
+    clearFoliage(p);
+    if(sky)sky.position.copy(eye);
+    layer.setCameraX(eye.x*unit);layer.setCameraY(-eye.y*unit);layer.setCameraZ(eye.z*unit,null);
+    camera.position.set(eye.x,eye.y,eye.z);
+    camera.up.set(0,0,1);
+    camera.lookAt(look.x,look.y,look.z);
+    if(inspectionAngle===null)camera.rotateZ(-actionBank);
+    cameraFov+=((58+speed*3+12*scout)-cameraFov)*(snap?1:1-Math.exp(-4*dt));
+    camera.fov=inspectionAngle===null?cameraFov:44;
+    camera.aspect=scene.getGame().getGameResolutionWidth()/scene.getGame().getGameResolutionHeight();
+    camera.updateProjectionMatrix();camera.updateMatrixWorld();
+  }
+  function renderOthers(others,dt,localRider,clearDust){
+    for(const model of models.values())if(model!==local)model.root.visible=false;
+    for(const other of others){
+      const model=modelFor(other.slot);
+      model.root.visible=true;model.pose(other,dt,clearDust);
+    }
+    dust.update(localRider,others,dt,clearDust,scene.getGame().getGameResolutionHeight());
+  }
+  function dispose(){
+    const geometries=new Set(),materials=new Set(),textures=new Set(maps);
+    world.traverse(object=>{
+      if(object.geometry)geometries.add(object.geometry);
+      if(object.material){
+        const list=Array.isArray(object.material)?object.material:[object.material];
+        for(const mat of list){materials.add(mat);if(mat.map)textures.add(mat.map);}
+      }
+    });
+    for(const asset of [...geometries,...materials,...textures])asset.dispose();
+    world.removeFromParent();
+  }
+  return {render,renderOthers,setLocalSlot,dispose};
+}
+
+
+/* Crew rooms use the browser's WebSocket API and the same-origin game server. */
+function createBikeCrew(ui,onRoom,onLeave,onKick){
+  const rules=21;
+  const panel=document.createElement('div');
+  panel.className='bike-cover crew-cover';
+  panel.hidden=true;
+  panel.innerHTML=`
+    <section class="bike-card crew-card" aria-label="Crew Descent">
+      <div class="bike-label">PRIVATE CREW / UP TO 4 RIDERS</div>
+      <h1>Crew Descent</h1>
+      <p data-crew-summary>Share a code and ride the same mountain together.</p>
+      <output class="bike-result" data-crew-crash hidden></output>
+      <div data-crew-entry>
+        <label>Your rider <input data-crew-name maxlength="16" autocomplete="nickname" placeholder="Rider"></label>
+        <button type="button" data-crew-create>Create crew</button>
+        <form data-crew-join>
+          <label>Crew code <input data-crew-code maxlength="6" autocapitalize="characters" autocomplete="off" placeholder="ABC123" required></label>
+          <button type="submit">Join crew</button>
+        </form>
+      </div>
+      <div data-crew-room hidden>
+        <div class="crew-code" data-crew-room-code></div>
+        <button type="button" class="bike-secondary" data-crew-invite>Copy invite link</button>
+        <input data-crew-invite-url readonly hidden aria-label="Crew invite link">
+        <ul data-crew-list aria-label="Crew standings"></ul>
+        <button type="button" data-crew-primary></button>
+        <button type="button" class="bike-secondary" data-crew-repeat hidden>Retry trail</button>
+        <button type="button" class="bike-secondary" data-crew-lobby hidden>Return to lobby</button>
+      </div>
+      <button type="button" class="bike-secondary crew-exit" data-crew-back>Back to solo</button>
+      <p class="crew-message" data-crew-message aria-live="polite"></p>
+    </section>`;
+  ui.append(panel);
+  const live=document.createElement('div');
+  live.className='crew-live';
+  live.hidden=true;
+  live.setAttribute('aria-live','polite');
+  ui.append(live);
+  const el=name=>panel.querySelector('[data-crew-'+name+']');
+  const name=el('name'),code=el('code');
+  const message=text=>{el('message').textContent=text;};
+  const pendingInvite=(new URLSearchParams(location.search).get('crew')||'').toUpperCase();
+  if(/^[A-Z0-9]{6}$/.test(pendingInvite))code.value=pendingInvite;
+  const ghosts=new Map();
+  let socket=null,room=null,playerId=null,shown=false,action=null,localCrash=null;
+  let offset=0,lastSend=0;
+  const now=()=>Date.now()+offset;
+  const me=()=>room?.players.find(player=>player.id===playerId);
+  const owner=()=>room?.owner===playerId;
+  function send(data){
+    if(socket?.readyState!==WebSocket.OPEN)return false;
+    socket.send(JSON.stringify(data));return true;
+  }
+  function formatTime(ms){return (ms/1000).toFixed(1)+' s';}
+  function render(){
+    panel.hidden=!shown||(room?.phase==='race'&&me()?.finish===null&&!me()?.dnf);
+    live.hidden=!shown||room?.phase!=='race';
+    const crash=room?.phase!=='lobby'&&me()?.dnf?localCrash:null;
+    el('crash').hidden=!crash;
+    el('crash').textContent=crash?crash.title+' · '+crash.metrics:'';
+    if(!room){
+      el('entry').hidden=false;el('room').hidden=true;
+      el('summary').textContent='Share a code and ride the same mountain together.';
+      return;
+    }
+    el('entry').hidden=true;el('room').hidden=false;
+    const result=room.phase==='results',waiting=room.phase==='race';
+    const canAdvance=room.players.some(p=>p.finish!==null);
+    el('room-code').textContent='CREW '+room.code;
+    el('summary').textContent=result?(canAdvance?'Descent complete. Ride this trail again or move down the mountain.':'Nobody reached the valley. Give this descent another run.'):waiting?
+      (me()?.dnf?'Run ended. The rest of the crew is still riding.':'Finished. The rest of the crew is still riding.'):
+      'One life per rider. Fastest clean finish wins.';
+    const rows=room.players.slice().sort((a,b)=>(a.finish??Infinity)-(b.finish??Infinity));
+    el('list').replaceChildren(...rows.map(rider=>{
+      const li=document.createElement('li');
+      const label=document.createElement('strong'),value=document.createElement('span');
+      label.textContent='#'+(17+rider.slot*7)+' '+rider.name+(rider.id===playerId?' (you)':'');
+      value.textContent=rider.finish!==null?formatTime(rider.finish):rider.dnf&&room.phase!=='lobby'?
+        'DNF':waiting?'Riding':rider.id===room.owner?'Host':rider.ready?'Ready':'Waiting';
+      li.append(label,value);return li;
+    }));
+    const primary=el('primary');
+    primary.hidden=waiting||(result&&!owner());
+    primary.textContent=result?(canAdvance?'Next descent':'Retry descent'):owner()?'Start descent':me()?.ready?'Unready':'Ready';
+    primary.disabled=room.phase==='lobby'&&owner()&&(room.players.length<2||room.players.some(p=>p.id!==playerId&&!p.ready));
+    el('repeat').hidden=!result||!owner()||!canAdvance;
+    el('lobby').hidden=!result||!owner();
+    updateLive();
+  }
+  function updateLive(){
+    if(live.hidden)return;
+    const stamp=now(),remaining=Math.min(3,Math.ceil((room.startAt-stamp)/1000));
+    const secondsLeft=Math.max(0,Math.ceil((room.endsAt-stamp)/1000));
+    const finished=room.players.filter(player=>player.finish!==null).length;
+    const out=room.players.filter(player=>player.dnf).length;
+    const text=remaining>0?'CREW '+room.code+' / START IN '+remaining:
+      'CREW '+room.code+' / '+finished+' FINISHED / '+out+' OUT'+(secondsLeft<=20?' / '+secondsLeft+'s LEFT':'');
+    if(live.textContent!==text)live.textContent=text;
+  }
+  function setRoom(next){
+    const previous=room;
+    room=next;
+    if(previous?.round!==room.round){
+      ghosts.clear();
+      lastSend=0;
+      localCrash=null;
+    }
+    for(const id of ghosts.keys())if(!room.players.some(p=>p.id===id))ghosts.delete(id);
+    onRoom(next,previous);
+    render();
+  }
+  const fields=['x','y','z','yaw','speed','lean','pitch','turn','shift','brake','drive','spin','crank',
+    'grounded','compression','frontTravel','rearTravel','hopAge','rearSpin','rearSkid','slip','slipSide',
+    'forkLoad','shockLoad','vx','vy','vz'];
+  function receive(event){
+    let payload;
+    try{payload=JSON.parse(event.data);}catch{return;}
+    if(payload.type==='hello'){
+      offset=payload.now-Date.now();send({type:'ping',sent:Date.now()});return;
+    }
+    if(payload.type==='pong'){
+      const receiveTime=Date.now();
+      offset=payload.now-(receiveTime+payload.sent)*.5;return;
+    }
+    if(payload.type==='error'){message(payload.message);return;}
+    if(payload.type==='joined'){playerId=payload.id;message('');setRoom(payload.room);return;}
+    if(payload.type==='room'){message('');setRoom(payload);return;}
+    if(payload.type==='pose'&&room?.round===payload.round){
+      const player=room.players.find(p=>p.id===payload.id);
+      if(!player)return;
+      const pose={slot:player.slot,phase:'riding',time:0};
+      fields.forEach((field,i)=>{pose[field]=field==='grounded'?Boolean(payload.pose[i]):payload.pose[i];});
+      const prior=ghosts.get(payload.id);
+      if(prior)prior.target=pose;
+      else ghosts.set(payload.id,{current:{...pose},target:pose,fell:false});
+    }
+    if(payload.type==='fall'&&room?.round===payload.round){
+      const other=ghosts.get(payload.id);
+      if(other){Object.assign(other.current,other.target);other.fell=true;}
+    }
+    if(payload.type==='kick'&&room?.round===payload.round){
+      const actor=ghosts.get(payload.id);
+      if(actor){actor.kickSide=payload.side;actor.kickAge=.008;}
+      onKick(payload);
+    }
+  }
+  function connect(request){
+    action=request;
+    if(socket?.readyState===WebSocket.OPEN){send(action);action=null;return;}
+    if(socket?.readyState===WebSocket.CONNECTING)return;
+    message('Connecting to crew server...');
+    const protocol=location.protocol==='https:'?'wss:':'ws:';
+    const ws=new WebSocket(protocol+'//'+location.host+'/crew');
+    socket=ws;
+    ws.addEventListener('open',()=>{
+      if(socket!==ws)return;
+      if(action)send(action);
+      action=null;
+    });
+    ws.addEventListener('message',event=>{if(socket===ws)receive(event);});
+    ws.addEventListener('close',()=>{
+      if(socket!==ws)return;
+      socket=null;action=null;room=null;playerId=null;ghosts.clear();
+      onLeave();
+      message('Crew server disconnected. Check the link and try again.');
+      render();
+    });
+  }
+  function open(){shown=true;render();}
+  function close(){
+    shown=false;
+    room=null;playerId=null;ghosts.clear();action=null;
+    const previous=socket;socket=null;
+    previous?.close();
+    onLeave();message('');render();
+  }
+  function frame(rider,dt){
+    if(room?.phase!=='race'&&room?.phase!=='results')return [];
+    updateLive();
+    const stamp=performance.now();
+    if(room.phase==='race'&&(rider.phase==='ready'||rider.phase==='riding')&&stamp-lastSend>=64){
+      transmitPose(rider);lastSend=stamp;
+    }
+    const output=[];
+    for(const other of ghosts.values()){
+      const {current,target}=other;
+      const snap=Math.hypot(target.x-current.x,target.y-current.y)>14;
+      const blend=snap?1:1-Math.exp(-15*dt);
+      for(const field of fields){
+        if(field==='grounded'){current.grounded=target.grounded;continue;}
+        if(field==='hopAge'&&target.hopAge===0){current.hopAge=0;continue;}
+        const change=target[field]-current[field];
+        current[field]+=(field==='yaw'?Math.atan2(Math.sin(change),Math.cos(change)):change)*blend;
+      }
+      current.time+=dt;
+      if(other.kickAge>0)other.kickAge=other.kickAge>=.38?0:other.kickAge+dt;
+      current.kickAge=other.kickAge||0;
+      current.kickSide=other.kickSide||0;
+      current.phase=other.fell?'crashed':'riding';
+      output.push(current);
+    }
+    return output;
+  }
+  const pack=rider=>fields.map(key=>Math.round(Number(rider[key]||0)*1000)/1000);
+  function transmitPose(rider){send({type:'pose',round:room.round,pose:pack(rider)});}
+  function finish(rider){
+    if(room?.phase!=='race')return;
+    send({type:'finish',round:room.round,pose:pack(rider)});
+  }
+  function fall(rider){
+    if(room?.phase!=='race')return;
+    localCrash=rider.crashInfo;
+    send({type:'crash',round:room.round,pose:pack(rider)});
+  }
+  function kick(side){
+    if(room?.phase==='race')send({type:'kick',round:room.round,side});
+  }
+  el('create').addEventListener('click',()=>connect({type:'create',rules,name:name.value}));
+  el('join').addEventListener('submit',event=>{
+    event.preventDefault();
+    const value=code.value.trim().toUpperCase();
+    if(!/^[A-Z0-9]{6}$/.test(value)){message('Enter a six-character crew code.');return;}
+    connect({type:'join',rules,code:value,name:name.value});
+  });
+  el('primary').addEventListener('click',()=>{
+    if(room.phase==='results')send({type:room.players.some(p=>p.finish!==null)?'advance':'retry'});
+    else if(owner())send({type:'start'});
+    else send({type:'ready',value:!me()?.ready});
+  });
+  el('repeat').addEventListener('click',()=>send({type:'retry'}));
+  el('lobby').addEventListener('click',()=>send({type:'lobby'}));
+  el('back').addEventListener('click',close);
+  el('invite').addEventListener('click',async()=>{
+    if(!room)return;
+    const url=new URL(location.pathname,location.origin);
+    url.searchParams.set('crew',room.code);
+    try{await navigator.clipboard.writeText(url.href);message('Invite link copied.');}
+    catch{
+      const input=el('invite-url');
+      input.hidden=false;input.value=url.href;input.select();
+      message('Copy this link for your friends.');
+    }
+  });
+  return {open,close,frame,finish,fall,kick,now,owner,me,render,
+    get room(){return room;},get shown(){return shown;},get invited(){return Boolean(code.value);}};
+}
+
+
+/* GDevelop owns startup, rendering, and frame scheduling. This event keeps the
+ * simulation, controls and scene-specific interface together. */
+function createBikeGame(scene){
+  const M=BikeMotion;
+  function readProgress(){
+    try{
+      const saved=JSON.parse(localStorage.getItem('downhill-bike:trail'));
+      if(saved&&Number.isInteger(saved.seed)&&Number.isSafeInteger(saved.stage)&&saved.stage>0)return saved;
+    }catch{}
+    return {seed:0,stage:1};
+  }
+  let soloTrail=readProgress();
+  let T=BikeLandscape.makeTrack(soloTrail.seed,soloTrail.stage),view=createBikeView(scene,T);
+  for(const name of ['RidgeReference','ValleyReference'])for(const object of scene.getObjects(name))object.hide();
+  const ui=document.createElement('div');
+  ui.id='bike-ui';
+  ui.innerHTML=`
+<style>
+#bike-ui{position:fixed;inset:0;z-index:12;pointer-events:none;font-family:system-ui,sans-serif;color:#fff3d8}
+#bike-ui *{box-sizing:border-box}#bike-ui button{pointer-events:auto;cursor:pointer;font:inherit}
+#bike-ui .hud{position:absolute;inset:0;padding:clamp(13px,2.4vw,32px);display:flex;flex-direction:column;justify-content:space-between}
+.bike-top,.bike-bottom{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.bike-bottom{align-items:end}.bike-brand,.bike-speed,.bike-cue{background:#252829ed;border:1px solid #b6a28788;border-left:3px solid #bf6739;border-radius:3px;box-shadow:0 3px 0 #10121388}
+.bike-brand{padding:12px 17px}.bike-brand strong{display:block;font-size:24px;font-style:italic;font-weight:900;letter-spacing:-.04em;line-height:1.2}
+.bike-label{font-size:10px;font-weight:800;letter-spacing:.17em;text-transform:uppercase;color:#dfbb80}
+.bike-stat-row{display:flex;gap:16px;align-items:center;margin-top:9px;font-size:13px;color:#dfebde}
+.bike-speed{padding:12px 18px;min-width:126px;margin-left:auto}.bike-speed strong{font-size:37px;line-height:1;letter-spacing:-.08em;font-variant-numeric:tabular-nums}
+.bike-speed span{font-size:12px;margin-left:7px;color:#dfebde}.bike-surface{font-size:12px;color:#dfbb80;margin-top:7px}
+.bike-cue{padding:12px 17px;max-width:min(400px,64vw);font-size:13px;line-height:1.45}
+.bike-cue strong{font-size:14px;display:block;margin-bottom:3px}.bike-cue small{display:block;color:#d2ded2;margin-top:5px}
+.bike-cue[data-pace="low"] strong,.bike-cue[data-pace="high"] strong{color:#ffbe78}
+.bike-cue[data-pace="line"] strong{color:#c3dfac}
+.bike-cover{position:absolute;inset:0;display:flex;justify-content:flex-end;align-items:center;padding:clamp(20px,5vw,74px);background:linear-gradient(90deg,#11282903,#11282973)}
+.bike-card{pointer-events:auto;background:#e9dcc0;color:#303232;border-radius:4px;padding:clamp(19px,3.4vw,36px);width:min(410px,86vw);box-shadow:0 20px 70px #152b37a0;border-top:4px solid #c46a40}
+.bike-card .bike-label{color:#805134}.bike-card h1{font:italic 900 clamp(28px,5vw,46px)/1 system-ui;margin:9px 0 13px;letter-spacing:-.06em}
+.bike-card p{line-height:1.48;color:#45534d;margin:0 0 15px;font-size:14px}
+.bike-card button{background:#244a49;color:#fff3d8;border:0;border-radius:6px;padding:10px 15px;font-weight:750}
+.bike-card button:focus-visible{outline:3px solid #a85e32;outline-offset:3px}
+.bike-card .bike-secondary{color:#254542;background:#e2dbca;margin-left:6px}
+.bike-card button{margin-top:6px}.bike-volume{display:flex;align-items:center;gap:9px;margin-top:16px;font-size:12px}.bike-volume input{width:120px;accent-color:#365d50}
+.bike-mouse-options{border-top:1px solid #52645644;margin-top:14px;padding-top:9px;font-size:12px}.bike-mouse-options label{display:flex;gap:8px;align-items:center;margin:7px 0}.bike-mouse-options input{accent-color:#365d50}.bike-card{max-height:94dvh;overflow:auto}
+.bike-mouse-status{margin-top:6px;font-size:11px;color:#dfbb80}
+.bike-card kbd{font:700 11px system-ui;background:#e8dfc8;padding:2px 5px;border-radius:3px}
+.bike-controls{display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;margin:15px 0;font-size:12px}
+.bike-card details{font-size:11px;margin-top:12px;color:#526456}.bike-card summary{cursor:pointer}.bike-result{display:block;margin-top:12px;color:#536055;font-size:13px;font-variant-numeric:tabular-nums}
+.crew-cover{padding-top:70px}.crew-card{max-height:calc(100dvh - 85px);overflow:auto}
+.crew-card input{pointer-events:auto;display:block;font:inherit;width:100%;border:1px solid #8e8a74;border-radius:3px;background:#faf2dd;color:#292e29;padding:8px;margin:5px 0 8px}
+.crew-card label{display:block;font-weight:700;font-size:12px}.crew-card form{margin-top:16px}
+.crew-card button:disabled{opacity:.6;cursor:default!important}.crew-code{font:bold 14px monospace;letter-spacing:.12em;margin-bottom:9px}
+.crew-card ul{padding:0;list-style:none;font-size:13px}.crew-card li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #776b4d44}
+.crew-card .crew-exit{margin:10px 0 0}.crew-card .crew-message{font-size:12px;margin:8px 0 0}
+.crew-live{position:absolute;top:clamp(13px,2.4vw,32px);left:50%;transform:translateX(-50%);font-size:12px;font-weight:850;letter-spacing:.09em;background:#252829ed;padding:9px 13px;border:1px solid #b6a28788;border-radius:3px;text-align:center}
+.bike-inspect{position:absolute;left:clamp(13px,2.4vw,32px);bottom:clamp(13px,2.4vw,32px);width:auto;padding:14px 18px}
+.bike-inspect strong{display:block;font-size:19px;font-style:italic;margin:3px 0 10px}
+.bike-debug{position:absolute;top:155px;left:26px;white-space:pre;background:#172a2bef;color:#f4edda;padding:9px;font:12px monospace}
+#bike-ui [hidden]{display:none!important}
+@media(max-height:540px){.bike-card{padding:16px}.bike-cue small{display:none}}
+</style>
+<div class="hud" data-bike-hud>
+  <div class="bike-top">
+    <div class="bike-brand"><div class="bike-label" data-bike-trail>DOWNHILL BIKE / 01</div><strong data-bike-name>Ridge Run</strong>
+      <div class="bike-stat-row"><span data-bike-time hidden></span><span data-bike-progress></span></div><div class="bike-mouse-status" data-bike-mouse-status hidden></div></div>
+  </div>
+  <div class="bike-bottom">
+    <div class="bike-cue" data-bike-callout hidden><strong data-bike-cue></strong><div data-bike-detail></div></div>
+    <div class="bike-speed"><strong data-bike-speed>0</strong><span>km/h</span><div class="bike-surface" data-bike-surface>Packed dirt</div></div>
+  </div>
+</div>
+<div class="bike-cover" data-bike-cover>
+  <section class="bike-card" aria-label="Downhill Bike run menu">
+    <div class="bike-label" data-bike-eyebrow>ALPINE DESCENT / 01</div><h1 data-bike-heading>Ridge Run</h1>
+    <p data-bike-summary>Read the slope and get down to the valley in one piece.</p>
+    <div class="bike-controls" data-bike-controls><div><kbd>W</kbd> Pedal</div><div><kbd>Shift</kbd> Brake</div>
+      <div><kbd>A</kbd> <kbd>D</kbd> Steer / lean</div><div><kbd>Space</kbd> Jump</div><div><kbd>W</kbd> <kbd>S</kbd> Pitch in air</div>
+      <div><kbd>C</kbd> Scout / free look</div><div><kbd>Q</kbd> <kbd>E</kbd> Kick left / right</div><div><kbd>Mouse drag</kbd> Look + steer</div><div><kbd>A/D</kbd> Steering priority</div></div>
+    <button data-bike-go>Drop in</button><button class="bike-secondary" data-bike-retry hidden>Retry</button>
+    <button class="bike-secondary" data-bike-friends>Ride with friends</button>
+    <button class="bike-secondary" data-bike-inspect>View rider</button>
+    <button class="bike-secondary" data-bike-practice>Practice a landing</button>
+    <output class="bike-result" data-bike-result></output>
+    <div class="bike-mouse-options"><label><input data-bike-mouse-enabled type="checkbox" checked> Mouse-assisted riding</label>
+      <label>Sensitivity <input data-bike-mouse-sensitivity type="range" min="50" max="150" value="100" aria-label="Mouse sensitivity"><span data-bike-mouse-value>100%</span></label>
+      <span>Hold either mouse button and drag to look and steer. A/D takes over steering while mouse-look stays active. Release to recenter. In the air or holding C, mouse movement only looks.</span></div>
+    <label class="bike-volume">Sound <input data-bike-volume type="range" min="0" max="100" value="65" aria-label="Master volume"><span data-bike-volume-label>65%</span></label>
+    <details><summary>Asset credits</summary>Terrain detail by Christopher Melani, Charlotte Baglioni and eye-candy.xyz (Poly Haven). Kloppenheim 06 sky by Greg Zaal and Jarod Guest (Poly Haven). Bicycle sounds by AntumDeluge (OpenGameArt). CC0.</details>
+  </section>
+</div>
+<section class="bike-card bike-inspect" data-bike-inspect-panel hidden aria-label="Rider preview">
+  <div class="bike-label">RIDGE CREW / SERIES 02</div><strong>Trail rider #17</strong>
+  <button data-bike-angle>Turn rider</button><button class="bike-secondary" data-bike-back>Back</button>
+</section>
+<output class="bike-debug" data-bike-debug hidden></output>`;
+  document.body.append(ui);
+  const get=name=>ui.querySelector('[data-bike-'+name+']');
+  const fields=Object.fromEntries(['time','progress','cue','detail','speed','surface','cover','eyebrow','heading',
+    'summary','go','retry','friends','result','controls','debug','trail','name','hud',
+    'inspect','inspect-panel','angle','back','callout','practice','volume','volume-label',
+    'mouse-enabled','mouse-sensitivity','mouse-value','mouse-status'].map(name=>[name,get(name)]));
+  function labelMountain(){
+    fields.trail.textContent='DOWNHILL BIKE / '+String(T.stage||1).padStart(2,'0');
+    fields.name.textContent=T.title||'Ridge Run';
+  }
+  labelMountain();
+
+  const keys=new Set();
+  const controller=new AbortController(),signal=controller.signal;
+  const mouseRiding=createMouseRiding();
+  let mouseEnabled=true,mouseSensitivity=100,mouseCapture=null,mouseButtonMask=0;
+  try{
+    const saved=JSON.parse(localStorage.getItem('downhill-bike:mouse'));
+    if(saved){mouseEnabled=saved.enabled!==false;if(Number.isFinite(saved.sensitivity))mouseSensitivity=T.clamp(saved.sensitivity,50,150);}
+  }catch{}
+  fields['mouse-enabled'].checked=mouseEnabled;fields['mouse-sensitivity'].value=mouseSensitivity;
+  fields['mouse-value'].textContent=mouseSensitivity+'%';mouseRiding.setSensitivity(mouseSensitivity/100);
+  function releaseMouse(){
+    mouseRiding.release();
+    mouseButtonMask=0;
+    const capture=mouseCapture;mouseCapture=null;
+    if(capture?.element.hasPointerCapture(capture.id))capture.element.releasePointerCapture(capture.id);
+  }
+  function saveMouse(){
+    mouseEnabled=fields['mouse-enabled'].checked;mouseSensitivity=Number(fields['mouse-sensitivity'].value);
+    fields['mouse-value'].textContent=mouseSensitivity+'%';mouseRiding.setSensitivity(mouseSensitivity/100);releaseMouse();
+    try{localStorage.setItem('downhill-bike:mouse',JSON.stringify({enabled:mouseEnabled,sensitivity:mouseSensitivity}));}catch{}
+  }
+  fields['mouse-enabled'].addEventListener('change',saveMouse,{signal});
+  fields['mouse-sensitivity'].addEventListener('input',saveMouse,{signal});
+  let rider=M.create(T),paused=false,pauseWhy='',snap=true,previous=performance.now(),acc=0,lastUI=0,hopQueued=false;
+  let journey=createDescentJourney(T),arrivalReveal=0,bestResult='';
+  let longFrames=0,poseValid=false,frameMax=0,worstFrame=0;
+  let bailReveal=0;
+  let kickMessage='',kickMessageUntil=0;
+  const motion=['x','y','z','yaw','speed','lean','pitch','turn','shift','brake','drive','spin','rearSpin','crank','compression',
+    'frontTravel','rearTravel','forkLoad','shockLoad','hopAge','rearSkid','slip','slipSide'];
+  const prior={},rendered={};
+  let inspection=null;
+  let practice=null,practiceAirborne=false,practiceLandingAt=null;
+  const landedGaps=new Set();
+  let lastLandedGap=null,landedGapUntil=0;
+  let debug=new URLSearchParams(location.search).has('debug'),frames=0,frameTime=0,fps=0,dropFrames=0;
+  let audio=null,master=null,wind=null,grit=null,water=null,windFilter=null,gritFilter=null,noise=null,lastSpoke=-1;
+  let volume=.65;
+  try{const value=localStorage.getItem('downhill-bike:volume');if(value!==null&&Number.isFinite(Number(value)))volume=T.clamp(Number(value),0,1);}catch{}
+  fields.volume.value=Math.round(volume*100);fields['volume-label'].textContent=volume?Math.round(volume*100)+'%':'Muted';
+  fields.volume.addEventListener('input',()=>{
+    volume=Number(fields.volume.value)/100;
+    fields['volume-label'].textContent=volume?Math.round(volume*100)+'%':'Muted';
+    if(master)master.gain.setTargetAtTime(volume,audio.currentTime,.04);
+    try{localStorage.setItem('downhill-bike:volume',String(volume));}catch{}
+  },{signal});
+  const sounds=new Map(),voices=new Set();
+  function loadSounds(){
+    const resources=scene.getGame().getGameData().resources.resources;
+    for(const name of ['bike-spokes','bike-bell']){
+      const resource=resources.find(entry=>entry.name===name);
+      if(!resource)continue;
+      fetch(resource.file)
+        .then(response=>{if(!response.ok)throw Error('Audio file unavailable');return response.arrayBuffer();})
+        .then(buffer=>audio.decodeAudioData(buffer))
+        .then(clip=>sounds.set(name,clip))
+        .catch(()=>{}); // Procedural wind and rolling audio remain available.
+    }
+  }
+  function playSound(name,volume,rate=1,duration){
+    const clip=sounds.get(name);
+    if(!clip||audio.state!=='running'||voices.size>=3)return;
+    const source=audio.createBufferSource(),gain=audio.createGain();
+    source.buffer=clip;source.playbackRate.value=rate;gain.gain.value=volume;
+    source.connect(gain).connect(master);
+    voices.add(source);
+    source.onended=()=>voices.delete(source);
+    source.start(0,0,duration??clip.duration);
+  }
+  function stopSounds(){
+    for(const source of voices)source.stop();
+    voices.clear();
+  }
+  function touchdown(strength,crash=false){
+    if(!noise||audio.state!=='running'||voices.size>=3)return;
+    const source=audio.createBufferSource(),filter=audio.createBiquadFilter(),gain=audio.createGain();
+    const t=audio.currentTime;
+    source.buffer=noise;filter.type='lowpass';filter.frequency.value=crash?1000:440;
+    gain.gain.setValueAtTime(.025+strength*.18,t);
+    gain.gain.exponentialRampToValueAtTime(.001,t+(crash?.29:.15));
+    source.connect(filter).connect(gain).connect(master);
+    voices.add(source);source.onended=()=>voices.delete(source);
+    source.start(t,0,crash?.30:.16);
+  }
+  let lastCompression=0,lastCompressionTime=0,lastCreak=-1;
+  function suspensionSound(amount){
+    if(!audio||audio.state!=='running'||voices.size>=3)return;
+    const t=audio.currentTime,source=audio.createOscillator(),gain=audio.createGain();
+    source.type='sine';source.frequency.setValueAtTime(170+amount*40,t);
+    source.frequency.exponentialRampToValueAtTime(85,t+.13);
+    gain.gain.setValueAtTime(.001,t);gain.gain.linearRampToValueAtTime(.012+amount*.018,t+.012);
+    gain.gain.exponentialRampToValueAtTime(.001,t+.15);
+    source.connect(gain).connect(master);voices.add(source);source.onended=()=>voices.delete(source);
+    source.start(t);source.stop(t+.16);
+  }
+  function audioStart(){
+    if(!audio){
+      const AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC)return;
+      audio=new AC();
+      master=audio.createGain();master.gain.value=volume;master.connect(audio.destination);
+      const sample=noise=audio.createBuffer(1,audio.sampleRate*2,audio.sampleRate);
+      const buf=sample.getChannelData(0);
+      for(let i=0;i<buf.length;i++)buf[i]=Math.random()*2-1;
+      function texture(type){
+        const sound=audio.createBufferSource(),filter=audio.createBiquadFilter(),gain=audio.createGain();
+        filter.type=type;sound.buffer=sample;sound.loop=true;gain.gain.value=0;
+        sound.connect(filter).connect(gain).connect(master);sound.start();
+        return [filter,gain];
+      }
+      [windFilter,wind]=texture('lowpass');[gritFilter,grit]=texture('bandpass');
+      const waterfall=texture('lowpass');waterfall[0].frequency.value=1500;water=waterfall[1];
+      loadSounds();
+    }
+    audio.resume().catch(()=>{});
+  }
+  function audioUpdate(){
+    if(!audio)return;
+    const live=!paused&&rider.phase==='riding',speed=live?rider.speed:0,now=audio.currentTime;
+    windFilter.frequency.setTargetAtTime(260+speed*28,now,.15);
+    const skid=rider.grounded?rider.rearSkid:0;
+    gritFilter.frequency.setTargetAtTime((rider.surface==='gravel'?1500:rider.surface==='stone'?1050:rider.surface==='roots'?410:rider.surface==='grass'?420:780)+skid*380,now,.12);
+    const region=T.region(rider.y);
+    const fallDistance=Math.hypot(rider.x-(T.waterfallX??T.bounds.left-7),rider.y-(T.waterfallY??324));
+    water.gain.setTargetAtTime(live?.035*Math.max(0,1-fallDistance/175):0,now,.4);
+    wind.gain.setTargetAtTime(live?speed*.0042*(1-.55*region.forest)+.009*region.alpine:0,now,.3);
+    const texture=rider.surface==='gravel'?.0045:rider.surface==='stone'?.0018:rider.surface==='grass'?.0012:.0021;
+    const rough=rider.grounded?speed*texture+Math.min(.045,rider.slip*.012)+skid*.042:0;
+    grit.gain.setTargetAtTime(live?rough:0,now,.09);
+    const compression=rider.forkLoad+rider.shockLoad,elapsed=rider.time-lastCompressionTime;
+    if(live&&rider.grounded&&elapsed>0&&elapsed<.2&&now-lastCreak>.24){
+      const rate=Math.max(0,(compression-lastCompression)/elapsed);
+      if(rate>.38){suspensionSound(Math.min(1,rate*.35));lastCreak=now;}
+    }
+    lastCompression=compression;lastCompressionTime=rider.time;
+    if(live&&rider.grounded&&speed>4&&!keys.has('KeyW')&&!keys.has('ArrowUp')&&rider.time-lastSpoke>Math.max(.42,1-speed*.031)){
+      playSound('bike-spokes',.048,.88+speed*.021,.30);
+      lastSpoke=rider.time;
+    }
+  }
+  function time(seconds){
+    const rounded=Math.floor(seconds*10)/10;
+    return Math.floor(rounded/60)+':'+(rounded%60).toFixed(1).padStart(4,'0');
+  }
+  function menu(){
+    const phase=rider.phase;
+    fields['inspect-panel'].hidden=inspection===null;
+    fields.hud.hidden=inspection!==null;
+    if(inspection!==null){fields.cover.hidden=true;fields.debug.hidden=true;return;}
+    if(crew.shown&&!paused){fields.cover.hidden=true;return;}
+    fields.cover.hidden=(!paused&&phase==='riding')||(phase==='crashed'&&bailReveal>0)||(phase==='finished'&&arrivalReveal>0);
+    if(fields.cover.hidden)return;
+    fields.retry.hidden=Boolean(crew.room)||(!paused&&phase!=='finished'&&!(phase==='crashed'&&journey.state.checkpoint));
+    fields.retry.textContent=phase==='crashed'?'Restart at summit':'Ride again';
+    fields.friends.textContent=crew.room?'Leave crew':'Ride with friends';
+    fields.friends.hidden=Boolean(practice);
+    fields.inspect.hidden=phase!=='ready';
+    fields.practice.hidden=Boolean(practice||crew.room)||paused||(phase!=='ready'&&phase!=='crashed');
+    fields.controls.hidden=phase==='crashed'||phase==='finished'||phase==='practiceDone';
+    fields.eyebrow.textContent=paused?'RIDE PAUSED':phase==='finished'?'REFUGE REACHED':phase==='crashed'?'DESCENT INTERRUPTED':'KEEP IT ALIVE / '+fields.trail.textContent;
+    fields.heading.textContent=paused?(pauseWhy==='stall'?'Preview slowed down.':'Take a breath.'):phase==='finished'?'You made it down.':
+      phase==='crashed'?rider.crashInfo?.title||'Ride over.':fields.name.textContent;
+    fields.summary.textContent=paused?(pauseWhy==='stall'?
+      'The browser stopped delivering frames. Your bike is paused here. Resume when the tab is active.':
+      crew.room?'Resume when you are ready. Your crew’s race clock keeps running.':'Resume when you are ready.'):phase==='finished'?
+      'You brought your rider home. Ride this mountain again to discover another way down, or explore the next descent.':
+      phase==='crashed'?rider.crashInfo?.detail||rider.reason:
+      T.summitDrop+' m down an open summit, old-growth forest and rocky gorge to shelter. Hold C to scout. Stop on a broad outlook to save a rest point.';
+    fields.go.textContent=paused?'Resume':phase==='ready'?'Drop in':phase==='finished'?'Next descent':
+      !crew.room&&journey.state.checkpoint?'Return to last rest':'Ride again';
+    fields.result.textContent=phase==='crashed'?rider.crashInfo?.metrics||'':phase==='finished'?
+      time(rider.time)+' · '+journey.state.falls+' falls · '+rider.saves+' saves · '+rider.cleanLandings+' clean landings'+bestResult:'';
+    if(practice){
+      const crossed=practiceLandingAt!==null;
+      fields.eyebrow.textContent='PRACTICE / '+practice.name.toUpperCase();
+      if(!paused)fields.heading.textContent=phase==='practiceDone'?(crossed?'Gap cleared.':'Runout reached.'):(rider.crashInfo?.title||'Try the jump again.');
+      if(!paused)fields.summary.textContent=phase==='crashed'?(rider.crashInfo?.detail||rider.reason):crossed?'You crossed the gap. Try it in a full descent.':
+        'Coast off the lip. Aim for the broad slope below and bring both tires down on the bank.';
+      fields.go.textContent=paused?'Resume':'Retry jump';
+      fields.retry.hidden=false;fields.retry.textContent='Back to summit';
+    }
+  }
+  function clearMotion(){
+    releaseMouse();
+    stopSounds();lastSpoke=-1;
+    bailReveal=0;
+    arrivalReveal=0;
+    kickMessageUntil=0;
+    landedGaps.clear();lastLandedGap=null;landedGapUntil=0;
+    inspection=null;paused=false;pauseWhy='';snap=true;acc=0;longFrames=0;poseValid=false;hopQueued=false;keys.clear();
+  }
+  function loadTrail(seed,stage){
+    if(T.seed===seed&&T.stage===stage)return;
+    view.dispose();
+    T=BikeLandscape.makeTrack(seed,stage);
+    view=createBikeView(scene,T);
+    labelMountain();
+  }
+  function reset(next=false){
+    if(practice){startPractice(practice);return;}
+    if(next){
+      soloTrail={seed:soloTrail.seed||((Math.random()*4294967296)>>>0),stage:T.stage+1};
+      try{localStorage.setItem('downhill-bike:trail',JSON.stringify(soloTrail));}catch{}
+      loadTrail(soloTrail.seed,soloTrail.stage);
+    }
+    clearMotion();
+    journey=createDescentJourney(T);bestResult='';
+    rider=M.create(T);rider.phase='riding';audioStart();menu();
+  }
+  function recover(){
+    const restored=journey.resume(M);
+    if(!restored){reset();return;}
+    clearMotion();rider=restored;audioStart();menu();
+  }
+  function startPractice(j){
+    clearMotion();
+    practice=j;practiceAirborne=false;practiceLandingAt=null;
+    const y=j.lip-8;
+    rider=M.create(T,y);
+    rider.x=j.center(y);
+    rider.yaw=Math.atan2(j.center(y+1)-j.center(y-1),2);
+    rider.z=T.sample(rider.x,y).z+M.clearance;
+    // Start rolling at target pace so the drill teaches the catch.
+    rider.speed=(j.min+j.max)/7.2;
+    rider.vx=Math.sin(rider.yaw)*rider.speed;
+    rider.vy=Math.cos(rider.yaw)*rider.speed;
+    const grade=T.sample(j.center(y+.5),y+.5).z-T.sample(j.center(y-.5),y-.5).z;
+    rider.vz=grade*rider.vy;
+    rider.pitch=Math.atan(grade);
+    rider.phase='riding';audioStart();menu();
+  }
+  function leavePractice(){
+    practice=null;practiceAirborne=false;practiceLandingAt=null;clearMotion();
+    rider=M.create(T);menu();
+  }
+  function receiveRoom(room,before){
+    const newRun=!before||room.round!==before.round||room.phase==='lobby'&&before.phase!=='lobby';
+    if(newRun){
+      loadTrail(room.seed,room.stage);
+      clearMotion();
+      rider=M.create(T);
+      const slots=[-.8,.8,-1.92,1.92];
+      const baseZ=T.sample(rider.x,rider.y).z;
+      const slot=crew.me()?.slot??0;
+      view.setLocalSlot(slot);
+      rider.x+=slots[slot];
+      rider.z+=T.sample(rider.x,rider.y).z-baseZ;
+    }
+    if(room.phase==='results'){
+      const unfinished=rider.phase==='riding'||rider.phase==='ready';
+      clearMotion();
+      if(unfinished)rider.phase='dnf';
+    }
+    menu();
+  }
+  function leaveCrew(){
+    clearMotion();
+    loadTrail(soloTrail.seed,soloTrail.stage);
+    view.setLocalSlot(0);
+    journey=createDescentJourney(T);
+    rider=M.create(T);menu();
+  }
+  function setPaused(next,why=''){
+    if(rider.phase!=='riding')return;
+    paused=next;pauseWhy=next?why:'';keys.clear();acc=0;longFrames=0;poseValid=false;hopQueued=false;
+    releaseMouse();
+    if(paused)stopSounds();else audioStart();
+    audioUpdate();menu();
+  }
+  function receiveKick(event){
+    const me=crew.me()?.id;
+    if(event.target===me){
+      // The server has already validated that the shared countdown ended.
+      // A client clock a few frames behind must not discard a valid hit.
+      if(rider.phase==='ready'&&crew.room?.phase==='race')rider.phase='riding';
+      if(!M.takeKick(rider,event.x,event.y,event.solid===true))return;
+      if(rider.phase==='crashed'){
+        paused=false;poseValid=false;acc=0;
+        endRun(performance.now());
+      }else touchdown(.35,true);
+      kickMessage=event.solid?'Kicked off the bike':'Glancing kick';
+    }else if(event.id===me){
+      kickMessage=event.target?(event.solid?'Rider knocked off':'Glancing kick'):'Kick missed';
+      if(event.target)touchdown(.24);
+    }else return;
+    kickMessageUntil=performance.now()+900;
+  }
+  const crew=createBikeCrew(ui,receiveRoom,leaveCrew,receiveKick);
+  const angles=[2.30,.92,1.54,3.14];
+  function closeInspection(){
+    inspection=null;snap=true;menu();fields.inspect.focus();
+  }
+  fields.inspect.addEventListener('click',()=>{
+    inspection=0;snap=true;menu();fields.angle.focus();
+  },{signal});
+  fields.angle.addEventListener('click',()=>{inspection=(inspection+1)%angles.length;},{signal});
+  fields.back.addEventListener('click',closeInspection,{signal});
+  fields.go.addEventListener('click',()=>{
+    if(paused)setPaused(false);
+    else if(rider.phase==='crashed'&&!practice&&!crew.room&&journey.state.checkpoint)recover();
+    else reset(rider.phase==='finished');
+  },{signal});
+  fields.retry.addEventListener('click',()=>practice?leavePractice():reset(),{signal});
+  fields.practice.addEventListener('click',()=>startPractice(rider.flight?.jump??T.jumps[0]),{signal});
+  fields.friends.addEventListener('click',()=>{
+    if(crew.room){crew.close();return;}
+    audioStart();crew.open();menu();
+  },{signal});
+  const controls=new Set(['KeyW','KeyA','KeyS','KeyD','Space','ShiftLeft','ShiftRight','ArrowUp','ArrowDown','ArrowLeft','ArrowRight',
+    'KeyQ','KeyE','KeyC','KeyR','Escape','F3']);
+  window.addEventListener('keydown',event=>{
+    if(event.ctrlKey||event.metaKey||event.altKey||event.target instanceof HTMLInputElement&&event.code!=='Escape')return;
+    if(inspection!==null){
+      if(event.code==='Escape'){event.preventDefault();closeInspection();}
+      return;
+    }
+    if(controls.has(event.code))event.preventDefault();
+    if(event.repeat&&(event.code==='KeyR'||event.code==='Escape'||event.code==='F3'))return;
+    if(event.code==='Escape'){setPaused(!paused);return;}
+    if(event.code==='KeyR'){
+      if(!crew.shown)reset();
+      return;
+    }
+    if(event.code==='F3'){debug=!debug;return;}
+    if(event.code==='KeyC'&&!paused)keys.add(event.code);
+    if(!paused&&rider.phase==='riding'){
+      if(event.code==='Space'&&!event.repeat)hopQueued=true;
+      if(!event.repeat&&(event.code==='KeyQ'||event.code==='KeyE')){
+        const side=event.code==='KeyQ'?-1:1;
+        if(M.startKick(rider,side))crew.kick(side);
+      }
+      keys.add(event.code);
+    }
+  },{signal});
+  window.addEventListener('keyup',event=>{
+    keys.delete(event.code);
+    if(event.code==='KeyC')mouseRiding.rebase(rider.yaw);
+  },{signal});
+  const keyboardSteering=()=>['KeyA','KeyD','ArrowLeft','ArrowRight'].some(key=>keys.has(key));
+  const rideSurface=target=>!(target instanceof Element&&target.closest('button,input,select,textarea,a,summary,.bike-card,.crew-card'));
+  function beginMouse(event){
+    if(mouseRiding.state.active||![0,2].includes(event.button)||event.pointerType==='touch'||!mouseEnabled||paused||
+      rider.phase!=='riding'||inspection!==null||!rideSurface(event.target))return;
+    event.preventDefault();
+    mouseButtonMask=event.button===2?2:1;
+    mouseRiding.begin(event.clientX,event.clientY,rider.yaw,keys.has('KeyC')||!rider.grounded);
+    if(Number.isInteger(event.pointerId)&&event.target instanceof Element){
+      try{event.target.setPointerCapture(event.pointerId);mouseCapture={element:event.target,id:event.pointerId};}catch{}
+    }
+  }
+  function moveMouse(event){
+    if(!mouseRiding.state.active)return;
+    if(!(event.buttons&mouseButtonMask)){releaseMouse();return;}
+    mouseRiding.move(event.clientX,event.clientY,rider.yaw,keys.has('KeyC')||!rider.grounded,keyboardSteering());
+  }
+  function endMouse(event){if((event.button===2?2:event.button===0?1:0)===mouseButtonMask)releaseMouse();}
+  // Capture before wrappers intercept the event. Legacy mouse listeners cover
+  // embedded surfaces that emit MouseEvents without PointerEvents. Identical
+  // client coordinates make paired pointer/mouse moves idempotent.
+  for(const type of ['pointerdown','mousedown'])window.addEventListener(type,beginMouse,{signal,capture:true});
+  for(const type of ['pointermove','mousemove'])window.addEventListener(type,moveMouse,{signal,capture:true});
+  for(const type of ['pointerup','mouseup'])window.addEventListener(type,endMouse,{signal,capture:true});
+  window.addEventListener('lostpointercapture',event=>{
+    if(mouseCapture?.id===event.pointerId&&!mouseCapture.element.hasPointerCapture(event.pointerId))releaseMouse();
+  },{signal});
+  window.addEventListener('pointercancel',releaseMouse,{signal});
+  window.addEventListener('resize',releaseMouse,{signal});
+  window.addEventListener('contextmenu',event=>{
+    if(mouseEnabled&&!paused&&rider.phase==='riding'&&rideSurface(event.target))event.preventDefault();
+  },{signal,capture:true});
+  window.addEventListener('blur',()=>setPaused(true),{signal});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)setPaused(true);},{signal});
+  function drawHUD(){
+    fields.time.hidden=!crew.room;
+    fields.time.textContent=time(rider.time);
+    const height=Math.max(0,Math.round(rider.z-M.clearance-T.valleyFloor(rider.x)));
+    fields.progress.textContent=practice?'Landing practice':T.region(rider.y).name+' · '+height+' m to refuge';
+    fields.speed.textContent=Math.round(rider.speed*3.6);
+    fields['mouse-status'].hidden=paused||rider.phase!=='riding';
+    fields['mouse-status'].textContent=!mouseEnabled?'Mouse riding off · enable in pause menu':
+      !mouseRiding.state.active?'Hold left or right mouse + drag to look / steer':
+      keys.has('KeyC')||!rider.grounded?'Mouse look · keyboard balance':
+      keyboardSteering()?'Mouse look + keyboard steering':'Mouse riding · release to recenter';
+    const brakeDrift=rider.rearSkid>.32&&rider.slip>.55;
+    const slipping=rider.slip>Math.max(.70,rider.speed*.075);
+    fields.surface.textContent=!rider.grounded?'Airborne':brakeDrift?'Brake drift':
+      slipping?'Tires slipping':T.surfaces[rider.surface].name;
+    let cue='',detail='',pace='';
+    if(rider.phase==='crashed'){
+      cue=rider.crashInfo?.title||'Descent ended';
+      detail=rider.crashInfo?.metrics||rider.reason;
+    }else if(rider.phase==='riding'&&performance.now()<kickMessageUntil){
+      cue=kickMessage;
+    }else if(rider.recovery>.12){
+      cue='Hold it together';detail='Ease the steering. Countersteer gently if the bike leans.';
+    }else if(rider.phase==='riding'&&rider.time-rider.lastSave<1.5){
+      cue='Saved it';pace='line';
+    }else if(!crew.room&&!practice&&rider.time<journey.state.restUntil){
+      cue='Rest point saved';detail='After a fall, you can try again from this outlook.';pace='line';
+    }else if(!rider.grounded&&rider.airTime>.12){
+      const pitch=rider.airPitchError,roll=rider.airRollError;
+      if(Math.abs(pitch)>.34){
+        cue=pitch>0?'Lower the nose':'Lift the nose';
+        detail='Tap '+(pitch>0?'W':'S')+' to match the landing slope.';
+      }else if(Math.abs(roll)>.31){
+        cue='Match the bank';
+        detail='Tap '+(roll>0?'A':'D')+' to bring the wheels in line.';
+      }
+    }else if(lastLandedGap&&rider.time<landedGapUntil){
+      cue=lastLandedGap.name+' cleared';
+      pace='line';
+    }else if(practice&&rider.y<practice.lip){
+      const speed=Math.round(rider.speed*3.6);
+      pace=speed<practice.min?'low':speed>practice.max?'high':'line';
+      cue=speed>practice.max?'Hold Shift before takeoff':'Coast off the lip';
+      detail=practice.min+'–'+practice.max+' km/h. Look for the downslope beyond the gap.';
+    }
+    fields.cue.textContent=cue;fields.detail.textContent=detail;
+    fields.callout.hidden=!cue;
+    fields.callout.dataset.pace=pace;
+    fields.debug.hidden=!debug||inspection!==null;
+    if(debug){
+      const gpu=scene.getGame().getRenderer().getThreeRenderer()?.info.render;
+      fields.debug.textContent=[
+        rider.phase+(paused?' / paused':'')+' | '+fps.toFixed(1)+' fps | '+dropFrames+' skipped stalls',
+        'Position '+[rider.x,rider.y,rider.z].map(n=>n.toFixed(2)).join(', '),
+        'Speed '+rider.speed.toFixed(2)+' m/s | heading '+(rider.yaw*180/Math.PI).toFixed(1),
+        'Grip '+rider.grip+' | slip '+rider.slip.toFixed(2)+' | ground '+rider.grounded,
+        'Chute '+rider.looseTime.toFixed(2)+' s | draws '+(gpu?.calls??0)+' | tris '+(gpu?.triangles??0),
+        'Frame peak '+Math.round(worstFrame*1000)+' ms'+(rider.crashInfo?' | '+rider.crashInfo.code:'')
+      ].join('\n');
+    }
+  }
+  const held=(...names)=>names.some(name=>keys.has(name));
+  // Physics landings and asynchronous crew hits share one result path.
+  // A kick must still report a DNF if its target has paused their tab.
+  function endRun(now){
+    releaseMouse();
+    if(rider.phase==='finished'||rider.phase==='practiceDone'){
+      playSound('bike-bell',.24);
+      if(rider.phase==='finished'&&!crew.room&&!practice){
+        arrivalReveal=now+1400;
+        const key='downhill-bike:best-v8:'+T.seed+':'+T.stage;
+        try{
+          const best=Number(localStorage.getItem(key))||Infinity;
+          if(journey.state.falls===0&&rider.time<best){
+            localStorage.setItem(key,String(rider.time));bestResult=' · New clean best';
+          }else if(Number.isFinite(best))bestResult=' · Clean best '+time(best);
+        }catch{}
+      }
+      if(!practice)crew.finish(rider);
+    }else{
+      if(!crew.room&&!practice)journey.fall(rider);
+      bailReveal=now+850;
+      touchdown(.85,true);
+      if(crew.room?.phase==='race')crew.fall(rider);
+    }
+    keys.clear();menu();
+  }
+  function tick(){
+    const now=performance.now(),elapsed=(now-previous)/1000;previous=now;
+    if(elapsed>0&&elapsed<2){frames++;frameTime+=elapsed;frameMax=Math.max(frameMax,elapsed);}
+    if(frameTime>=1){fps=frames/frameTime;worstFrame=frameMax;frames=0;frameTime=0;frameMax=0;}
+    const room=crew.room;
+    if(room?.phase==='race'&&!paused){
+      const raceNow=crew.now();
+      if(rider.phase==='ready'&&raceNow>=room.startAt){
+        rider.phase='riding';audioStart();
+      }
+    }
+    if(!paused&&rider.phase==='riding'&&elapsed>.25){
+      dropFrames++;acc=0;poseValid=false;
+      if(++longFrames>=2)setPaused(true,'stall');
+    }else if(!paused&&rider.phase==='riding'){
+      longFrames=0;
+      if(elapsed>.13)dropFrames++;
+      acc+=Math.min(elapsed,.125);
+      const forwardHeld=held('KeyW','ArrowUp'),backHeld=held('KeyS','ArrowDown');
+      const input={steer:Number(held('KeyD','ArrowRight'))-Number(held('KeyA','ArrowLeft')),
+        pedal:forwardHeld,brake:held('ShiftLeft','ShiftRight'),
+        airPitch:Number(backHeld)-Number(forwardHeld)};
+      while(acc>=M.dt&&rider.phase==='riding'){
+        const keyboard=Number(held('KeyD','ArrowRight'))-Number(held('KeyA','ArrowLeft'));
+        input.steer=mouseRiding.steer(rider,keyboard,keyboardSteering(),held('KeyC'));
+        input.hop=hopQueued;hopQueued=false;
+        for(const k of motion)prior[k]=rider[k];
+        poseValid=true;
+        const wasGrounded=rider.grounded;
+        const inFlight=rider.flight?.jump;
+        M.step(rider,input,T);acc-=M.dt;
+        if(!crew.room&&!practice)journey.update(rider,M.dt);
+        if(!wasGrounded&&rider.grounded&&rider.impact>.12&&rider.phase==='riding')touchdown(rider.impact);
+        if(!practice&&inFlight&&!wasGrounded&&rider.grounded){
+          const surface=T.sample(rider.x,rider.y);
+          if(surface.landing&&surface.jump===inFlight){
+            landedGaps.add(inFlight.name);
+            lastLandedGap=inFlight;
+            landedGapUntil=rider.time+2.3;
+          }
+        }
+        if(practice&&rider.phase==='riding'){
+          const surface=T.sample(rider.x,rider.y);
+          if(surface.gap&&surface.jump===practice&&!rider.grounded)practiceAirborne=true;
+          if(practiceLandingAt===null&&practiceAirborne&&!wasGrounded&&rider.grounded&&
+            surface.landing&&surface.jump===practice)practiceLandingAt=rider.y;
+          const caught=practiceLandingAt!==null&&rider.grounded&&rider.y>=practiceLandingAt+7;
+          if(caught||rider.y>=practice.runout)rider.phase='practiceDone';
+        }
+      }
+      if(room?.phase==='race'){
+        rider.time=Math.max(0,(crew.now()-room.startAt)/1000);
+      }
+      if(rider.phase!=='riding'){
+        endRun(now);
+      }
+    }
+    if(bailReveal&&now>=bailReveal){bailReveal=0;menu();}
+    if(arrivalReveal&&now>=arrivalReveal){arrivalReveal=0;menu();}
+    let pose=rider;
+    if(!snap&&!paused&&poseValid&&rider.phase==='riding'){
+      pose=Object.assign(rendered,rider);
+      const t=T.clamp(acc/M.dt,0,1);
+      for(const k of motion){
+        const d=rider[k]-prior[k];
+        pose[k]=k==='hopAge'&&d<0?rider[k]:prior[k]+(k==='yaw'?Math.atan2(Math.sin(d),Math.cos(d)):d)*t;
+      }
+    }
+    view.render(pose,Math.min(elapsed,.075),snap,angles[inspection]??null,held('KeyC')||rider.phase==='ready',mouseRiding.view(pose.yaw));
+    const visualDt=Math.min(elapsed,.05);
+    view.renderOthers(crew.frame(rider,visualDt),paused?0:visualDt,pose,snap);
+    snap=false;
+    if(now-lastUI>=65){drawHUD();audioUpdate();lastUI=now;}
+  }
+  if(crew.invited)crew.open();
+  view.render(rider,0,true,null,true);drawHUD();menu();
+  return {tick,dispose(){releaseMouse();controller.abort();crew.close();view.dispose();ui.remove();audio?.close().catch(()=>{});}};
+}
+
+  runtimeScene.__downhillBike = createBikeGame(runtimeScene);
+}
+runtimeScene.__downhillBike.tick();
+};
+gdjs.RidgeRunCode.eventsList0 = function(runtimeScene) {
+
+{
+
+
+gdjs.RidgeRunCode.userFunc0x83e3c8(runtimeScene);
+
+}
+
+
+};
+
+gdjs.RidgeRunCode.func = function(runtimeScene) {
+runtimeScene.getOnceTriggers().startNewFrame();
+
+gdjs.RidgeRunCode.GDRidgeReferenceObjects1.length = 0;
+gdjs.RidgeRunCode.GDValleyReferenceObjects1.length = 0;
+gdjs.RidgeRunCode.GDSurface_9595park_9595dirtObjects1.length = 0;
+gdjs.RidgeRunCode.GDSurface_9595gravel_9595floor_959504Objects1.length = 0;
+gdjs.RidgeRunCode.GDSurface_9595forest_9595floorObjects1.length = 0;
+gdjs.RidgeRunCode.GDSurface_9595mountain_9545skyObjects1.length = 0;
+
+gdjs.RidgeRunCode.eventsList0(runtimeScene);
+gdjs.RidgeRunCode.GDRidgeReferenceObjects1.length = 0;
+gdjs.RidgeRunCode.GDValleyReferenceObjects1.length = 0;
+gdjs.RidgeRunCode.GDSurface_9595park_9595dirtObjects1.length = 0;
+gdjs.RidgeRunCode.GDSurface_9595gravel_9595floor_959504Objects1.length = 0;
+gdjs.RidgeRunCode.GDSurface_9595forest_9595floorObjects1.length = 0;
+gdjs.RidgeRunCode.GDSurface_9595mountain_9545skyObjects1.length = 0;
+
+
+return;
+
+}
+
+gdjs['RidgeRunCode'] = gdjs.RidgeRunCode;

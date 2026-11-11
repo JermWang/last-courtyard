@@ -1,0 +1,8 @@
+{
+  "name": "downhill-bike",
+  "version": "0.2.0",
+  "private": true,
+  "engines": {"node": ">=22"},
+  "scripts": {"start":"node tools/crew-server.cjs","test":"node tools/check-routes.cjs && node tools/check-expedition.cjs && node tools/check-landscape.cjs && node tools/check-freeride.cjs && node tools/check-landing-feel.cjs && node tools/check-flanks.cjs && node tools/check-journey.cjs && node tools/check-solids.cjs && node tools/check-mouse.cjs && node tools/check-crew.cjs && node tools/check-kicks.cjs"},
+  "dependencies": {"ws":"^8.18.3"}
+}

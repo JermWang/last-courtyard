@@ -1,0 +1,12 @@
+{
+  "name": "Downhill Bike - Ridge Run",
+  "short_name": "Downhill Bike - Ridge Run",
+  "id": "com.downhillbike.ridgerun",
+  "description": "A third-person mountain bike descent. Ride the ridge solo or take on a series of descents with up to three friends.",
+  "orientation": "landscape",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "black",
+  "categories": ["games", "entertainment"],
+  "icons": []
+}
